@@ -1,3 +1,4 @@
+import { ebGaramond, inter } from "@/lib/fonts";
 import "../globals.css";
 
 export const metadata = {
@@ -10,7 +11,10 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className="h-full antialiased">
+    <html
+      lang="fr"
+      className={`${ebGaramond.variable} ${inter.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
