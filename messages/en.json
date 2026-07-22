@@ -330,7 +330,102 @@
       "ctaLabel": "View The Packs"
     }
   },
-  "candidature": {},
+  "candidature": {
+    "page": {
+      "title": "Your Online Application",
+      "lead": "Processed within 72h · Guaranteed Response · Total Confidentiality",
+      "breadcrumbCurrent": "Application"
+    },
+    "sidebar": {
+      "eligibilityTitle": "Eligibility",
+      "eligibilityDescription": "The program is open to entrepreneurs, senior officials, and African thought leaders. Our committee reviews every profile within 3 business days.",
+      "eligibilityItem1": "Proof of professional activity required",
+      "eligibilityItem2": "Valid passport (min. 6 months)",
+      "securityTitle": "Security",
+      "securityDescription": "Your data is encrypted and used solely to review your application."
+    },
+    "form": {
+      "prenomLabel": "First Name",
+      "prenomPlaceholder": "e.g. Koffi",
+      "nomLabel": "Last Name",
+      "nomPlaceholder": "e.g. Diop",
+      "emailLabel": "Professional Email",
+      "emailPlaceholder": "name@company.com",
+      "telephoneLabel": "WhatsApp Phone Number",
+      "telephonePlaceholder": "+225 00 00 00 00",
+      "paysLabel": "Country Of Residence",
+      "paysPlaceholder": "Select your country",
+      "secteurLabel": "Sector Of Activity",
+      "secteurPlaceholder": "Your field",
+      "packLabel": "Desired Pack",
+      "packPlaceholder": "Choose a pack",
+      "visaHistoriqueLabel": "US Visa History",
+      "visaHistoriquePlaceholder": "Have you ever had a US visa?",
+      "casierJudiciaireLabel": "Criminal Record",
+      "casierJudiciairePlaceholder": "State \"None\" or briefly explain",
+      "motivationLabel": "Your Motivation (300 words max)",
+      "motivationPlaceholder": "Why do you want to join the Silicon Valley Africa Program?",
+      "rgpdNote": "By submitting this form, you agree to our personal data protection policy.",
+      "submitLabel": "Submit My Application",
+      "submittingLabel": "Submitting...",
+      "submitError": "Something went wrong. Please try again."
+    },
+    "options": {
+      "pays": {
+        "civ": "Côte d'Ivoire",
+        "sen": "Senegal",
+        "cod": "Congo (DRC)",
+        "nga": "Nigeria",
+        "ken": "Kenya",
+        "other_west": "Other West Africa",
+        "other_east": "Other East Africa",
+        "other_central": "Other Central Africa",
+        "other": "Other"
+      },
+      "secteur": {
+        "tech_fintech": "Tech & Fintech",
+        "agriculture": "Agriculture / Agrotech",
+        "energy_infrastructure": "Energy & Infrastructure",
+        "finance_investment": "Finance & Investment",
+        "public_administration": "Public Administration",
+        "education": "Education",
+        "health": "Healthcare"
+      },
+      "pack": {
+        "laureat": "Fellow",
+        "boursier": "Scholar",
+        "invite": "Guest",
+        "ambassadeur": "Ambassador",
+        "delegue": "Delegate"
+      },
+      "visaHistorique": {
+        "valid": "Yes, currently valid visa",
+        "expired_lt5": "Yes, expired less than 5 years ago",
+        "expired_gt5": "Yes, expired more than 5 years ago",
+        "never": "No, never",
+        "denied": "Previously denied"
+      }
+    },
+    "validation": {
+      "required": "This field is required.",
+      "email": "Invalid email address.",
+      "phone": "Invalid phone number.",
+      "pays": "Please select your country.",
+      "secteur": "Please select your sector.",
+      "pack": "Please select a pack.",
+      "motivationMin": "Please elaborate on your motivation (minimum 50 characters).",
+      "invalidOption": "Invalid selection."
+    },
+    "trust": {
+      "title": "Data Protection",
+      "quote": "In accordance with GDPR and local data protection laws, the Silicon Valley Africa Program guarantees the anonymity of unsuccessful applications and the permanent deletion of files after 90 days."
+    },
+    "success": {
+      "title": "Application Received!",
+      "description": "Thank you for applying. Our committee will review your file within 72 business hours and reach out by email.",
+      "ctaLabel": "Back To Home"
+    }
+  },
   "home": {
     "bourseTeaser": {
       "statValue": "110",

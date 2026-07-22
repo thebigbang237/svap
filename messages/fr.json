@@ -330,7 +330,102 @@
       "ctaLabel": "Voir les packs"
     }
   },
-  "candidature": {},
+  "candidature": {
+    "page": {
+      "title": "Votre candidature en ligne",
+      "lead": "Traitement sous 72h · Réponse garantie · Confidentialité totale",
+      "breadcrumbCurrent": "Candidature"
+    },
+    "sidebar": {
+      "eligibilityTitle": "Admissibilité",
+      "eligibilityDescription": "Le programme est ouvert aux entrepreneurs, hauts fonctionnaires et leaders d'opinion africains. Notre comité évalue chaque profil sous 3 jours ouvrés.",
+      "eligibilityItem1": "Preuve d'activité professionnelle requise",
+      "eligibilityItem2": "Passeport valide (min. 6 mois)",
+      "securityTitle": "Sécurité",
+      "securityDescription": "Vos données sont cryptées et traitées uniquement pour l'examen de votre dossier."
+    },
+    "form": {
+      "prenomLabel": "Prénom",
+      "prenomPlaceholder": "Ex: Koffi",
+      "nomLabel": "Nom",
+      "nomPlaceholder": "Ex: Diop",
+      "emailLabel": "Email professionnel",
+      "emailPlaceholder": "nom@entreprise.com",
+      "telephoneLabel": "Téléphone WhatsApp",
+      "telephonePlaceholder": "+225 00 00 00 00",
+      "paysLabel": "Pays de résidence",
+      "paysPlaceholder": "Sélectionner votre pays",
+      "secteurLabel": "Secteur d'activité",
+      "secteurPlaceholder": "Votre domaine",
+      "packLabel": "Pack souhaité",
+      "packPlaceholder": "Choisir un pack",
+      "visaHistoriqueLabel": "Historique visa USA",
+      "visaHistoriquePlaceholder": "Avez-vous déjà eu un visa USA ?",
+      "casierJudiciaireLabel": "Antécédents judiciaires",
+      "casierJudiciairePlaceholder": "Précisez « Aucun » ou détaillez brièvement",
+      "motivationLabel": "Vos motivations (300 mots max)",
+      "motivationPlaceholder": "Pourquoi souhaitez-vous rejoindre le Silicon Valley Africa Program ?",
+      "rgpdNote": "En soumettant ce formulaire, vous acceptez notre politique de protection des données personnelles.",
+      "submitLabel": "Soumettre ma candidature",
+      "submittingLabel": "Envoi en cours...",
+      "submitError": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "options": {
+      "pays": {
+        "civ": "Côte d'Ivoire",
+        "sen": "Sénégal",
+        "cod": "Congo (RDC)",
+        "nga": "Nigéria",
+        "ken": "Kenya",
+        "other_west": "Autre Afrique de l'Ouest",
+        "other_east": "Autre Afrique de l'Est",
+        "other_central": "Autre Afrique Centrale",
+        "other": "Autre"
+      },
+      "secteur": {
+        "tech_fintech": "Tech & Fintech",
+        "agriculture": "Agriculture / Agrotech",
+        "energy_infrastructure": "Énergie & Infrastructures",
+        "finance_investment": "Finance & Investissement",
+        "public_administration": "Administration Publique",
+        "education": "Éducation",
+        "health": "Santé"
+      },
+      "pack": {
+        "laureat": "Lauréat",
+        "boursier": "Boursier",
+        "invite": "Invité",
+        "ambassadeur": "Ambassadeur",
+        "delegue": "Délégué"
+      },
+      "visaHistorique": {
+        "valid": "Oui, visa en cours de validité",
+        "expired_lt5": "Oui, expiré il y a moins de 5 ans",
+        "expired_gt5": "Oui, expiré il y a plus de 5 ans",
+        "never": "Non, jamais",
+        "denied": "Refus précédent"
+      }
+    },
+    "validation": {
+      "required": "Ce champ est requis.",
+      "email": "Adresse email invalide.",
+      "phone": "Numéro de téléphone invalide.",
+      "pays": "Veuillez sélectionner votre pays.",
+      "secteur": "Veuillez sélectionner votre secteur.",
+      "pack": "Veuillez sélectionner un pack.",
+      "motivationMin": "Merci de détailler votre motivation (minimum 50 caractères).",
+      "invalidOption": "Sélection invalide."
+    },
+    "trust": {
+      "title": "Protection des données",
+      "quote": "Conformément au RGPD et aux législations locales sur la protection des données, Silicon Valley Africa Program garantit l'anonymat des candidatures non retenues et la suppression définitive des dossiers après 90 jours."
+    },
+    "success": {
+      "title": "Candidature reçue !",
+      "description": "Merci pour votre candidature. Notre comité l'examinera sous 72 heures ouvrées et vous contactera par email.",
+      "ctaLabel": "Retour à l'accueil"
+    }
+  },
   "home": {
     "bourseTeaser": {
       "statValue": "110",
