@@ -2,7 +2,10 @@
   "nav": {},
   "hero": {},
   "why": {},
-  "packs": {},
+  "packs": {
+    "places": "Spots",
+    "mostPopular": "Most popular"
+  },
   "agenda": {},
   "admission": {},
   "candidature": {},
