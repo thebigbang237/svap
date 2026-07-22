@@ -1,13 +1,379 @@
 {
-  "nav": {},
-  "hero": {},
-  "why": {},
+  "common": {
+    "home": "Accueil"
+  },
+  "nav": {
+    "brand": "Silicon Valley Africa",
+    "programme": "Programme",
+    "admission": "Admission",
+    "packs": "Packs",
+    "agenda": "Agenda",
+    "cta": "Candidater",
+    "menuLabel": "Menu"
+  },
+  "hero": {
+    "titleLine1": "L'Afrique rencontre la",
+    "titleEmphasis": "Valley.",
+    "ctaPrimary": "Soumettre ma candidature",
+    "ctaSecondary": "Critères d'admission",
+    "stats": {
+      "leaders": { "value": "250", "label": "Leaders" },
+      "countries": { "value": "10", "label": "Pays" },
+      "days": { "value": "6", "label": "Jours" },
+      "opportunities": { "value": "$2M+", "label": "Opportunités" }
+    }
+  },
+  "why": {
+    "eyebrow": "Pourquoi ce programme",
+    "title": "Une passerelle stratégique entre deux écosystèmes.",
+    "description": "Nous ne nous contentons pas de visiter des bureaux. Nous créons des alliances opérationnelles entre les futurs géants africains et les infrastructures de la Silicon Valley.",
+    "ctaLabel": "Découvrir tous les avantages",
+    "cards": {
+      "network": {
+        "title": "Réseau International",
+        "description": "Accès direct aux investisseurs et partenaires de Palo Alto et San Francisco."
+      },
+      "immersion": {
+        "title": "Immersion Technologique",
+        "description": "Plongez au cœur de l'IA, du Web3 et des technologies de rupture."
+      },
+      "certification": {
+        "title": "Certification",
+        "description": "Une reconnaissance officielle par les institutions partenaires du programme."
+      }
+    }
+  },
   "packs": {
     "places": "Places",
-    "mostPopular": "Plus populaire"
+    "mostPopular": "Plus populaire",
+    "teaser": {
+      "eyebrow": "Votre candidature",
+      "title": "Choisissez votre pack",
+      "ctaLabel": "Voir tous les packs",
+      "laureat": {
+        "name": "Lauréat",
+        "badgeLabel": "Sélectivité Haute",
+        "placesCount": "30",
+        "costLabel": "Bourse complète",
+        "costValue": "Pris en charge à 100%",
+        "features": [
+          "Vols et hébergement inclus",
+          "Accès total aux conférences",
+          "Mentorat post-programme"
+        ]
+      },
+      "boursier": {
+        "name": "Boursier",
+        "badgeLabel": "Équilibre Idéal",
+        "placesCount": "80",
+        "costLabel": "Bourse partielle",
+        "costValue": "Co-financement du programme",
+        "features": [
+          "Subvention de 50% des frais",
+          "Accès aux visites de sièges (Big Tech)",
+          "Networking exclusif"
+        ],
+        "ctaLabel": "Sélectionner"
+      }
+    },
+    "page": {
+      "eyebrow": "Opportunités 2026",
+      "title": "Choisissez votre pack de participation",
+      "lead": "Le programme Silicon Valley Africa est conçu pour identifier et propulser les futurs leaders de l'écosystème technologique africain. Sélectionnez le niveau d'engagement qui correspond à vos ambitions et à votre profil.",
+      "breadcrumbCurrent": "Packs"
+    },
+    "items": {
+      "laureat": {
+        "name": "Lauréat",
+        "badgeLabel": "Sélectivité Haute",
+        "placesCount": "30",
+        "costLabel": "Bourse Complète",
+        "costValue": "Pris en charge à 100%",
+        "features": [
+          "Immersion complète 6 jours",
+          "Vols & Hébergement 5*",
+          "Rencontres C-Level (Google, Meta)",
+          "Accès Demo Day exclusif"
+        ],
+        "applicationFee": "Frais de candidature : $50",
+        "ctaLabel": "Postuler"
+      },
+      "boursier": {
+        "name": "Boursier",
+        "badgeLabel": "Équilibre Idéal",
+        "placesCount": "80",
+        "costLabel": "Bourse Partielle",
+        "costValue": "Co-financement du programme",
+        "features": [
+          "Immersion complète 6 jours",
+          "Hébergement partagé premium",
+          "Visites campus technologiques",
+          "Ateliers Pitch & Strategy"
+        ],
+        "applicationFee": "Frais de candidature : $30",
+        "ctaLabel": "Postuler"
+      },
+      "invite": {
+        "name": "Invité",
+        "badgeLabel": "Ouverture Large",
+        "placesCount": "120",
+        "costLabel": "$330",
+        "costValue": "Participation directe",
+        "features": [
+          "Pass conférences 3 jours",
+          "Accès zones Networking",
+          "Lunch & Coffee inclus",
+          "Logement non inclus"
+        ],
+        "applicationFee": "Réservation garantie",
+        "ctaLabel": "Réserver"
+      },
+      "ambassadeur": {
+        "name": "Ambassadeur",
+        "badgeLabel": "Prestige",
+        "placesCount": "20",
+        "costLabel": "$3,330",
+        "costValue": "Service VIP Conciergerie",
+        "features": [
+          "Tout inclus (Vols First Class)",
+          "Rencontres privées investisseurs",
+          "Dîner de gala à Palo Alto",
+          "Rapport d'analyse personnalisé"
+        ],
+        "applicationFee": "Traitement Prioritaire",
+        "ctaLabel": "S'inscrire"
+      }
+    },
+    "process": {
+      "eyebrow": "Le Parcours",
+      "title": "De l'Afrique à la Silicon Valley en 5 étapes",
+      "steps": {
+        "step1": {
+          "title": "Candidature",
+          "description": "Soumission de votre dossier en ligne avec vos réalisations."
+        },
+        "step2": {
+          "title": "Présélection",
+          "description": "Examen rigoureux par notre comité d'experts internationaux."
+        },
+        "step3": {
+          "title": "Vérification",
+          "description": "Audit de sécurité et vérification du casier judiciaire."
+        },
+        "step4": {
+          "title": "Notification",
+          "description": "Annonce des résultats officiels et admission au programme."
+        },
+        "step5": {
+          "title": "Visa & Logistique",
+          "description": "Accompagnement administratif pour le départ en Californie."
+        }
+      }
+    },
+    "closingCta": {
+      "title": "Prêt à transformer votre vision en réalité ?",
+      "description": "Les places sont limitées. La sélection pour la cohorte 2026 commence dès maintenant.",
+      "ctaLabel": "Déposer ma candidature"
+    }
   },
-  "agenda": {},
-  "admission": {},
+  "agenda": {
+    "teaser": {
+      "eyebrow": "Programme détaillé",
+      "title": "6 jours qui changent votre trajectoire",
+      "ctaLabel": "Voir le programme complet des 6 jours",
+      "day1": {
+        "locationLabel": "San Francisco",
+        "title": "Arrivée & Immersion",
+        "description": "Accueil à San Francisco, dîner de bienvenue avec les alumnis et présentation de la « Valley Mindset »."
+      },
+      "day3": {
+        "locationLabel": "Mountain View & Cupertino",
+        "title": "Google & Apple Park",
+        "description": "Visite exclusive des campus de Mountain View et Cupertino. Workshops avec des VP Engineering."
+      }
+    },
+    "page": {
+      "eyebrow": "Expérience Immersive",
+      "title": "6 jours qui changent votre trajectoire",
+      "lead": "Un itinéraire curaté pour les leaders africains. Entre sessions académiques à Stanford, rencontres avec les géants de la Tech et réseautage stratégique, découvrez le futur du leadership technologique.",
+      "breadcrumbCurrent": "Agenda"
+    },
+    "days": {
+      "day1": {
+        "locationLabel": "San Francisco Airport (SFO)",
+        "title": "Arrivée & Welcome",
+        "items": [
+          { "time": "14:00", "description": "Transfert privé vers le Palace Hotel, San Francisco." },
+          { "time": "18:30", "description": "Briefing d'ouverture : « L'écosystème Silicon Valley »." },
+          { "time": "20:00", "description": "Dîner de bienvenue et réseautage entre participants." }
+        ]
+      },
+      "day2": {
+        "locationLabel": "Palo Alto",
+        "title": "L'Esprit Stanford",
+        "items": [
+          { "time": "09:00", "description": "Masterclass : « Leadership & Innovation Mentality »." },
+          { "time": "13:00", "description": "Déjeuner au Stanford Faculty Club." },
+          { "time": "15:00", "description": "Rencontre avec des chercheurs africains de la Silicon Valley." }
+        ]
+      },
+      "day3": {
+        "locationLabel": "Mountain View & Cupertino",
+        "title": "Google & Apple Park",
+        "items": [
+          { "time": "09:30", "description": "Googleplex : Vision IA & Infrastructure mondiale." },
+          { "time": "14:30", "description": "Apple Park Visitor Center : L'obsession du design et de l'expérience." },
+          { "time": "17:00", "description": "Session de debriefing stratégique." }
+        ]
+      },
+      "day4": {
+        "locationLabel": "Menlo Park & Santa Clara",
+        "title": "Meta & Nvidia",
+        "items": [
+          { "time": "10:00", "description": "Meta HQ : L'avenir du social media et de la connectivité en Afrique." },
+          { "time": "14:00", "description": "Nvidia : Immersion dans la révolution du GPU et du Deep Learning." },
+          { "time": "19:00", "description": "Networking Night avec des investisseurs de Sand Hill Road." }
+        ]
+      },
+      "day5": {
+        "locationLabel": "Redwood City & Santa Clara",
+        "title": "Cloud & Business Impact",
+        "items": [
+          { "time": "09:00", "description": "Microsoft : Transformation digitale & Cloud souverain." },
+          { "time": "13:30", "description": "Amazon Web Services (AWS) : Scalabilité extrême." },
+          { "time": "16:30", "description": "Visite VIP : Levi's Stadium (Tech & Smart Venue)." }
+        ]
+      },
+      "day6": {
+        "locationLabel": "Fremont & SFO",
+        "title": "Tesla & Départ",
+        "items": [
+          { "time": "08:30", "description": "Tesla Factory : Automatisation et futur de l'énergie." },
+          { "time": "12:00", "description": "Cérémonie de clôture et remise des certificats Silicon Valley Africa." },
+          { "time": "16:00", "description": "Transfert vers l'aéroport SFO pour les départs." }
+        ]
+      }
+    },
+    "closingCta": {
+      "title": "Prêt à vivre ces 6 jours ?",
+      "ctaLabel": "Voir les packs"
+    }
+  },
+  "admission": {
+    "page": {
+      "eyebrow": "Critères de sélection",
+      "title": "Qui peut candidater ?",
+      "lead": "Le programme Silicon Valley Africa est conçu pour les visionnaires, les entrepreneurs et les décideurs qui souhaitent importer l'excellence technologique californienne au sein de l'écosystème africain. Nous recherchons des profils à fort potentiel d'impact.",
+      "breadcrumbCurrent": "Admission"
+    },
+    "eligibility": {
+      "eligibleTitle": "Profils éligibles",
+      "eligibleItems": [
+        "Entrepreneurs avec un produit minimum viable (MVP) ou en phase de scale-up.",
+        "Cadres dirigeants et directeurs de l'innovation (CTO, CDO, CEO).",
+        "Investisseurs et gestionnaires de fonds de capital-risque africains.",
+        "Étudiants de fin de cycle ou jeunes diplômés avec un projet technologique structuré."
+      ],
+      "ineligibleTitle": "Non-éligibles",
+      "ineligibleItems": [
+        "Profils sans lien direct avec le secteur technologique ou entrepreneurial.",
+        "Projets n'ayant aucune velléité d'implémentation sur le continent africain.",
+        "Candidats n'ayant pas la maîtrise de l'anglais technique (recommandé)."
+      ]
+    },
+    "criteria": {
+      "eyebrow": "Processus d'évaluation",
+      "title": "Nos trois piliers de sélection",
+      "pillar1": {
+        "title": "Motivation",
+        "description": "Au-delà des compétences, nous mesurons la volonté de transformer durablement le secteur. Votre « Why » est l'élément déclencheur de notre intérêt."
+      },
+      "pillar2": {
+        "title": "Impact Social",
+        "description": "Le projet doit répondre à une problématique africaine concrète : inclusion financière, éducation, santé ou infrastructure numérique."
+      },
+      "pillar3": {
+        "title": "Retour au Pays",
+        "description": "Un engagement moral ou contractuel à appliquer les connaissances acquises sur le continent pour générer de la valeur locale."
+      }
+    },
+    "statuses": {
+      "title": "Deux statuts, un seul objectif",
+      "lead": "Chaque candidature est étudiée pour deux types d'admission selon le profil financier et académique.",
+      "laureat": {
+        "eyebrow": "Admission Standard",
+        "name": "Le Lauréat",
+        "items": [
+          "Accès complet au programme immersif",
+          "Certification Silicon Valley Africa",
+          "Financement individuel ou via l'employeur",
+          "Networking privilégié avec les experts"
+        ],
+        "target": "Cible : Professionnels & Executives"
+      },
+      "boursier": {
+        "eyebrow": "Excellence Académique",
+        "name": "Le Boursier",
+        "quote": "Une bourse de mérite couvrant jusqu'à 80% des frais de participation pour les profils exceptionnels.",
+        "items": [
+          "Critères de ressources financières strictes",
+          "Dossier académique d'excellence (Top 5%)",
+          "Projet à fort impact communautaire",
+          "Accompagnement Mentorat inclus"
+        ],
+        "target": "Cible : Jeunes Pousses & Étudiants"
+      }
+    },
+    "closingCta": {
+      "title": "Vous pensez être éligible ?",
+      "description": "Ne laissez pas passer l'opportunité de transformer votre trajectoire. Consultez nos différents packs de participation et initiez votre dossier de candidature dès aujourd'hui.",
+      "ctaLabel": "Voir les packs"
+    }
+  },
   "candidature": {},
-  "footer": {}
+  "home": {
+    "bourseTeaser": {
+      "statValue": "110",
+      "statLabel": "Bourses disponibles",
+      "title": "110 bourses disponibles",
+      "description": "Le Silicon Valley Africa Program s'engage à l'inclusivité. Grâce à nos partenaires, plus d'une centaine de délégués bénéficieront d'un financement partiel ou total pour l'édition 2026.",
+      "ctaLabel": "Voir les critères d'éligibilité"
+    },
+    "delegate": {
+      "eyebrow": "Rejoindre la délégation",
+      "title": "100 positions stratégiques pour l'élite africaine",
+      "highlight1": {
+        "title": "Réseau d'alumnis",
+        "description": "Rejoignez un cercle fermé de 500+ leaders africains ayant déjà complété le programme."
+      },
+      "highlight2": {
+        "title": "Facilitation business",
+        "description": "Mises en relation ciblées selon votre secteur (Fintech, Agritech, Santé)."
+      },
+      "statValue": "100",
+      "statLabel": "Sièges réservés",
+      "subStat1Value": "40%",
+      "subStat1Label": "Femmes leaders",
+      "subStat2Value": "15+",
+      "subStat2Label": "Secteurs tech"
+    },
+    "closingCta": {
+      "title": "Prêt à candidater ?",
+      "description": "La sélection est rigoureuse, l'opportunité est unique. Ne laissez pas votre vision attendre demain.",
+      "ctaLabel": "Commencer ma candidature"
+    }
+  },
+  "footer": {
+    "brand": "Silicon Valley Africa",
+    "description": "Le pont d'excellence entre l'innovation africaine et l'écosystème tech le plus puissant au monde.",
+    "navigationTitle": "Navigation",
+    "resourcesTitle": "Ressources",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "privacy": "Confidentialité",
+    "followTitle": "Suivez-nous",
+    "copyright": "© 2026 Silicon Valley Africa Program. Tous droits réservés.",
+    "legal": "Mentions légales",
+    "privacyLink": "Confidentialité"
+  }
 }

@@ -1,13 +1,379 @@
 {
-  "nav": {},
-  "hero": {},
-  "why": {},
+  "common": {
+    "home": "Home"
+  },
+  "nav": {
+    "brand": "Silicon Valley Africa",
+    "programme": "Program",
+    "admission": "Admission",
+    "packs": "Packs",
+    "agenda": "Agenda",
+    "cta": "Apply Now",
+    "menuLabel": "Menu"
+  },
+  "hero": {
+    "titleLine1": "Africa meets the",
+    "titleEmphasis": "Valley.",
+    "ctaPrimary": "Submit My Application",
+    "ctaSecondary": "Admission Criteria",
+    "stats": {
+      "leaders": { "value": "250", "label": "Leaders" },
+      "countries": { "value": "10", "label": "Countries" },
+      "days": { "value": "6", "label": "Days" },
+      "opportunities": { "value": "$2M+", "label": "In Opportunities" }
+    }
+  },
+  "why": {
+    "eyebrow": "Why This Program",
+    "title": "A strategic bridge between two ecosystems.",
+    "description": "This isn't a sightseeing tour of tech campuses. We build working alliances between Africa's rising champions and the infrastructure of Silicon Valley.",
+    "ctaLabel": "Discover All The Benefits",
+    "cards": {
+      "network": {
+        "title": "Global Network",
+        "description": "Direct access to investors and partners across Palo Alto and San Francisco."
+      },
+      "immersion": {
+        "title": "Tech Immersion",
+        "description": "Go deep on AI, Web3, and the technologies reshaping every industry."
+      },
+      "certification": {
+        "title": "Certification",
+        "description": "Official recognition from the program's institutional partners."
+      }
+    }
+  },
   "packs": {
     "places": "Spots",
-    "mostPopular": "Most popular"
+    "mostPopular": "Most popular",
+    "teaser": {
+      "eyebrow": "Your Application",
+      "title": "Choose Your Track",
+      "ctaLabel": "View All Packs",
+      "laureat": {
+        "name": "Fellow",
+        "badgeLabel": "Highly Selective",
+        "placesCount": "30",
+        "costLabel": "Full Scholarship",
+        "costValue": "100% Covered",
+        "features": [
+          "Flights and lodging included",
+          "Full conference access",
+          "Post-program mentorship"
+        ]
+      },
+      "boursier": {
+        "name": "Scholar",
+        "badgeLabel": "Best Balance",
+        "placesCount": "80",
+        "costLabel": "Partial Scholarship",
+        "costValue": "Program Co-Financing",
+        "features": [
+          "50% fee subsidy",
+          "Big Tech HQ visits",
+          "Exclusive networking"
+        ],
+        "ctaLabel": "Select"
+      }
+    },
+    "page": {
+      "eyebrow": "2026 Opportunities",
+      "title": "Choose Your Participation Pack",
+      "lead": "The Silicon Valley Africa Program is designed to identify and propel the next generation of leaders in Africa's tech ecosystem. Select the level of engagement that matches your ambitions and your profile.",
+      "breadcrumbCurrent": "Packs"
+    },
+    "items": {
+      "laureat": {
+        "name": "Fellow",
+        "badgeLabel": "Highly Selective",
+        "placesCount": "30",
+        "costLabel": "Full Scholarship",
+        "costValue": "100% Covered",
+        "features": [
+          "Full 6-day immersion",
+          "Flights & 5-star lodging",
+          "C-Level meetings (Google, Meta)",
+          "Exclusive Demo Day access"
+        ],
+        "applicationFee": "Application Fee: $50",
+        "ctaLabel": "Apply"
+      },
+      "boursier": {
+        "name": "Scholar",
+        "badgeLabel": "Best Balance",
+        "placesCount": "80",
+        "costLabel": "Partial Scholarship",
+        "costValue": "Program Co-Financing",
+        "features": [
+          "Full 6-day immersion",
+          "Premium shared lodging",
+          "Tech campus visits",
+          "Pitch & strategy workshops"
+        ],
+        "applicationFee": "Application Fee: $30",
+        "ctaLabel": "Apply"
+      },
+      "invite": {
+        "name": "Guest",
+        "badgeLabel": "Open Access",
+        "placesCount": "120",
+        "costLabel": "$330",
+        "costValue": "Direct Participation",
+        "features": [
+          "3-day conference pass",
+          "Access to networking areas",
+          "Lunch & coffee included",
+          "Lodging not included"
+        ],
+        "applicationFee": "Guaranteed Reservation",
+        "ctaLabel": "Reserve"
+      },
+      "ambassadeur": {
+        "name": "Ambassador",
+        "badgeLabel": "Prestige",
+        "placesCount": "20",
+        "costLabel": "$3,330",
+        "costValue": "VIP Concierge Service",
+        "features": [
+          "All-inclusive (First Class flights)",
+          "Private investor meetings",
+          "Gala dinner in Palo Alto",
+          "Personalized analysis report"
+        ],
+        "applicationFee": "Priority Processing",
+        "ctaLabel": "Register"
+      }
+    },
+    "process": {
+      "eyebrow": "The Journey",
+      "title": "From Africa To Silicon Valley In 5 Steps",
+      "steps": {
+        "step1": {
+          "title": "Application",
+          "description": "Submit your online file along with your achievements."
+        },
+        "step2": {
+          "title": "Shortlisting",
+          "description": "Rigorous review by our panel of international experts."
+        },
+        "step3": {
+          "title": "Verification",
+          "description": "Background check and criminal record verification."
+        },
+        "step4": {
+          "title": "Notification",
+          "description": "Official results announced and admission to the program."
+        },
+        "step5": {
+          "title": "Visa & Logistics",
+          "description": "Administrative support for your departure to California."
+        }
+      }
+    },
+    "closingCta": {
+      "title": "Ready To Turn Your Vision Into Reality?",
+      "description": "Spots are limited. Selection for the 2026 cohort begins now.",
+      "ctaLabel": "Submit My Application"
+    }
   },
-  "agenda": {},
-  "admission": {},
+  "agenda": {
+    "teaser": {
+      "eyebrow": "The Detailed Program",
+      "title": "6 Days That Change Your Trajectory",
+      "ctaLabel": "View The Full 6-Day Program",
+      "day1": {
+        "locationLabel": "San Francisco",
+        "title": "Arrival & Immersion",
+        "description": "Welcome reception in San Francisco, dinner with program alumni, and an introduction to the \"Valley Mindset.\""
+      },
+      "day3": {
+        "locationLabel": "Mountain View & Cupertino",
+        "title": "Google & Apple Park",
+        "description": "An exclusive visit to the Mountain View and Cupertino campuses, with workshops led by VP-level engineering leaders."
+      }
+    },
+    "page": {
+      "eyebrow": "Immersive Experience",
+      "title": "6 Days That Change Your Trajectory",
+      "lead": "A curated itinerary for African leaders. Between academic sessions at Stanford, meetings with tech giants, and strategic networking, discover the future of tech leadership.",
+      "breadcrumbCurrent": "Agenda"
+    },
+    "days": {
+      "day1": {
+        "locationLabel": "San Francisco Airport (SFO)",
+        "title": "Arrival & Welcome",
+        "items": [
+          { "time": "14:00", "description": "Private transfer to the Palace Hotel, San Francisco." },
+          { "time": "18:30", "description": "Opening briefing: \"The Silicon Valley Ecosystem.\"" },
+          { "time": "20:00", "description": "Welcome dinner and networking among participants." }
+        ]
+      },
+      "day2": {
+        "locationLabel": "Palo Alto",
+        "title": "The Stanford Spirit",
+        "items": [
+          { "time": "09:00", "description": "Masterclass: \"Leadership & Innovation Mentality.\"" },
+          { "time": "13:00", "description": "Lunch at the Stanford Faculty Club." },
+          { "time": "15:00", "description": "Meeting with African researchers based in Silicon Valley." }
+        ]
+      },
+      "day3": {
+        "locationLabel": "Mountain View & Cupertino",
+        "title": "Google & Apple Park",
+        "items": [
+          { "time": "09:30", "description": "Googleplex: AI vision & global infrastructure." },
+          { "time": "14:30", "description": "Apple Park Visitor Center: the obsession with design and experience." },
+          { "time": "17:00", "description": "Strategic debriefing session." }
+        ]
+      },
+      "day4": {
+        "locationLabel": "Menlo Park & Santa Clara",
+        "title": "Meta & Nvidia",
+        "items": [
+          { "time": "10:00", "description": "Meta HQ: the future of social media and connectivity in Africa." },
+          { "time": "14:00", "description": "Nvidia: immersion in the GPU and deep learning revolution." },
+          { "time": "19:00", "description": "Networking night with Sand Hill Road investors." }
+        ]
+      },
+      "day5": {
+        "locationLabel": "Redwood City & Santa Clara",
+        "title": "Cloud & Business Impact",
+        "items": [
+          { "time": "09:00", "description": "Microsoft: digital transformation & sovereign cloud." },
+          { "time": "13:30", "description": "Amazon Web Services (AWS): extreme scalability." },
+          { "time": "16:30", "description": "VIP visit: Levi's Stadium (tech & smart venue)." }
+        ]
+      },
+      "day6": {
+        "locationLabel": "Fremont & SFO",
+        "title": "Tesla & Departure",
+        "items": [
+          { "time": "08:30", "description": "Tesla Factory: automation and the future of energy." },
+          { "time": "12:00", "description": "Closing ceremony and Silicon Valley Africa certificate presentation." },
+          { "time": "16:00", "description": "Transfer to SFO airport for departures." }
+        ]
+      }
+    },
+    "closingCta": {
+      "title": "Ready To Live These 6 Days?",
+      "ctaLabel": "View The Packs"
+    }
+  },
+  "admission": {
+    "page": {
+      "eyebrow": "Selection Criteria",
+      "title": "Who Can Apply?",
+      "lead": "The Silicon Valley Africa Program is designed for visionaries, entrepreneurs, and decision-makers looking to bring Californian tech excellence into the African ecosystem. We're looking for profiles with strong potential for impact.",
+      "breadcrumbCurrent": "Admission"
+    },
+    "eligibility": {
+      "eligibleTitle": "Eligible Profiles",
+      "eligibleItems": [
+        "Entrepreneurs with a minimum viable product (MVP) or in a scale-up phase.",
+        "Executives and heads of innovation (CTO, CDO, CEO).",
+        "Investors and African venture capital fund managers.",
+        "Final-year students or recent graduates with a structured tech project."
+      ],
+      "ineligibleTitle": "Not Eligible",
+      "ineligibleItems": [
+        "Profiles with no direct link to the tech or entrepreneurial sector.",
+        "Projects with no intention of implementation on the African continent.",
+        "Candidates without working proficiency in technical English (recommended)."
+      ]
+    },
+    "criteria": {
+      "eyebrow": "Evaluation Process",
+      "title": "Our Three Pillars Of Selection",
+      "pillar1": {
+        "title": "Motivation",
+        "description": "Beyond skills, we measure the drive to durably transform the sector. Your \"why\" is what sparks our interest."
+      },
+      "pillar2": {
+        "title": "Social Impact",
+        "description": "The project must address a concrete African challenge: financial inclusion, education, health, or digital infrastructure."
+      },
+      "pillar3": {
+        "title": "Return To The Continent",
+        "description": "A moral or contractual commitment to apply what you've learned on the continent to generate local value."
+      }
+    },
+    "statuses": {
+      "title": "Two Statuses, One Goal",
+      "lead": "Every application is reviewed for two types of admission based on financial and academic profile.",
+      "laureat": {
+        "eyebrow": "Standard Admission",
+        "name": "The Fellow",
+        "items": [
+          "Full access to the immersive program",
+          "Silicon Valley Africa certification",
+          "Individual or employer-sponsored funding",
+          "Privileged networking with experts"
+        ],
+        "target": "Target: Professionals & Executives"
+      },
+      "boursier": {
+        "eyebrow": "Academic Excellence",
+        "name": "The Scholar",
+        "quote": "A merit-based scholarship covering up to 80% of participation costs for exceptional profiles.",
+        "items": [
+          "Strict financial-need criteria",
+          "Outstanding academic record (Top 5%)",
+          "High community-impact project",
+          "Mentorship support included"
+        ],
+        "target": "Target: Emerging Talent & Students"
+      }
+    },
+    "closingCta": {
+      "title": "Think You're Eligible?",
+      "description": "Don't miss the opportunity to transform your trajectory. Explore our participation packs and start your application today.",
+      "ctaLabel": "View The Packs"
+    }
+  },
   "candidature": {},
-  "footer": {}
+  "home": {
+    "bourseTeaser": {
+      "statValue": "110",
+      "statLabel": "Scholarships Available",
+      "title": "110 Scholarships Available",
+      "description": "The Silicon Valley Africa Program is committed to inclusion. Thanks to our partners, more than a hundred delegates will receive partial or full funding for the 2026 cohort.",
+      "ctaLabel": "View Eligibility Criteria"
+    },
+    "delegate": {
+      "eyebrow": "Join The Delegation",
+      "title": "100 Strategic Seats For Africa's Elite",
+      "highlight1": {
+        "title": "Alumni Network",
+        "description": "Join a close-knit circle of 500+ African leaders who've already completed the program."
+      },
+      "highlight2": {
+        "title": "Business Facilitation",
+        "description": "Targeted introductions based on your sector — Fintech, Agritech, Healthcare."
+      },
+      "statValue": "100",
+      "statLabel": "Seats Reserved",
+      "subStat1Value": "40%",
+      "subStat1Label": "Women Leaders",
+      "subStat2Value": "15+",
+      "subStat2Label": "Tech Sectors"
+    },
+    "closingCta": {
+      "title": "Ready To Apply?",
+      "description": "Selection is rigorous and the opportunity is rare. Don't let your vision wait until tomorrow.",
+      "ctaLabel": "Start My Application"
+    }
+  },
+  "footer": {
+    "brand": "Silicon Valley Africa",
+    "description": "The bridge of excellence between African innovation and the world's most powerful tech ecosystem.",
+    "navigationTitle": "Navigation",
+    "resourcesTitle": "Resources",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "privacy": "Privacy",
+    "followTitle": "Follow Us",
+    "copyright": "© 2026 Silicon Valley Africa Program. All rights reserved.",
+    "legal": "Legal Notice",
+    "privacyLink": "Privacy Policy"
+  }
 }

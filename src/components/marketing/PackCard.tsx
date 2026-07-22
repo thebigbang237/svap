@@ -1,6 +1,13 @@
 import { useTranslations } from "next-intl";
 import { CTAButton } from "./CTAButton";
-import { CheckIcon } from "./icons";
+import { CheckIcon, CrossIcon } from "./icons";
+
+export interface PackFeature {
+  text: string;
+  /** Set false for a feature explicitly NOT included (e.g. "Logement non
+   * inclus") — renders with a cross instead of a check. Defaults to true. */
+  included?: boolean;
+}
 
 export interface PackCardProps {
   name: string;
@@ -11,8 +18,13 @@ export interface PackCardProps {
   /** Small caption under costLabel (e.g. "Pris en charge à 100%"). In
    * "compact" size only costLabel is shown, styled as a short caption. */
   costValue: string;
-  features: string[];
-  ctaLabel: string;
+  /** Plain strings are treated as included; pass a PackFeature to mark an
+   * item as explicitly excluded. */
+  features: (string | PackFeature)[];
+  /** Required in effect for size="full" (the CTA always renders there).
+   * Optional only because a "compact" + "default" card (e.g. the homepage
+   * teaser's non-featured pack) has no CTA at all. */
+  ctaLabel?: string;
   /** Small caption above the CTA button in "full" size (e.g. "Frais de
    * candidature : $50", "Réservation garantie"). Omit when a pack has
    * nothing to note there — the line simply won't render. Not shown in
@@ -41,6 +53,10 @@ export function PackCard({
   const t = useTranslations("packs");
   const featured = variant === "featured";
 
+  const normalizedFeatures = features.map((f) =>
+    typeof f === "string" ? { text: f, included: true } : { included: true, ...f },
+  );
+
   const surfaceClasses = featured
     ? "bg-blue-dark text-white border border-terracotta"
     : "bg-white text-ink border border-ink-dim/20 hover:border-blue transition-colors";
@@ -68,14 +84,21 @@ export function PackCard({
           {costLabel}
         </p>
         <ul className={`space-y-4 ${featured ? "mb-12" : ""} ${bodyText}`}>
-          {features.slice(0, 3).map((feature) => (
-            <li key={feature} className="flex items-start gap-3">
-              <CheckIcon className={`mt-1 h-4 w-4 shrink-0 ${accentText}`} />
-              <span>{feature}</span>
+          {normalizedFeatures.slice(0, 3).map((feature) => (
+            <li
+              key={feature.text}
+              className={`flex items-start gap-3 ${feature.included ? "" : "opacity-40"}`}
+            >
+              {feature.included ? (
+                <CheckIcon className={`mt-1 h-4 w-4 shrink-0 ${accentText}`} />
+              ) : (
+                <CrossIcon className={`mt-1 h-4 w-4 shrink-0 ${mutedText}`} />
+              )}
+              <span>{feature.text}</span>
             </li>
           ))}
         </ul>
-        {featured && href && (
+        {featured && ctaLabel && (
           <CTAButton href={href} variant="primary" className="mt-auto w-full">
             {ctaLabel}
           </CTAButton>
@@ -137,10 +160,17 @@ export function PackCard({
       </div>
 
       <ul className={`mb-auto space-y-4 text-sm ${bodyText}`}>
-        {features.map((feature) => (
-          <li key={feature} className="flex items-start gap-3">
-            <CheckIcon className={`mt-1 h-4 w-4 shrink-0 ${accentText}`} />
-            <span>{feature}</span>
+        {normalizedFeatures.map((feature) => (
+          <li
+            key={feature.text}
+            className={`flex items-start gap-3 ${feature.included ? "" : "opacity-40"}`}
+          >
+            {feature.included ? (
+              <CheckIcon className={`mt-1 h-4 w-4 shrink-0 ${accentText}`} />
+            ) : (
+              <CrossIcon className={`mt-1 h-4 w-4 shrink-0 ${mutedText}`} />
+            )}
+            <span>{feature.text}</span>
           </li>
         ))}
       </ul>

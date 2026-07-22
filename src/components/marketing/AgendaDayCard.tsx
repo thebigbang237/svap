@@ -36,11 +36,13 @@ export function AgendaDayCard({
             {title}
           </h4>
           <ul className="space-y-3">
-            {items.map((item) => (
-              <li key={item.time} className="flex gap-4 text-ink-mid">
-                <span className="font-semibold whitespace-nowrap">
-                  {item.time}
-                </span>
+            {items.map((item, i) => (
+              <li key={i} className="flex gap-4 text-ink-mid">
+                {item.time && (
+                  <span className="font-semibold whitespace-nowrap">
+                    {item.time}
+                  </span>
+                )}
                 <span>{item.description}</span>
               </li>
             ))}
@@ -73,14 +75,16 @@ export function AgendaDayCard({
           {title}
         </h3>
         <ul className="space-y-4">
-          {items.map((item) => (
+          {items.map((item, i) => (
             <li
-              key={item.time}
+              key={i}
               className="flex gap-4 border-l-2 border-blue-light pl-4 text-ink"
             >
-              <span className="font-semibold whitespace-nowrap">
-                {item.time}
-              </span>
+              {item.time && (
+                <span className="font-semibold whitespace-nowrap">
+                  {item.time}
+                </span>
+              )}
               <span>{item.description}</span>
             </li>
           ))}
