@@ -57,6 +57,15 @@ export async function POST(request: Request) {
   });
 
   if (error) {
+    // Postgres unique_violation on idx_svap_candidatures_email_unique —
+    // this email has already submitted a candidature.
+    if (error.code === "23505") {
+      return NextResponse.json(
+        { success: false, errors: { email: ["validation.duplicateEmail"] } },
+        { status: 409 },
+      );
+    }
+
     console.error("Failed to insert candidature:", error);
     return NextResponse.json(
       { success: false, errors: { root: ["form.submitError"] } },

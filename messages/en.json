@@ -420,7 +420,8 @@
       "secteur": "Please select your sector.",
       "pack": "Please select a pack.",
       "motivationMin": "Please elaborate on your motivation (minimum 50 characters).",
-      "invalidOption": "Invalid selection."
+      "invalidOption": "Invalid selection.",
+      "duplicateEmail": "An application has already been submitted with this email address."
     },
     "trust": {
       "title": "Data Protection",

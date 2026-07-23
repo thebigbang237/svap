@@ -420,7 +420,8 @@
       "secteur": "Veuillez sélectionner votre secteur.",
       "pack": "Veuillez sélectionner un pack.",
       "motivationMin": "Merci de détailler votre motivation (minimum 50 caractères).",
-      "invalidOption": "Sélection invalide."
+      "invalidOption": "Sélection invalide.",
+      "duplicateEmail": "Une candidature a déjà été soumise avec cet email."
     },
     "trust": {
       "title": "Protection des données",
