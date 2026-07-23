@@ -180,7 +180,7 @@ export default function HomePage() {
               costValue={tPacks("teaser.boursier.costValue")}
               features={tPacks.raw("teaser.boursier.features")}
               ctaLabel={tPacks("teaser.boursier.ctaLabel")}
-              href="/candidature"
+              href="/candidature?pack=boursier"
             />
           </div>
           <div className="mt-12 text-center">

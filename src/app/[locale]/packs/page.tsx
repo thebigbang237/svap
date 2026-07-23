@@ -75,7 +75,7 @@ export default function PacksPage() {
               features={tPacks.raw("items.laureat.features")}
               applicationFee={tPacks("items.laureat.applicationFee")}
               ctaLabel={tPacks("items.laureat.ctaLabel")}
-              href="/candidature"
+              href="/candidature?pack=laureat"
             />
             <PackCard
               size="full"
@@ -88,7 +88,7 @@ export default function PacksPage() {
               features={tPacks.raw("items.boursier.features")}
               applicationFee={tPacks("items.boursier.applicationFee")}
               ctaLabel={tPacks("items.boursier.ctaLabel")}
-              href="/candidature"
+              href="/candidature?pack=boursier"
             />
             <PackCard
               size="full"
@@ -101,7 +101,7 @@ export default function PacksPage() {
               features={withLastExcluded(tPacks.raw("items.invite.features"))}
               applicationFee={tPacks("items.invite.applicationFee")}
               ctaLabel={tPacks("items.invite.ctaLabel")}
-              href="/candidature"
+              href="/candidature?pack=invite"
             />
             <PackCard
               size="full"
@@ -114,7 +114,7 @@ export default function PacksPage() {
               features={tPacks.raw("items.ambassadeur.features")}
               applicationFee={tPacks("items.ambassadeur.applicationFee")}
               ctaLabel={tPacks("items.ambassadeur.ctaLabel")}
-              href="/candidature"
+              href="/candidature?pack=ambassadeur"
             />
           </div>
         </div>

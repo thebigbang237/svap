@@ -1,12 +1,20 @@
 // Stable value slugs for candidature form selects. Display labels live in
 // messages/*.json under candidature.options.* — keep these two in sync.
 
+// Includes every country flagged in the homepage hero (NG/KE/ZA/SN/CI/MA/
+// GH/EG/RW/ET), plus Congo (RDC) and regional catch-alls for everyone else.
 export const PAYS_OPTIONS = [
-  "civ",
-  "sen",
-  "cod",
   "nga",
   "ken",
+  "zaf",
+  "sen",
+  "civ",
+  "mar",
+  "gha",
+  "egy",
+  "rwa",
+  "eth",
+  "cod",
   "other_west",
   "other_east",
   "other_central",
