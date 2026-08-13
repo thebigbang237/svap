@@ -109,7 +109,9 @@ export function Topbar() {
                   {link.label}
                 </Link>
               ))}
-              <LocaleSwitcher />
+              {/* Inline here, not a dropdown: this panel animates via
+                  overflow-hidden, which would clip an absolute one. */}
+              <LocaleSwitcher variant="inline" />
               <CTAButton href="/candidature" variant="primary" className="w-full">
                 {t("cta")}
               </CTAButton>
