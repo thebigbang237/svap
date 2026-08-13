@@ -192,6 +192,11 @@ break its own stated commitment for most applicants.
 Both hit the same endpoint, and every operation is idempotent, so them
 overlapping is harmless by design.
 
+> **`vercel.json` takes no comments.** Vercel validates it against a strict
+> schema and rejects unknown keys at build time — including the `"//"`
+> convention used for comments in some other tools. The reasoning behind the
+> daily schedule lives here in the runbook instead of in the file.
+
 **To enable the GitHub Actions one**, add two repository secrets under
 Settings → Secrets and variables → Actions:
 
