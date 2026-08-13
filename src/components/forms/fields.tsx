@@ -1,6 +1,12 @@
 "use client";
 
 import type { ReactNode } from "react";
+import {
+  Controller,
+  type Control,
+  type FieldPath,
+  type FieldValues,
+} from "react-hook-form";
 
 // Shared field primitives for the candidature forms. They carry the design
 // system's flat, hairline-underlined input style (see globals.css: no
@@ -158,50 +164,72 @@ export function TextareaField({
 }
 
 /**
- * Radio group. Uses a fieldset/legend rather than a label so screen readers
- * announce the question before the options — a plain <label> would only
- * associate with whichever input it wrapped.
+ * Yes/No radio group bound to a real boolean.
+ *
+ * Must NOT use `register(name, { setValueAs })`. React Hook Form's value
+ * getter special-cases radio inputs — it returns `getRadioValue(refs).value`,
+ * the raw string, and never runs it through `setValueAs`. A `z.boolean()`
+ * field therefore received `"true"` and failed validation on every submit,
+ * leaving "this field is required" showing under an answered question with
+ * no way to proceed.
+ *
+ * `Controller` owns the value instead, so the string→boolean conversion
+ * happens where it actually takes effect.
  */
-export function RadioGroup({
+export function BooleanRadioGroup<T extends FieldValues>({
   name,
+  control,
   label,
-  options,
+  yesLabel,
+  noLabel,
   error,
-  registration,
 }: {
-  name: string;
+  name: FieldPath<T>;
+  control: Control<T>;
   label: string;
-  options: readonly { value: string; label: string }[];
+  yesLabel: string;
+  noLabel: string;
   error?: string;
-  registration: Registration;
 }) {
   return (
-    <fieldset className="space-y-3">
-      <legend className={labelClasses}>{label}</legend>
-      <div className="flex flex-wrap gap-x-8 gap-y-3 pt-1">
-        {options.map((o) => (
-          <label
-            key={o.value}
-            className="flex cursor-pointer items-center gap-2 text-ink"
-          >
-            <input
-              type="radio"
-              value={o.value}
-              className="h-4 w-4 accent-terracotta"
-              aria-invalid={!!error}
-              aria-describedby={error ? `${name}-error` : undefined}
-              {...registration}
-            />
-            <span>{o.label}</span>
-          </label>
-        ))}
-      </div>
-      {error && (
-        <p id={`${name}-error`} className={errorClasses} role="alert">
-          {error}
-        </p>
+    <Controller
+      name={name}
+      control={control}
+      render={({ field }) => (
+        <fieldset className="space-y-3">
+          <legend className={labelClasses}>{label}</legend>
+          <div className="flex flex-wrap gap-x-8 gap-y-3 pt-1">
+            {[
+              { value: true, label: yesLabel },
+              { value: false, label: noLabel },
+            ].map((option) => (
+              <label
+                key={String(option.value)}
+                className="flex cursor-pointer items-center gap-2 text-ink"
+              >
+                <input
+                  type="radio"
+                  name={field.name}
+                  value={String(option.value)}
+                  checked={field.value === option.value}
+                  onChange={() => field.onChange(option.value)}
+                  onBlur={field.onBlur}
+                  className="h-4 w-4 accent-terracotta"
+                  aria-invalid={!!error}
+                  aria-describedby={error ? `${name}-error` : undefined}
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+          {error && (
+            <p id={`${name}-error`} className={errorClasses} role="alert">
+              {error}
+            </p>
+          )}
+        </fieldset>
       )}
-    </fieldset>
+    />
   );
 }
 

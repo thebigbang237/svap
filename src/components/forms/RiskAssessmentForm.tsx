@@ -21,13 +21,25 @@ import { ArrowRightIcon } from "@/components/marketing/icons";
 import {
   SelectField,
   TextareaField,
-  RadioGroup,
+  BooleanRadioGroup,
   CheckboxField,
   errorClasses,
 } from "./fields";
 
-const yesNo = { setValueAs: (v: string) => (v === "" ? undefined : v === "true") };
 const emptyToUndefined = { setValueAs: (v: string) => (v === "" ? undefined : v) };
+
+const REQUIRED: (keyof RiskAssessmentInput)[] = [
+  "refusEntreePaysEtranger", "depassementVisa", "refusUsaCount",
+  "attachesFamiliales", "activitePays", "voyagesHorsAfrique",
+  "patrimoine", "familleUsa", "engagementsRetour", "motivationRetour",
+  "certificationHonneur",
+];
+
+function isAnswered(value: unknown): boolean {
+  if (typeof value === "boolean") return true;
+  if (value === undefined || value === null) return false;
+  return String(value).trim() !== "";
+}
 
 /**
  * Étape 2 — non-return risk questionnaire (§14 Étape 4).
@@ -42,13 +54,22 @@ export function RiskAssessmentForm() {
 
   const {
     register,
+    control,
     handleSubmit,
     setError,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<RiskAssessmentInput>({
     resolver: zodResolver(riskAssessmentSchema),
     mode: "onTouched",
   });
+
+  const values = watch();
+  const complete = REQUIRED.every((field) =>
+    field === "certificationHonneur"
+      ? values[field] === true
+      : isAnswered(values[field]),
+  );
 
   const fieldError = (name: FieldPath<RiskAssessmentInput>) => {
     const message = errors[name]?.message;
@@ -60,11 +81,6 @@ export function RiskAssessmentForm() {
       value,
       label: t(`options.${group}.${value}`),
     }));
-
-  const yesNoOptions = [
-    { value: "true", label: t("yes") },
-    { value: "false", label: t("no") },
-  ];
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -112,19 +128,21 @@ export function RiskAssessmentForm() {
           {t("evaluation.historySection")}
         </legend>
 
-        <RadioGroup
+        <BooleanRadioGroup
           name="refusEntreePaysEtranger"
+          control={control}
           label={t("evaluation.refusEntreeLabel")}
-          options={yesNoOptions}
+          yesLabel={t("yes")}
+          noLabel={t("no")}
           error={fieldError("refusEntreePaysEtranger")}
-          registration={register("refusEntreePaysEtranger", yesNo)}
         />
-        <RadioGroup
+        <BooleanRadioGroup
           name="depassementVisa"
+          control={control}
           label={t("evaluation.depassementVisaLabel")}
-          options={yesNoOptions}
+          yesLabel={t("yes")}
+          noLabel={t("no")}
           error={fieldError("depassementVisa")}
-          registration={register("depassementVisa", yesNo)}
         />
         <div className="md:w-1/2 md:pe-4">
           <SelectField
@@ -229,11 +247,16 @@ export function RiskAssessmentForm() {
         <CTAButton
           type="submit"
           variant="primary"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !complete}
           icon={<ArrowRightIcon className="h-4 w-4" />}
         >
           {isSubmitting ? t("saving") : t("continue")}
         </CTAButton>
+        {!complete && (
+          <p className="text-xs text-ink-dim" aria-live="polite">
+            {t("incompleteHint")}
+          </p>
+        )}
         {errors.root?.message && (
           <p className={errorClasses} role="alert">
             {t(errors.root.message)}

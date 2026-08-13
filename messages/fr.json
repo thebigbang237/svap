@@ -496,7 +496,8 @@
       "nextLabel": "Continuer",
       "submitLabel": "Soumettre ma candidature",
       "submittingLabel": "Envoi en cours...",
-      "submitError": "Une erreur est survenue. Veuillez réessayer."
+      "submitError": "Une erreur est survenue. Veuillez réessayer.",
+      "incompleteHint": "Complétez tous les champs de cette étape pour continuer."
     },
     "options": {
       "pays": {
@@ -970,7 +971,8 @@
       },
       "noAction": "Aucune action n'est requise de votre part. Toute communication concernant votre dossier passera par l'adresse email de votre candidature — jamais par téléphone ni par les réseaux sociaux.",
       "ctaLabel": "Retour à l'accueil"
-    }
+    },
+    "incompleteHint": "Complétez tous les champs de cette étape pour continuer."
   },
   "faq": {
     "eyebrow": "Questions fréquentes",

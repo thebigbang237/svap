@@ -496,7 +496,8 @@
       "nextLabel": "Continue",
       "submitLabel": "Submit my application",
       "submittingLabel": "Submitting...",
-      "submitError": "Something went wrong. Please try again."
+      "submitError": "Something went wrong. Please try again.",
+      "incompleteHint": "Complete every field on this step to continue."
     },
     "options": {
       "pays": {
@@ -970,7 +971,8 @@
       },
       "noAction": "No action is needed from you. Any communication about your file will come through the email address on your application — never by phone or social media.",
       "ctaLabel": "Back to home"
-    }
+    },
+    "incompleteHint": "Complete every field on this step to continue."
   },
   "faq": {
     "eyebrow": "Frequently asked questions",

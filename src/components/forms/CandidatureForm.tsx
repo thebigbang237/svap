@@ -26,7 +26,7 @@ import {
   TextField,
   SelectField,
   TextareaField,
-  RadioGroup,
+  BooleanRadioGroup,
   CheckboxField,
   StepProgress,
   errorClasses,
@@ -115,11 +115,44 @@ function isPackValue(value: string | null): value is CandidatureInput["pack"] {
 
 /** "" from an unselected control means "not answered", not "empty string". */
 const emptyToUndefined = { setValueAs: (v: string) => (v === "" ? undefined : v) };
-/** Radio groups carry booleans as strings; convert on the way in. */
-const stringToBoolean = {
-  setValueAs: (v: string) => (v === "" ? undefined : v === "true"),
-};
 
+/**
+ * Has this field been answered at all?
+ *
+ * Only "answered", never "valid" — format checks stay with Zod so the
+ * candidate still gets a specific message about a malformed email rather than
+ * a button that silently refuses to work.
+ */
+function isAnswered(value: unknown): boolean {
+  if (typeof value === "boolean") return true;
+  if (typeof value === "number") return Number.isFinite(value);
+  if (value === undefined || value === null) return false;
+  return String(value).trim() !== "";
+}
+
+/**
+ * Which of a step's fields must be answered before it can be left.
+ *
+ * `delegueNom` only counts when the candidate came via a delegate, and the two
+ * consents must be ticked rather than merely present — a `false` checkbox is
+ * answered but not agreed.
+ */
+function stepIsComplete(
+  step: number,
+  values: Partial<CandidatureInput>,
+): boolean {
+  const required = STEP_FIELDS[step].filter((field) => {
+    if (field === "delegueNom") return values.source === "delegue";
+    return true;
+  });
+
+  return required.every((field) => {
+    if (field === "consentExactitude" || field === "consentCommunications") {
+      return values[field] === true;
+    }
+    return isAnswered(values[field]);
+  });
+}
 export function CandidatureForm() {
   const t = useTranslations("candidature");
   const locale = useLocale();
@@ -135,6 +168,7 @@ export function CandidatureForm() {
 
   const {
     register,
+    control,
     handleSubmit,
     setError,
     trigger,
@@ -165,6 +199,10 @@ export function CandidatureForm() {
     const id = window.setTimeout(() => saveDraft(getValues()), 600);
     return () => window.clearTimeout(id);
   }, [watched, getValues]);
+
+  // `watched` is already a full snapshot from the draft-saving subscription,
+  // so gating the CTA costs no extra re-renders.
+  const stepComplete = stepIsComplete(step, watched);
 
   const source = watch("source");
   const motivation = watch("motivation") ?? "";
@@ -383,25 +421,21 @@ export function CandidatureForm() {
             />
           </div>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            <RadioGroup
+            <BooleanRadioGroup
               name="marie"
+              control={control}
               label={t("form.marieLabel")}
-              options={[
-                { value: "true", label: t("form.yes") },
-                { value: "false", label: t("form.no") },
-              ]}
+              yesLabel={t("form.yes")}
+              noLabel={t("form.no")}
               error={fieldError("marie")}
-              registration={register("marie", stringToBoolean)}
             />
-            <RadioGroup
+            <BooleanRadioGroup
               name="enfants"
+              control={control}
               label={t("form.enfantsLabel")}
-              options={[
-                { value: "true", label: t("form.yes") },
-                { value: "false", label: t("form.no") },
-              ]}
+              yesLabel={t("form.yes")}
+              noLabel={t("form.no")}
               error={fieldError("enfants")}
-              registration={register("enfants", stringToBoolean)}
             />
           </div>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
@@ -520,6 +554,7 @@ export function CandidatureForm() {
               <CTAButton
                 type="button"
                 variant="primary"
+                disabled={!stepComplete}
                 onClick={handleNext}
                 icon={<ArrowRightIcon className="h-4 w-4" />}
               >
@@ -529,7 +564,7 @@ export function CandidatureForm() {
               <CTAButton
                 type="submit"
                 variant="primary"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !stepComplete}
                 icon={<ArrowRightIcon className="h-4 w-4" />}
               >
                 {isSubmitting
@@ -538,6 +573,15 @@ export function CandidatureForm() {
               </CTAButton>
             )}
           </div>
+
+          {/* A disabled button can't be clicked, so it can't explain itself.
+              This says why — without it the control just looks broken, which
+              is the same dead end the radio bug produced. */}
+          {!stepComplete && (
+            <p className="text-xs text-ink-dim" aria-live="polite">
+              {t("form.incompleteHint")}
+            </p>
+          )}
 
           {errors.root?.message && (
             <p className={errorClasses} role="alert">
