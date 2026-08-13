@@ -21,7 +21,7 @@
     "agenda": "Agenda",
     "delegues": "Delegates",
     "faq": "FAQ",
-    "cta": "Apply — free",
+    "cta": "Apply",
     "menuLabel": "Menu",
     "language": "Language"
   },
@@ -30,7 +30,7 @@
     "titleEmphasis": "Valley.",
     "lead": "The first technology immersion program built for Africa's exceptional leaders. Six days in Silicon Valley, six eligible countries, 75 scholarships.",
     "freeBadge": "Applying is 100% free — no fee before pre-selection",
-    "ctaPrimary": "Submit my application",
+    "ctaPrimary": "Submit",
     "ctaSecondary": "See the criteria",
     "stats": {
       "leaders": {
@@ -191,7 +191,7 @@
     "closingCta": {
       "title": "Applying is free. The only risk is not trying.",
       "description": "It takes a few minutes. You'll know straight away whether your profile moves to Phase 2.",
-      "ctaLabel": "Submit my application"
+      "ctaLabel": "Submit "
     },
     "freeNotice": "Applying is entirely free for every pack. Verification fees are only due in Phase 2, after pre-selection and once you've received your access code.",
     "feePrefix": "Verification fee",
@@ -204,7 +204,7 @@
     "breadcrumbCurrent": "Agenda",
     "dayLabel": "Day",
     "closingTitle": "These six days start with a free form.",
-    "closingCta": "Submit my application",
+    "closingCta": "Submit",
     "days": {
       "day1": {
         "locationLabel": "San Francisco",
@@ -418,7 +418,7 @@
     "closingCta": {
       "title": "Do you meet the criteria?",
       "description": "Applying takes a few minutes and costs nothing. The system answers you immediately.",
-      "ctaLabel": "Submit my application"
+      "ctaLabel": "Submit"
     }
   },
   "candidature": {
@@ -494,7 +494,7 @@
       "rgpdNote": "By submitting this form, you accept our personal data protection policy.",
       "previousLabel": "Back",
       "nextLabel": "Continue",
-      "submitLabel": "Submit my application",
+      "submitLabel": "Submit",
       "submittingLabel": "Submitting...",
       "submitError": "Something went wrong. Please try again.",
       "incompleteHint": "Complete every field on this step to continue."
@@ -980,7 +980,7 @@
     "lead": "If your question isn't here, contact us — we answer.",
     "breadcrumbCurrent": "FAQ",
     "ctaTitle": "Ready to apply?",
-    "ctaLabel": "Submit my application",
+    "ctaLabel": "Submit",
     "items": [
       {
         "q": "Is applying really free?",
@@ -1166,7 +1166,7 @@
     ],
     "ctaTitle": "Questions before you start?",
     "ctaFaq": "Read the FAQ",
-    "ctaApply": "Submit my application"
+    "ctaApply": "Submit"
   },
   "legal": {
     "eyebrow": "Legal information",

@@ -76,22 +76,27 @@ export async function checkRateLimit(
 ): Promise<RateLimitVerdict> {
   const since = new Date(Date.now() - WINDOW_MS).toISOString();
 
+  // `.limit(1)` rather than `head: true` — a HEAD request has no body, so
+  // supabase-js cannot report why it failed, and the log ends up as an
+  // empty message. The exact count still arrives in the Content-Range header.
   const [byCode, byIp] = await Promise.all([
     ctx.codeHash
       ? supabase
           .from("access_code_attempts")
-          .select("id", { count: "exact", head: true })
+          .select("id", { count: "exact" })
           .eq("code_hash", ctx.codeHash)
           .eq("success", false)
           .gte("created_at", since)
+          .limit(1)
       : Promise.resolve({ count: 0, error: null }),
     ctx.ip
       ? supabase
           .from("access_code_attempts")
-          .select("id", { count: "exact", head: true })
+          .select("id", { count: "exact" })
           .eq("ip", ctx.ip)
           .eq("success", false)
           .gte("created_at", since)
+          .limit(1)
       : Promise.resolve({ count: 0, error: null }),
   ]);
 
