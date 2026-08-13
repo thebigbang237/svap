@@ -32,3 +32,44 @@
 body {
   color: var(--color-ink);
 }
+
+/*
+ * ARABIC / RTL
+ *
+ * The layout only ships the font files for the active script, so in the
+ * Arabic tree --font-eb-garamond and --font-inter are simply absent. These
+ * rules repoint the semantic --font-serif / --font-sans tokens at the Arabic
+ * pair, which means every `font-serif` and `font-sans` utility in the app
+ * keeps working untouched.
+ *
+ * `html[lang="ar"]` rather than `[lang="ar"]`: the @theme block above emits
+ * into `:root` inside Tailwind's `theme` layer, and matching its specificity
+ * exactly would leave the winner up to source order.
+ */
+html[lang="ar"] {
+  --font-serif: var(--font-noto-kufi-arabic);
+  --font-sans: var(--font-ibm-plex-sans-arabic);
+}
+
+/*
+ * Arabic is a cursive script — letters join. `letter-spacing` severs those
+ * joins and renders the text as disconnected glyphs, so it's a correctness
+ * bug rather than a stylistic preference. This design leans hard on
+ * `tracking-[0.2em]` for its eyebrow labels, so neutralise the whole family
+ * inside the Arabic tree. Unlayered, so it beats Tailwind's utilities layer.
+ *
+ * `uppercase` needs no equivalent: Arabic has no letter case, so the
+ * utility is already a no-op.
+ */
+html[lang="ar"] [class*="tracking-"] {
+  letter-spacing: 0;
+}
+
+/*
+ * Arabic glyphs carry taller ascenders and deeper descenders than Latin at
+ * the same point size, so the tight display leading used on headings clips.
+ * Loosen it across the Arabic tree; the Latin scale is untouched.
+ */
+html[lang="ar"] :is(h1, h2, h3, h4) {
+  line-height: 1.5;
+}

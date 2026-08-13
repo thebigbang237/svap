@@ -8,7 +8,7 @@ import {
   filtersToSearchParams,
   buildCandidaturesQuery,
 } from "@/lib/admin/candidatures-query";
-import { PACK_LABELS, PAYS_LABELS } from "@/lib/resend/labels";
+import { packLabel, paysLabel } from "@/lib/resend/labels";
 import type { CandidatureRow } from "@/lib/supabase/types";
 
 const PAGE_SIZE = 20;
@@ -96,10 +96,10 @@ export default async function CandidaturesListPage({
                 </td>
                 <td className="px-4 py-3 text-ink-mid">{row.email}</td>
                 <td className="px-4 py-3">
-                  {PACK_LABELS.fr[row.pack] ?? row.pack}
+                  {packLabel("fr", row.pack)}
                 </td>
                 <td className="px-4 py-3">
-                  {PAYS_LABELS.fr[row.pays] ?? row.pays}
+                  {paysLabel("fr", row.pays)}
                 </td>
                 <td className="px-4 py-3">
                   <StatusBadge status={row.status} />

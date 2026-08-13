@@ -18,6 +18,8 @@ export const dynamic = "force-dynamic";
 const navLinks = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/candidatures", label: "Candidatures" },
+  { href: "/admin/revue", label: "File de revue" },
+  { href: "/admin/journal", label: "Journal d'audit" },
 ];
 
 export default async function AdminLayout({

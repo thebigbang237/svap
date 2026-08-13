@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { STATUS_OPTIONS, STATUS_LABELS_FR } from "@/lib/constants/admin-options";
-import { PACK_OPTIONS, PAYS_OPTIONS } from "@/lib/constants/candidature-options";
+import { PACKS, COUNTRIES } from "@/lib/constants/program";
 import { PACK_LABELS, PAYS_LABELS } from "@/lib/resend/labels";
 
 export interface CandidaturesFiltersProps {
@@ -88,7 +88,7 @@ export function CandidaturesFilters({
           className={selectClasses}
         >
           <option value="">Tous</option>
-          {PACK_OPTIONS.map((p) => (
+          {PACKS.map((p) => (
             <option key={p} value={p}>
               {PACK_LABELS.fr[p]}
             </option>
@@ -106,7 +106,7 @@ export function CandidaturesFilters({
           className={selectClasses}
         >
           <option value="">Tous</option>
-          {PAYS_OPTIONS.map((p) => (
+          {COUNTRIES.map((p) => (
             <option key={p} value={p}>
               {PAYS_LABELS.fr[p]}
             </option>

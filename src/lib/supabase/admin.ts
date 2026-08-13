@@ -24,3 +24,12 @@ export function createAdminClient() {
     },
   );
 }
+
+/**
+ * The client type as actually configured — pinned to the "svap" schema.
+ *
+ * Helpers that accept a client should take this rather than a bare
+ * `SupabaseClient`, whose default schema parameter is "public" and therefore
+ * won't accept what createAdminClient returns.
+ */
+export type AdminClient = ReturnType<typeof createAdminClient>;

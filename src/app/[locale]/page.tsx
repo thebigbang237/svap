@@ -4,17 +4,36 @@ import { Link } from "@/i18n/navigation";
 import { SectionEyebrow } from "@/components/marketing/SectionEyebrow";
 import { StatBlock } from "@/components/marketing/StatBlock";
 import { PackCard } from "@/components/marketing/PackCard";
-import { AgendaDayCard } from "@/components/marketing/AgendaDayCard";
 import { CTAButton } from "@/components/marketing/CTAButton";
+import { Ltr } from "@/components/layout/Ltr";
 import {
   ArrowRightIcon,
   GlobeIcon,
   ChipIcon,
   CertificateIcon,
+  ShieldIcon,
+  MailIcon,
+  CheckIcon,
 } from "@/components/marketing/icons";
+import {
+  COUNTRIES,
+  PACK_SPECS,
+  PROGRAMME_DAYS,
+  TOTAL_PARTICIPANT_PLACES,
+  TOTAL_SCHOLARSHIPS,
+  TOTAL_COUNTRIES,
+  TOTAL_DELEGATE_PLACES,
+} from "@/lib/constants/program";
 
-// Decorative country flags — not translated copy, identical in every locale.
-const FLAGS = ["🇳🇬", "🇰🇪", "🇿🇦", "🇸🇳", "🇨🇮", "🇲🇦", "🇬🇭", "🇪🇬", "🇷🇼", "🇪🇹"];
+/** Decorative flags for the six participating countries, in COUNTRIES order. */
+const FLAGS: Record<(typeof COUNTRIES)[number], string> = {
+  zaf: "🇿🇦",
+  mar: "🇲🇦",
+  cmr: "🇨🇲",
+  ken: "🇰🇪",
+  gha: "🇬🇭",
+  egy: "🇪🇬",
+};
 
 function TextCTA({ href, children }: { href: string; children: ReactNode }) {
   return (
@@ -38,14 +57,12 @@ function WhyCard({
   description: string;
 }) {
   return (
-    <div className="flex h-full flex-col justify-between border border-ink-dim/20 bg-white p-8 transition-colors hover:border-terracotta">
-      <div>
-        <div className="mb-6 text-blue">{icon}</div>
-        <h3 className="font-serif text-[24px] font-normal text-ink mb-4">
-          {title}
-        </h3>
-        <p className="text-ink-mid">{description}</p>
-      </div>
+    <div className="flex h-full flex-col border border-ink-dim/20 bg-white p-8 transition-colors hover:border-terracotta">
+      <div className="mb-6 text-blue">{icon}</div>
+      <h3 className="mb-4 font-serif text-[24px] font-normal text-ink">
+        {title}
+      </h3>
+      <p className="text-ink-mid">{description}</p>
     </div>
   );
 }
@@ -54,259 +71,227 @@ export default function HomePage() {
   const tHero = useTranslations("hero");
   const tWhy = useTranslations("why");
   const tPacks = useTranslations("packs");
-  const tAgenda = useTranslations("agenda");
+  const tPack = useTranslations("candidature.options.pack");
   const tHome = useTranslations("home");
+
+  // Every headline figure is derived from program.ts. The old page hard-coded
+  // "250 leaders / 10 pays / 110 bourses", none of which matched the edition.
+  const stats = [
+    { value: TOTAL_PARTICIPANT_PLACES, key: "leaders" },
+    { value: TOTAL_COUNTRIES, key: "countries" },
+    { value: PROGRAMME_DAYS, key: "days" },
+    { value: TOTAL_SCHOLARSHIPS, key: "bourses" },
+  ] as const;
 
   return (
     <>
       {/* HERO */}
-      <section className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-linear-to-b from-blue-dark to-ink text-white">
-        <div className="relative z-10 mx-auto grid w-full max-w-[1280px] grid-cols-1 items-end gap-8 px-8 py-16 lg:grid-cols-12">
-          <div className="pb-12 lg:col-span-8">
-            <div className="mb-8 flex gap-2 text-2xl" aria-hidden="true">
-              {FLAGS.map((flag, i) => (
-                <span key={i}>{flag}</span>
-              ))}
-            </div>
-            <h1 className="font-serif text-[48px] sm:text-[72px] lg:text-[100px] leading-none font-normal mb-12">
-              {tHero("titleLine1")}
-              <br />
-              <span className="italic text-terracotta-light">
-                {tHero("titleEmphasis")}
+      <section className="relative overflow-hidden bg-linear-to-b from-sky to-sky-mid px-8 pt-16 pb-[120px]">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="mb-8 flex flex-wrap gap-2" aria-hidden="true">
+            {COUNTRIES.map((c) => (
+              <span key={c} className="text-2xl">
+                {FLAGS[c]}
               </span>
-            </h1>
-            <div className="flex flex-wrap gap-6">
-              <CTAButton
-                href="/candidature"
-                variant="primary"
-                icon={<ArrowRightIcon className="h-4 w-4" />}
-              >
-                {tHero("ctaPrimary")}
-              </CTAButton>
-              <CTAButton href="/admission" variant="ghost" className="text-white">
-                {tHero("ctaSecondary")}
-              </CTAButton>
-            </div>
+            ))}
           </div>
-          <div className="grid grid-cols-2 gap-8 pb-12 lg:col-span-4">
-            <StatBlock
-              value={tHero("stats.leaders.value")}
-              label={tHero("stats.leaders.label")}
-              variant="dark"
-            />
-            <StatBlock
-              value={tHero("stats.countries.value")}
-              label={tHero("stats.countries.label")}
-              variant="dark"
-            />
-            <StatBlock
-              value={tHero("stats.days.value")}
-              label={tHero("stats.days.label")}
-              variant="dark"
-            />
-            <StatBlock
-              value={tHero("stats.opportunities.value")}
-              label={tHero("stats.opportunities.label")}
-              variant="dark"
-            />
+
+          <h1 className="mb-8 max-w-4xl font-serif text-[44px] font-normal leading-[1.1] text-blue-dark sm:text-[64px] lg:text-[80px]">
+            {tHero("titleLine1")}{" "}
+            <span className="text-terracotta">{tHero("titleEmphasis")}</span>
+          </h1>
+
+          <p className="mb-8 max-w-2xl text-lg text-ink-mid">
+            {tHero("lead")}
+          </p>
+
+          {/* The founding principle, above the fold, before any CTA. */}
+          <p className="mb-12 inline-flex items-center gap-3 border border-terracotta/40 bg-white px-5 py-3 text-sm font-semibold text-terracotta">
+            <CheckIcon className="h-4 w-4 shrink-0" />
+            {tHero("freeBadge")}
+          </p>
+
+          <div className="mb-20 flex flex-wrap items-center gap-6">
+            <CTAButton
+              href="/candidature"
+              variant="primary"
+              icon={<ArrowRightIcon className="h-4 w-4" />}
+            >
+              {tHero("ctaPrimary")}
+            </CTAButton>
+            <CTAButton href="/admission" variant="secondary">
+              {tHero("ctaSecondary")}
+            </CTAButton>
+          </div>
+
+          <div className="grid grid-cols-2 gap-8 border-t border-ink-dim/20 pt-12 md:grid-cols-4">
+            {stats.map((stat) => (
+              <StatBlock
+                key={stat.key}
+                variant="light"
+                value={String(stat.value)}
+                label={tHero(`stats.${stat.key}.label`)}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TWO-PHASE PROCESS — the single most important thing a visitor needs
+          to understand before they decide whether to trust the site. */}
+      <section className="px-8 py-[120px]">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="mb-16 max-w-2xl">
+            <h2 className="mb-6 font-serif text-[32px] font-normal text-blue-dark sm:text-[42px]">
+              {tHome("processTitle")}
+            </h2>
+            <p className="text-ink-mid">{tHome("processLead")}</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            {(["phase1", "phase2"] as const).map((phase, i) => (
+              <div
+                key={phase}
+                className={[
+                  "border p-10",
+                  i === 0
+                    ? "border-terracotta bg-white"
+                    : "border-ink-dim/20 bg-white",
+                ].join(" ")}
+              >
+                <span
+                  className={[
+                    "mb-6 inline-block px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em]",
+                    i === 0
+                      ? "bg-terracotta text-white"
+                      : "bg-sky-mid text-blue",
+                  ].join(" ")}
+                >
+                  {tHome(`${phase}.badge`)}
+                </span>
+                <h3 className="mb-4 font-serif text-[28px] font-normal text-blue-dark">
+                  {tHome(`${phase}.title`)}
+                </h3>
+                <p className="text-ink-mid">{tHome(`${phase}.description`)}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* WHY */}
-      <section id="why" className="mx-auto w-full max-w-[1280px] px-8 py-[120px]">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-          <div className="lg:col-span-4">
+      <section id="why" className="bg-sky-mid px-8 py-[120px]">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="mb-16 max-w-2xl">
             <SectionEyebrow label={tWhy("eyebrow")} className="mb-6" />
-            <h2 className="font-serif text-[32px] sm:text-[42px] leading-[1.2] font-normal text-blue-dark mb-8">
+            <h2 className="mb-6 font-serif text-[32px] font-normal text-blue-dark sm:text-[42px]">
               {tWhy("title")}
             </h2>
-            <p className="text-[18px] leading-[1.6] text-ink-mid mb-8">
-              {tWhy("description")}
-            </p>
-            <TextCTA href="/#why">{tWhy("ctaLabel")}</TextCTA>
+            <p className="text-ink-mid">{tWhy("description")}</p>
           </div>
-          <div className="grid gap-8 md:grid-cols-3 lg:col-span-8">
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <WhyCard
-              icon={<GlobeIcon className="h-9 w-9" />}
+              icon={<GlobeIcon className="h-8 w-8" />}
               title={tWhy("cards.network.title")}
               description={tWhy("cards.network.description")}
             />
             <WhyCard
-              icon={<ChipIcon className="h-9 w-9" />}
+              icon={<ChipIcon className="h-8 w-8" />}
               title={tWhy("cards.immersion.title")}
               description={tWhy("cards.immersion.description")}
             />
             <WhyCard
-              icon={<CertificateIcon className="h-9 w-9" />}
+              icon={<GlobeIcon className="h-8 w-8" />}
+              title={tWhy("cards.africa.title")}
+              description={tWhy("cards.africa.description")}
+            />
+            <WhyCard
+              icon={<CertificateIcon className="h-8 w-8" />}
               title={tWhy("cards.certification.title")}
               description={tWhy("cards.certification.description")}
             />
+            <WhyCard
+              icon={<ArrowRightIcon className="h-8 w-8" />}
+              title={tWhy("cards.impact.title")}
+              description={tWhy("cards.impact.description")}
+            />
+            <WhyCard
+              icon={<ShieldIcon className="h-8 w-8" />}
+              title={tWhy("cards.selection.title")}
+              description={tWhy("cards.selection.description")}
+            />
+          </div>
+
+          <div className="mt-12">
+            <TextCTA href="/agenda">{tWhy("ctaLabel")}</TextCTA>
           </div>
         </div>
       </section>
 
-      {/* PACKS TEASER */}
-      <section className="border-y border-ink-dim/10 bg-white px-8 py-[120px]">
+      {/* PACKS TEASER — the two scholarship tracks, priced from PACK_SPECS. */}
+      <section className="px-8 py-[120px]">
         <div className="mx-auto max-w-[1280px]">
-          <div className="mb-16 text-center">
-            <SectionEyebrow
-              label={tPacks("teaser.eyebrow")}
-              align="center"
-              className="mb-4"
-            />
-            <h2 className="font-serif text-[32px] sm:text-[42px] font-normal text-blue-dark">
-              {tPacks("teaser.title")}
+          <div className="mb-16 flex flex-wrap items-end justify-between gap-6">
+            <h2 className="font-serif text-[32px] font-normal text-blue-dark sm:text-[42px]">
+              {tPacks("page.title")}
             </h2>
+            <TextCTA href="/packs">{tPacks("closingCta.ctaLabel")}</TextCTA>
           </div>
-          <div className="mx-auto grid max-w-4xl grid-cols-1 gap-8 md:grid-cols-2">
-            <PackCard
-              size="compact"
-              variant="default"
-              name={tPacks("teaser.laureat.name")}
-              badgeLabel={tPacks("teaser.laureat.badgeLabel")}
-              placesCount={tPacks("teaser.laureat.placesCount")}
-              costLabel={tPacks("teaser.laureat.costLabel")}
-              costValue={tPacks("teaser.laureat.costValue")}
-              features={tPacks.raw("teaser.laureat.features")}
-            />
-            <PackCard
-              size="compact"
-              variant="featured"
-              name={tPacks("teaser.boursier.name")}
-              badgeLabel={tPacks("teaser.boursier.badgeLabel")}
-              placesCount={tPacks("teaser.boursier.placesCount")}
-              costLabel={tPacks("teaser.boursier.costLabel")}
-              costValue={tPacks("teaser.boursier.costValue")}
-              features={tPacks.raw("teaser.boursier.features")}
-              ctaLabel={tPacks("teaser.boursier.ctaLabel")}
-              href="/candidature?pack=boursier"
-            />
-          </div>
-          <div className="mt-12 text-center">
-            <TextCTA href="/packs">{tPacks("teaser.ctaLabel")}</TextCTA>
-          </div>
-        </div>
-      </section>
 
-      {/* AGENDA TEASER */}
-      <section className="mx-auto w-full max-w-[1280px] px-8 py-[120px]">
-        <div className="mb-16">
-          <SectionEyebrow label={tAgenda("teaser.eyebrow")} className="mb-6" />
-          <h2 className="font-serif text-[32px] sm:text-[42px] font-normal text-blue-dark">
-            {tAgenda("teaser.title")}
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
-          <AgendaDayCard
-            size="compact"
-            day={1}
-            locationLabel={tAgenda("teaser.day1.locationLabel")}
-            title={tAgenda("teaser.day1.title")}
-            items={[{ time: "", description: tAgenda("teaser.day1.description") }]}
-          />
-          <AgendaDayCard
-            size="compact"
-            day={3}
-            locationLabel={tAgenda("teaser.day3.locationLabel")}
-            title={tAgenda("teaser.day3.title")}
-            items={[{ time: "", description: tAgenda("teaser.day3.description") }]}
-          />
-        </div>
-        <div className="mt-16 text-right">
-          <TextCTA href="/agenda">{tAgenda("teaser.ctaLabel")}</TextCTA>
-        </div>
-      </section>
-
-      {/* BOURSE TEASER */}
-      <section className="relative overflow-hidden bg-linear-to-b from-blue-dark to-ink px-8 py-24">
-        <div className="relative z-10 mx-auto flex max-w-[1280px] flex-col items-center gap-12 md:flex-row md:justify-between">
-          <div className="max-w-xl text-center md:text-left">
-            <StatBlock
-              value={tHome("bourseTeaser.statValue")}
-              label={tHome("bourseTeaser.statLabel")}
-              variant="dark"
-              className="mb-6"
-            />
-            <p className="mb-8 leading-relaxed text-white/80">
-              {tHome("bourseTeaser.description")}
-            </p>
-            <CTAButton href="/admission" variant="ghost" className="text-white">
-              {tHome("bourseTeaser.ctaLabel")}
-            </CTAButton>
-          </div>
-        </div>
-      </section>
-
-      {/* DELEGATE SECTION */}
-      <section className="bg-sky-deep px-8 py-[120px]">
-        <div className="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-8 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <SectionEyebrow label={tHome("delegate.eyebrow")} className="mb-6" />
-            <h2 className="font-serif text-[32px] sm:text-[42px] font-normal text-blue-dark mb-8">
-              {tHome("delegate.title")}
-            </h2>
-            <div className="mb-12 space-y-6">
-              <div className="flex items-start gap-4 border border-blue/10 bg-white/50 p-6">
-                <GlobeIcon className="h-6 w-6 shrink-0 text-blue" />
-                <div>
-                  <h4 className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-ink">
-                    {tHome("delegate.highlight1.title")}
-                  </h4>
-                  <p className="text-ink-mid">
-                    {tHome("delegate.highlight1.description")}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 border border-blue/10 bg-white/50 p-6">
-                <ChipIcon className="h-6 w-6 shrink-0 text-blue" />
-                <div>
-                  <h4 className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-ink">
-                    {tHome("delegate.highlight2.title")}
-                  </h4>
-                  <p className="text-ink-mid">
-                    {tHome("delegate.highlight2.description")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="lg:col-span-5">
-            <div className="border border-ink-dim/20 bg-white p-12 text-center">
-              <StatBlock
-                value={tHome("delegate.statValue")}
-                label={tHome("delegate.statLabel")}
-                variant="light"
-                className="mb-8"
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            {(["laureat", "boursier"] as const).map((pack) => (
+              <PackCard
+                key={pack}
+                size="full"
+                variant={pack === "boursier" ? "featured" : "default"}
+                name={tPack(pack)}
+                badgeLabel={tPacks(`items.${pack}.badgeLabel`)}
+                placesCount={PACK_SPECS[pack].places}
+                costLabel={tPacks(`items.${pack}.costLabel`)}
+                costValue={tPacks(`items.${pack}.costValue`)}
+                features={tPacks.raw(`items.${pack}.features`)}
+                applicationFee={`${tPacks("feePrefix")} $${PACK_SPECS[pack].verificationFeeUsd} — ${tPacks("feeSuffix")}`}
+                ctaLabel={tPacks(`items.${pack}.ctaLabel`)}
+                href={`/candidature?pack=${pack}`}
               />
-              <div className="mb-8 h-px bg-gradient-to-r from-terracotta to-transparent" />
-              <div className="grid grid-cols-2 gap-4 text-left">
-                <div>
-                  <p className="font-serif text-[32px] font-normal text-blue">
-                    {tHome("delegate.subStat1Value")}
-                  </p>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-dim">
-                    {tHome("delegate.subStat1Label")}
-                  </p>
-                </div>
-                <div>
-                  <p className="font-serif text-[32px] font-normal text-blue">
-                    {tHome("delegate.subStat2Value")}
-                  </p>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-dim">
-                    {tHome("delegate.subStat2Label")}
-                  </p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CLOSING CTA */}
-      <section className="border-t border-ink-dim/10 px-8 py-[120px] text-center">
+      {/* SCHOLARSHIPS + DELEGATES */}
+      <section className="bg-ink px-8 py-[120px] text-white">
+        <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-16 lg:grid-cols-2">
+          <div>
+            <Ltr className="mb-6 block font-serif text-[64px] font-normal leading-none text-terracotta-light">
+              {String(TOTAL_SCHOLARSHIPS)}
+            </Ltr>
+            <h2 className="mb-6 font-serif text-[32px] font-normal">
+              {tHome("bourseTitle")}
+            </h2>
+            <p className="mb-8 text-white/70">{tHome("bourseDescription")}</p>
+            <TextCTA href="/admission">{tHome("bourseCta")}</TextCTA>
+          </div>
+
+          <div className="border-s border-white/10 ps-16">
+            <Ltr className="mb-6 block font-serif text-[64px] font-normal leading-none text-terracotta-light">
+              {String(TOTAL_DELEGATE_PLACES)}
+            </Ltr>
+            <h2 className="mb-6 font-serif text-[32px] font-normal">
+              {tHome("delegateTitle")}
+            </h2>
+            <p className="mb-8 text-white/70">{tHome("delegateDescription")}</p>
+            <TextCTA href="/delegues">{tHome("delegateCta")}</TextCTA>
+          </div>
+        </div>
+      </section>
+
+      {/* CLOSING */}
+      <section className="px-8 py-[120px] text-center">
         <div className="mx-auto max-w-3xl">
-          <h2 className="font-serif text-[32px] sm:text-[42px] font-normal text-blue-dark mb-12">
+          <MailIcon className="mx-auto mb-8 h-10 w-10 text-terracotta" />
+          <h2 className="mb-8 font-serif text-[32px] font-normal text-blue-dark sm:text-[42px]">
             {tHome("closingCta.title")}
           </h2>
           <p className="mb-12 text-ink-mid">{tHome("closingCta.description")}</p>

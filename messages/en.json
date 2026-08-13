@@ -1,333 +1,423 @@
 {
+  "meta": {
+    "title": "Silicon Valley Africa Program",
+    "description": "The first technology immersion program built for Africa's exceptional leaders. Free to apply — 2026 edition."
+  },
   "common": {
-    "home": "Home"
+    "home": "Home",
+    "trustLink": "Trust and security",
+    "stats": {
+      "places": "Positions",
+      "total": "In total",
+      "months": "Months",
+      "age": "Age"
+    }
   },
   "nav": {
     "brand": "Silicon Valley Africa",
-    "programme": "Program",
+    "programme": "The program",
     "admission": "Admission",
     "packs": "Packs",
     "agenda": "Agenda",
-    "cta": "Apply Now",
+    "delegues": "Delegates",
+    "faq": "FAQ",
+    "cta": "Apply — free",
     "menuLabel": "Menu"
   },
   "hero": {
     "titleLine1": "Africa meets the",
     "titleEmphasis": "Valley.",
-    "ctaPrimary": "Submit My Application",
-    "ctaSecondary": "Admission Criteria",
+    "lead": "The first technology immersion program built for Africa's exceptional leaders. Six days in Silicon Valley, six eligible countries, 75 scholarships.",
+    "freeBadge": "Applying is 100% free — no fee before pre-selection",
+    "ctaPrimary": "Submit my application",
+    "ctaSecondary": "See the criteria",
     "stats": {
-      "leaders": { "value": "250", "label": "Leaders" },
-      "countries": { "value": "10", "label": "Countries" },
-      "days": { "value": "6", "label": "Days" },
-      "opportunities": { "value": "$2M+", "label": "In Opportunities" }
+      "leaders": {
+        "label": "Places"
+      },
+      "countries": {
+        "label": "Eligible countries"
+      },
+      "days": {
+        "label": "Days of immersion"
+      },
+      "bourses": {
+        "label": "Scholarships"
+      }
     }
   },
   "why": {
-    "eyebrow": "Why This Program",
-    "title": "A strategic bridge between two ecosystems.",
-    "description": "This isn't a sightseeing tour of tech campuses. We build working alliances between Africa's rising champions and the infrastructure of Silicon Valley.",
-    "ctaLabel": "Discover All The Benefits",
+    "eyebrow": "Why this program",
+    "title": "Direct access, not a guided tour.",
+    "description": "For the first time, a structured program connects Africa's most ambitious leaders directly to Silicon Valley's investors, founders and giants — anchored firmly in the economic realities of our own markets.",
+    "ctaLabel": "See the full program",
     "cards": {
       "network": {
-        "title": "Global Network",
-        "description": "Direct access to investors and partners across Palo Alto and San Francisco."
+        "title": "Global network",
+        "description": "Direct access to leaders at the world's technology giants and to investment funds active in Africa. Every meeting is arranged to maximise your impact."
       },
       "immersion": {
-        "title": "Tech Immersion",
-        "description": "Go deep on AI, Web3, and the technologies reshaping every industry."
+        "title": "Tech immersion",
+        "description": "Stanford, Apple, Tesla, Meta, Nvidia, Amazon, Microsoft, Alphabet. Understand from the inside how AI, blockchain and fintech will reshape your sectors."
+      },
+      "africa": {
+        "title": "Built for Africa",
+        "description": "Unlike generic programs, this curriculum is designed for our markets: diaspora financing, Mobile Money, regional integration, new trade routes."
       },
       "certification": {
-        "title": "Certification",
-        "description": "Official recognition from the program's institutional partners."
+        "title": "Official certification",
+        "description": "A First Of All African leader certificate recognised by chambers of commerce and partner institutions — a strong signal to your partners, clients and investors."
+      },
+      "impact": {
+        "title": "Concrete impact",
+        "description": "Every participant leaves with a personalised strategic plan, qualified contacts, and lifetime access to the First Of All Africa community."
+      },
+      "selection": {
+        "title": "Competitive selection",
+        "description": "Places are limited. Rigorous selection guarantees the calibre of participants and the depth of the exchanges. Being selected is itself recognition."
       }
     }
   },
   "packs": {
-    "places": "Spots",
-    "mostPopular": "Most popular",
-    "teaser": {
-      "eyebrow": "Your Application",
-      "title": "Choose Your Track",
-      "ctaLabel": "View All Packs",
-      "laureat": {
-        "name": "Fellow",
-        "badgeLabel": "Highly Selective",
-        "placesCount": "30",
-        "costLabel": "Full Scholarship",
-        "costValue": "100% Covered",
-        "features": [
-          "Flights and lodging included",
-          "Full conference access",
-          "Post-program mentorship"
-        ]
-      },
-      "boursier": {
-        "name": "Scholar",
-        "badgeLabel": "Best Balance",
-        "placesCount": "80",
-        "costLabel": "Partial Scholarship",
-        "costValue": "Program Co-Financing",
-        "features": [
-          "50% fee subsidy",
-          "Big Tech HQ visits",
-          "Exclusive networking"
-        ],
-        "ctaLabel": "Select"
-      }
-    },
+    "places": "Places",
+    "mostPopular": "Most requested",
     "page": {
-      "eyebrow": "2026 Opportunities",
-      "title": "Choose Your Participation Pack",
-      "lead": "The Silicon Valley Africa Program is designed to identify and propel the next generation of leaders in Africa's tech ecosystem. Select the level of engagement that matches your ambitions and your profile.",
+      "eyebrow": "2026 Edition",
+      "title": "Five ways to take part",
+      "lead": "The same process applies to every pack: free application, automatic pre-selection, then verification. Choose the format that matches your situation.",
       "breadcrumbCurrent": "Packs"
     },
     "items": {
       "laureat": {
-        "name": "Fellow",
-        "badgeLabel": "Highly Selective",
-        "placesCount": "30",
-        "costLabel": "Full Scholarship",
-        "costValue": "100% Covered",
+        "badgeLabel": "Full scholarship",
+        "costLabel": "Trip 100% funded",
+        "costValue": "Covered by the program",
         "features": [
-          "Full 6-day immersion",
-          "Flights & 5-star lodging",
-          "C-Level meetings (Google, Meta)",
-          "Exclusive Demo Day access"
+          "7 nights in a 4★ San Francisco hotel",
+          "All visits and masterclasses",
+          "Airport transfers and delegation bus",
+          "Meals and networking dinners",
+          "Return flight included",
+          "Official First Of All certificate",
+          "1 year of alumni community access",
+          "US visa assistance included"
         ],
-        "applicationFee": "Application Fee: $50",
         "ctaLabel": "Apply"
       },
       "boursier": {
-        "name": "Scholar",
-        "badgeLabel": "Best Balance",
-        "placesCount": "80",
-        "costLabel": "Partial Scholarship",
-        "costValue": "Program Co-Financing",
+        "badgeLabel": "Partial scholarship",
+        "costLabel": "Everything covered",
+        "costValue": "Except the flight",
         "features": [
-          "Full 6-day immersion",
-          "Premium shared lodging",
-          "Tech campus visits",
-          "Pitch & strategy workshops"
+          "7 nights in a 4★ San Francisco hotel",
+          "All visits and masterclasses",
+          "Airport transfers and delegation bus",
+          "Meals and networking dinners",
+          "Official First Of All certificate",
+          "1 year of alumni community access",
+          "US visa assistance included",
+          "Return flight at your own cost"
         ],
-        "applicationFee": "Application Fee: $30",
         "ctaLabel": "Apply"
       },
-      "invite": {
-        "name": "Guest",
-        "badgeLabel": "Open Access",
-        "placesCount": "120",
-        "costLabel": "$330",
-        "costValue": "Direct Participation",
+      "delegue": {
+        "badgeLabel": "Paid role",
+        "costLabel": "Paid position",
+        "costValue": "200 USD/month for 3 months",
         "features": [
-          "3-day conference pass",
-          "Access to networking areas",
-          "Lunch & coffee included",
-          "Lodging not included"
+          "200 USD per month — October to December",
+          "Guaranteed Laureate eligibility, 2027 edition",
+          "Official First Of All certificate",
+          "1 year of alumni community access",
+          "Open from 18 to 65"
         ],
-        "applicationFee": "Guaranteed Reservation",
-        "ctaLabel": "Reserve"
+        "ctaLabel": "Become a delegate"
       },
-      "ambassadeur": {
-        "name": "Ambassador",
-        "badgeLabel": "Prestige",
-        "placesCount": "20",
-        "costLabel": "$3,330",
-        "costValue": "VIP Concierge Service",
+      "business_visitor": {
+        "badgeLabel": "Automatic selection",
+        "costLabel": "Self-funded",
+        "costValue": "Full program at your own cost",
         "features": [
-          "All-inclusive (First Class flights)",
-          "Private investor meetings",
-          "Gala dinner in Palo Alto",
-          "Personalized analysis report"
+          "Everything in the Laureate pack",
+          "Priority on the business visa file",
+          "Automatic selection if criteria are met",
+          "Travel documents sent by email",
+          "US visa assistance included"
         ],
-        "applicationFee": "Priority Processing",
-        "ctaLabel": "Register"
+        "ctaLabel": "Reserve my place"
+      },
+      "vip_visitor": {
+        "badgeLabel": "Premium",
+        "costLabel": "Self-funded",
+        "costValue": "Dedicated VIP support",
+        "features": [
+          "Everything in the Business Visitor pack",
+          "Personalised pitch coaching (2h)",
+          "Dedicated VIP assistance",
+          "Program sponsor visibility",
+          "Priority access to investor meetings"
+        ],
+        "ctaLabel": "Reserve my place",
+        "note": "A 7,000 USD sponsorship contribution applies only if your file is validated after verification. It is arranged directly with the administration and is never paid on this site."
       }
     },
     "process": {
-      "eyebrow": "The Journey",
-      "title": "From Africa To Silicon Valley In 5 Steps",
+      "eyebrow": "The journey",
+      "title": "From application to departure, in 5 steps",
       "steps": {
         "step1": {
-          "title": "Application",
-          "description": "Submit your online file along with your achievements."
+          "title": "Free application",
+          "description": "An online eligibility form. No payment and no documents at this stage."
         },
         "step2": {
-          "title": "Shortlisting",
-          "description": "Rigorous review by our panel of international experts."
+          "title": "Automatic pre-selection",
+          "description": "The system checks the eligibility criteria on submission. Immediate answer."
         },
         "step3": {
-          "title": "Verification",
-          "description": "Background check and criminal record verification."
+          "title": "Access code within 72h",
+          "description": "A unique code, tied to your name and email, opens Phase 2 for 14 days."
         },
         "step4": {
-          "title": "Notification",
-          "description": "Official results announced and admission to the program."
+          "title": "Verification",
+          "description": "Full details, verification fee, supporting documents. Checks start after payment."
         },
         "step5": {
-          "title": "Visa & Logistics",
-          "description": "Administrative support for your departure to California."
+          "title": "Visa and departure",
+          "description": "Invitation letter, embassy letter and visa support sent by email."
         }
       }
     },
     "closingCta": {
-      "title": "Ready To Turn Your Vision Into Reality?",
-      "description": "Spots are limited. Selection for the 2026 cohort begins now.",
-      "ctaLabel": "Submit My Application"
-    }
+      "title": "Applying is free. The only risk is not trying.",
+      "description": "It takes a few minutes. You'll know straight away whether your profile moves to Phase 2.",
+      "ctaLabel": "Submit my application"
+    },
+    "freeNotice": "Applying is entirely free for every pack. Verification fees are only due in Phase 2, after pre-selection and once you've received your access code.",
+    "feePrefix": "Verification fee",
+    "feeSuffix": "only if pre-selected"
   },
   "agenda": {
-    "teaser": {
-      "eyebrow": "The Detailed Program",
-      "title": "6 Days That Change Your Trajectory",
-      "ctaLabel": "View The Full 6-Day Program",
-      "day1": {
-        "locationLabel": "San Francisco",
-        "title": "Arrival & Immersion",
-        "description": "Welcome reception in San Francisco, dinner with program alumni, and an introduction to the \"Valley Mindset.\""
-      },
-      "day3": {
-        "locationLabel": "Mountain View & Cupertino",
-        "title": "Google & Apple Park",
-        "description": "An exclusive visit to the Mountain View and Cupertino campuses, with workshops led by VP-level engineering leaders."
-      }
-    },
-    "page": {
-      "eyebrow": "Immersive Experience",
-      "title": "6 Days That Change Your Trajectory",
-      "lead": "A curated itinerary for African leaders. Between academic sessions at Stanford, meetings with tech giants, and strategic networking, discover the future of tech leadership.",
-      "breadcrumbCurrent": "Agenda"
-    },
+    "eyebrow": "Detailed program",
+    "title": "Six days, eight campuses, a network for life",
+    "lead": "A dense, curated itinerary. Each day combines a campus visit, a working session and focused networking.",
+    "breadcrumbCurrent": "Agenda",
+    "dayLabel": "Day",
+    "closingTitle": "These six days start with a free form.",
+    "closingCta": "Submit my application",
     "days": {
       "day1": {
-        "locationLabel": "San Francisco Airport (SFO)",
-        "title": "Arrival & Welcome",
+        "locationLabel": "San Francisco",
+        "title": "Arrival & welcome",
         "items": [
-          { "time": "14:00", "description": "Private transfer to the Palace Hotel, San Francisco." },
-          { "time": "18:30", "description": "Opening briefing: \"The Silicon Valley Ecosystem.\"" },
-          { "time": "20:00", "description": "Welcome dinner and networking among participants." }
+          {
+            "time": "11:00",
+            "description": "Arrivals, hotel transfer and check-in."
+          },
+          {
+            "time": "16:00",
+            "description": "Orientation walking tour — Fisherman's Wharf and Embarcadero."
+          },
+          {
+            "time": "19:00",
+            "description": "Welcome dinner: program introduction and informal networking."
+          }
         ]
       },
       "day2": {
         "locationLabel": "Palo Alto",
-        "title": "The Stanford Spirit",
+        "title": "Stanford & design thinking",
         "items": [
-          { "time": "09:00", "description": "Masterclass: \"Leadership & Innovation Mentality.\"" },
-          { "time": "13:00", "description": "Lunch at the Stanford Faculty Club." },
-          { "time": "15:00", "description": "Meeting with African researchers based in Silicon Valley." }
+          {
+            "time": "10:00",
+            "description": "Guided tour of the Stanford campus (1h30)."
+          },
+          {
+            "time": "12:00",
+            "description": "Full group lunch."
+          },
+          {
+            "time": "16:00",
+            "description": "Design Thinking masterclass (2h), led by a Stanford speaker."
+          },
+          {
+            "time": "19:00",
+            "description": "Free evening or networking."
+          }
         ]
       },
       "day3": {
-        "locationLabel": "Mountain View & Cupertino",
+        "locationLabel": "Mountain View · Cupertino",
         "title": "Google & Apple Park",
         "items": [
-          { "time": "09:30", "description": "Googleplex: AI vision & global infrastructure." },
-          { "time": "14:30", "description": "Apple Park Visitor Center: the obsession with design and experience." },
-          { "time": "17:00", "description": "Strategic debriefing session." }
+          {
+            "time": "10:00",
+            "description": "Googleplex: visit and Q&A session (1h30)."
+          },
+          {
+            "time": "12:00",
+            "description": "Full lunch on site."
+          },
+          {
+            "time": "15:00",
+            "description": "Apple Park Visitor Center and Innovation Lab (1h30)."
+          },
+          {
+            "time": "18:00",
+            "description": "Product-innovation networking dinner."
+          }
         ]
       },
       "day4": {
-        "locationLabel": "Menlo Park & Santa Clara",
-        "title": "Meta & Nvidia",
+        "locationLabel": "Menlo Park · Santa Clara",
+        "title": "Meta, Nvidia & AI",
         "items": [
-          { "time": "10:00", "description": "Meta HQ: the future of social media and connectivity in Africa." },
-          { "time": "14:00", "description": "Nvidia: immersion in the GPU and deep learning revolution." },
-          { "time": "19:00", "description": "Networking night with Sand Hill Road investors." }
+          {
+            "time": "10:00",
+            "description": "Meta: Metaverse presentation and VR demonstration (1h)."
+          },
+          {
+            "time": "12:00",
+            "description": "Full group lunch."
+          },
+          {
+            "time": "15:00",
+            "description": "Nvidia: private AI and GPU workshop (1h30)."
+          },
+          {
+            "time": "19:00",
+            "description": "Networking dinner with a local figure."
+          }
         ]
       },
       "day5": {
-        "locationLabel": "Redwood City & Santa Clara",
-        "title": "Cloud & Business Impact",
+        "locationLabel": "Mountain View · Sunnyvale · Santa Clara",
+        "title": "Microsoft, Amazon & Levi's Stadium",
         "items": [
-          { "time": "09:00", "description": "Microsoft: digital transformation & sovereign cloud." },
-          { "time": "13:30", "description": "Amazon Web Services (AWS): extreme scalability." },
-          { "time": "16:30", "description": "VIP visit: Levi's Stadium (tech & smart venue)." }
+          {
+            "time": "10:00",
+            "description": "Microsoft: digital transformation and Azure for emerging markets (1h)."
+          },
+          {
+            "time": "12:00",
+            "description": "Amazon Lab126: IoT and Alexa demonstrations (1h)."
+          },
+          {
+            "time": "15:00",
+            "description": "Levi's Stadium visit: technology and sustainability (LEED Gold)."
+          },
+          {
+            "time": "19:00",
+            "description": "Grand networking dinner: VCs, local CEOs, club and stadium representatives."
+          }
         ]
       },
       "day6": {
-        "locationLabel": "Fremont & SFO",
-        "title": "Tesla & Departure",
+        "locationLabel": "Palo Alto · San Francisco",
+        "title": "Tesla, wrap-up & departure",
         "items": [
-          { "time": "08:30", "description": "Tesla Factory: automation and the future of energy." },
-          { "time": "12:00", "description": "Closing ceremony and Silicon Valley Africa certificate presentation." },
-          { "time": "16:00", "description": "Transfer to SFO airport for departures." }
+          {
+            "time": "10:00",
+            "description": "Tesla showroom: mobility and energy (1h30)."
+          },
+          {
+            "time": "12:00",
+            "description": "Closing lunch and certificate ceremony."
+          },
+          {
+            "time": "15:00",
+            "description": "Airport transfers."
+          }
         ]
       }
-    },
-    "closingCta": {
-      "title": "Ready To Live These 6 Days?",
-      "ctaLabel": "View The Packs"
     }
   },
   "admission": {
     "page": {
-      "eyebrow": "Selection Criteria",
-      "title": "Who Can Apply?",
-      "lead": "The Silicon Valley Africa Program is designed for visionaries, entrepreneurs, and decision-makers looking to bring Californian tech excellence into the African ecosystem. We're looking for profiles with strong potential for impact.",
+      "eyebrow": "Eligibility",
+      "title": "Who can apply?",
+      "lead": "The program is open to nationals and residents of six countries. The criteria are deliberately simple and verifiable — you'll know immediately whether your profile moves forward.",
       "breadcrumbCurrent": "Admission"
     },
+    "countries": {
+      "title": "Participating countries — 2026 edition",
+      "lead": "For this edition, priority was given to countries still broadly eligible for B1 and B2 visas. Further countries may be added in future editions."
+    },
     "eligibility": {
-      "eligibleTitle": "Eligible Profiles",
+      "eligibleTitle": "Eligible profiles",
       "eligibleItems": [
-        "Entrepreneurs with a minimum viable product (MVP) or in a scale-up phase.",
-        "Executives and heads of innovation (CTO, CDO, CEO).",
-        "Investors and African venture capital fund managers.",
-        "Final-year students or recent graduates with a structured tech project."
+        "Any national or resident of one of the 6 participating countries",
+        "Minimum age: 18 (or the legal age of majority in your country)",
+        "Clean criminal record or legal equivalent",
+        "Genuine motivation to take part and contribute to your community",
+        "Confirmed intention to return to your home country"
       ],
-      "ineligibleTitle": "Not Eligible",
+      "ineligibleTitle": "Ineligible profiles",
       "ineligibleItems": [
-        "Profiles with no direct link to the tech or entrepreneurial sector.",
-        "Projects with no intention of implementation on the African continent.",
-        "Candidates without working proficiency in technical English (recommended)."
+        "Applicants under 18",
+        "People with a criminal record",
+        "People seeking only a visa or a travel opportunity with no real commitment",
+        "Nationals who have already had 4 or more US visa refusals"
       ]
     },
+    "automatic": {
+      "title": "What the system checks automatically",
+      "lead": "On submission, four criteria are checked instantly. If you meet them, you're pre-selected and receive an access code within 72 hours.",
+      "items": [
+        "Your country of residence is one of the 6 participating countries",
+        "You are 18 or over",
+        "You declare a clean criminal record",
+        "You declare fewer than 4 US visa refusals"
+      ],
+      "note": "The three qualitative criteria — motivation, impact of the trip, return home — are assessed by a human committee after verification, when places are allocated."
+    },
     "criteria": {
-      "eyebrow": "Evaluation Process",
-      "title": "Our Three Pillars Of Selection",
+      "eyebrow": "File review",
+      "title": "Our three assessment pillars",
+      "lead": "Every application is assessed against three fundamental pillars, whichever pack is chosen.",
       "pillar1": {
         "title": "Motivation",
-        "description": "Beyond skills, we measure the drive to durably transform the sector. Your \"why\" is what sparks our interest."
+        "description": "Clear, genuine, and grounded in a concrete project or a measurable professional ambition. This isn't a writing exercise: we're looking for what you intend to do, specifically."
       },
       "pillar2": {
-        "title": "Social Impact",
-        "description": "The project must address a concrete African challenge: financial inclusion, education, health, or digital infrastructure."
+        "title": "Impact of the trip",
+        "description": "The potential impact on your career, your company or your project, and the concrete benefits you expect from it."
       },
       "pillar3": {
-        "title": "Return To The Continent",
-        "description": "A moral or contractual commitment to apply what you've learned on the continent to generate local value."
+        "title": "Return home",
+        "description": "Your willingness to return and pass on what the program gives you. This is the central criterion: we value lasting local impact."
       }
     },
-    "statuses": {
-      "title": "Two Statuses, One Goal",
-      "lead": "Every application is reviewed for two types of admission based on financial and academic profile.",
+    "bourses": {
+      "title": "75 scholarships available",
+      "lead": "For high-potential applicants facing financial constraints. Awards are never automatic: they're decided on file, after in-depth review.",
       "laureat": {
-        "eyebrow": "Standard Admission",
-        "name": "The Fellow",
+        "eyebrow": "12 places — full scholarship",
+        "name": "Laureate",
         "items": [
-          "Full access to the immersive program",
-          "Silicon Valley Africa certification",
-          "Individual or employer-sponsored funding",
-          "Privileged networking with experts"
+          "Demonstrated high potential: track record, project, leadership",
+          "Real financial constraints — unable to fund the trip",
+          "Exceptional motivation file with clear community impact",
+          "Insufficient resources to cover the flight"
         ],
-        "target": "Target: Professionals & Executives"
+        "target": "Awarded on file after in-depth review"
       },
       "boursier": {
-        "eyebrow": "Academic Excellence",
-        "name": "The Scholar",
-        "quote": "A merit-based scholarship covering up to 80% of participation costs for exceptional profiles.",
+        "eyebrow": "63 places — partial scholarship",
+        "name": "Scholar",
+        "quote": "Everything is covered except the return flight.",
         "items": [
-          "Strict financial-need criteria",
-          "Outstanding academic record (Top 5%)",
-          "High community-impact project",
-          "Mentorship support included"
+          "High potential with partial financial constraints",
+          "Able to fund your own return flight",
+          "Solid motivation and a concrete project with African impact",
+          "Complete file submitted within the deadline"
         ],
-        "target": "Target: Emerging Talent & Students"
+        "target": "Awarded on file — not automatic"
       }
     },
     "closingCta": {
-      "title": "Think You're Eligible?",
-      "description": "Don't miss the opportunity to transform your trajectory. Explore our participation packs and start your application today.",
-      "ctaLabel": "View The Packs"
+      "title": "Do you meet the criteria?",
+      "description": "Applying takes a few minutes and costs nothing. The system answers you immediately.",
+      "ctaLabel": "Submit my application"
     }
   },
   "candidature": {
@@ -345,71 +435,113 @@
       "securityDescription": "Your data is encrypted and used solely to review your application."
     },
     "form": {
-      "prenomLabel": "First Name",
+      "stepLabel": "Step {current} of {total}",
+      "steps": {
+        "step1": {
+          "title": "Identity & contact",
+          "description": "How we reach you, and where your access code will be sent."
+        },
+        "step2": {
+          "title": "Your profile",
+          "description": "Your situation, your sector, and the pack that fits your project."
+        },
+        "step3": {
+          "title": "Eligibility & motivation",
+          "description": "The eligibility criteria, then what drives your application."
+        }
+      },
+      "prenomLabel": "First name",
       "prenomPlaceholder": "e.g. Koffi",
-      "nomLabel": "Last Name",
+      "nomLabel": "Last name",
       "nomPlaceholder": "e.g. Diop",
-      "emailLabel": "Professional Email",
+      "emailLabel": "Email",
       "emailPlaceholder": "name@company.com",
-      "telephoneLabel": "WhatsApp Phone Number",
-      "telephonePlaceholder": "+225 00 00 00 00",
-      "paysLabel": "Country Of Residence",
+      "emailHint": "Your access code will be sent to this address.",
+      "telephoneLabel": "WhatsApp number",
+      "telephonePlaceholder": "+237 6 00 00 00 00",
+      "ageLabel": "Age",
+      "agePlaceholder": "e.g. 32",
+      "paysLabel": "Country",
       "paysPlaceholder": "Select your country",
-      "secteurLabel": "Sector Of Activity",
+      "villeLabel": "City of residence",
+      "villePlaceholder": "e.g. Douala",
+      "secteurLabel": "Sector",
       "secteurPlaceholder": "Your field",
-      "packLabel": "Desired Pack",
+      "packLabel": "Preferred pack",
       "packPlaceholder": "Choose a pack",
-      "visaHistoriqueLabel": "US Visa History",
-      "visaHistoriquePlaceholder": "Have you ever had a US visa?",
-      "casierJudiciaireLabel": "Criminal Record",
-      "casierJudiciairePlaceholder": "State \"None\" or briefly explain",
-      "motivationLabel": "Your Motivation (300 words max)",
-      "motivationPlaceholder": "Why do you want to join the Silicon Valley Africa Program?",
-      "rgpdNote": "By submitting this form, you agree to our personal data protection policy.",
-      "submitLabel": "Submit My Application",
+      "marieLabel": "Are you married?",
+      "enfantsLabel": "Do you have children?",
+      "yes": "Yes",
+      "no": "No",
+      "sourceLabel": "How did you hear about the program?",
+      "sourcePlaceholder": "Choose an answer",
+      "delegueNomLabel": "Delegate's name",
+      "delegueNomPlaceholder": "Delegate's full name",
+      "casierJudiciaireLabel": "Do you have a criminal record?",
+      "casierJudiciairePlaceholder": "Choose an answer",
+      "visaHistoriqueLabel": "US visa refusals to date",
+      "visaHistoriquePlaceholder": "Choose an answer",
+      "motivationLabel": "Motivation",
+      "motivationPlaceholder": "Your motivation, the impact you expect the trip to have on your goals, and what you intend to bring back to your community.",
+      "wordCount": "{count} / {max} words",
+      "lienPaysLabel": "Ties to your country",
+      "lienPaysPlaceholder": "Professional activity, family ties, ongoing projects.",
+      "consentExactitude": "I certify that the information provided is accurate.",
+      "consentCommunications": "I agree to receive communications about my application, including my access code.",
+      "draftRestored": "We restored your draft.",
+      "draftClear": "Start over",
+      "rgpdNote": "By submitting this form, you accept our personal data protection policy.",
+      "previousLabel": "Back",
+      "nextLabel": "Continue",
+      "submitLabel": "Submit my application",
       "submittingLabel": "Submitting...",
       "submitError": "Something went wrong. Please try again."
     },
     "options": {
       "pays": {
-        "nga": "Nigeria",
-        "ken": "Kenya",
         "zaf": "South Africa",
-        "sen": "Senegal",
-        "civ": "Côte d'Ivoire",
         "mar": "Morocco",
+        "cmr": "Cameroon",
+        "ken": "Kenya",
         "gha": "Ghana",
-        "egy": "Egypt",
-        "rwa": "Rwanda",
-        "eth": "Ethiopia",
-        "cod": "Congo (DRC)",
-        "other_west": "Other West Africa",
-        "other_east": "Other East Africa",
-        "other_central": "Other Central Africa",
-        "other": "Other"
+        "egy": "Egypt"
       },
       "secteur": {
-        "tech_fintech": "Tech & Fintech",
-        "agriculture": "Agriculture / Agrotech",
-        "energy_infrastructure": "Energy & Infrastructure",
-        "finance_investment": "Finance & Investment",
-        "public_administration": "Public Administration",
-        "education": "Education",
-        "health": "Healthcare"
+        "banque_finance": "Banking & Finance",
+        "tech_digital": "Tech & Digital",
+        "telecoms": "Telecoms",
+        "commerce": "Trade & Retail",
+        "industrie": "Industry",
+        "agriculture": "Agriculture",
+        "energie": "Energy",
+        "sante": "Health",
+        "immobilier_btp": "Real Estate & Construction",
+        "conseil": "Consulting",
+        "administration": "Public Administration",
+        "autre": "Other"
       },
       "pack": {
-        "laureat": "Fellow",
+        "laureat": "Laureate",
         "boursier": "Scholar",
-        "invite": "Guest",
-        "ambassadeur": "Ambassador",
-        "delegue": "Delegate"
+        "delegue": "Delegate",
+        "business_visitor": "Business Visitor",
+        "vip_visitor": "VIP Visitor"
       },
       "visaHistorique": {
-        "valid": "Yes, currently valid visa",
-        "expired_lt5": "Yes, expired less than 5 years ago",
-        "expired_gt5": "Yes, expired more than 5 years ago",
-        "never": "No, never",
-        "denied": "Previously denied"
+        "aucun_jamais": "None (never applied)",
+        "aucun_obtenu": "None (visa granted)",
+        "refus_1_3": "1 to 3 refusals",
+        "refus_4_plus": "4 or more refusals"
+      },
+      "casierJudiciaire": {
+        "non": "No — clean record",
+        "oui": "Yes"
+      },
+      "source": {
+        "delegue": "Through a delegate",
+        "connaissance": "Through someone I know",
+        "reseaux_sociaux": "Social media",
+        "autre": "Other"
       }
     },
     "validation": {
@@ -419,63 +551,818 @@
       "pays": "Please select your country.",
       "secteur": "Please select your sector.",
       "pack": "Please select a pack.",
-      "motivationMin": "Please elaborate on your motivation (minimum 50 characters).",
+      "ageMin": "The program is open to applicants aged 18 and over.",
+      "ageInvalid": "Please enter a valid age.",
+      "motivationMaxWords": "Your motivation exceeds the 150-word limit.",
+      "tooLong": "This text is too long.",
+      "consentRequired": "You must accept this to continue.",
       "invalidOption": "Invalid selection.",
-      "duplicateEmail": "An application has already been submitted with this email address."
+      "duplicateEmail": "An application has already been submitted with this email."
     },
     "trust": {
       "title": "Data Protection",
       "quote": "In accordance with GDPR and local data protection laws, the Silicon Valley Africa Program guarantees the anonymity of unsuccessful applications and the permanent deletion of files after 90 days."
     },
     "success": {
-      "title": "Application Received!",
-      "description": "Thank you for applying. Our committee will review your file within 72 business hours and reach out by email.",
-      "ctaLabel": "Back To Home"
+      "title": "Application received.",
+      "description": "Thank you. Your application passed automatic pre-selection. You will receive your unique access code by email within 72 hours — it opens the “Get my documents” page and stays valid for 14 days.",
+      "ctaLabel": "Back to home"
+    },
+    "nonEligible": {
+      "eyebrow": "Application not retained",
+      "title": "Your application does not meet this edition's criteria.",
+      "reasons": {
+        "age": "The program is open to applicants aged 18 and over.",
+        "casier_judiciaire": "A clean criminal record, or its legal equivalent, is required to take part.",
+        "visa_refusals": "Applicants with 4 or more US visa refusals are not eligible for this edition.",
+        "pack_full": "This pack has reached its quota for this edition.",
+        "generic": "Your application does not meet one of this edition's eligibility criteria."
+      },
+      "noFee": "You were not charged anything, and you will not be.",
+      "futureEditions": "Your file remains eligible for future editions of the program.",
+      "ctaLabel": "Back to home",
+      "criteriaLink": "Review the criteria"
+    },
+    "complet": {
+      "eyebrow": "Quota reached",
+      "title": "Your application is eligible, but this pack is full.",
+      "explanation": "Your application meets every eligibility criterion. The number of pre-selections for this pack has simply reached its limit for the 2026 edition.",
+      "noFee": "You were not charged anything.",
+      "nextSteps": "You can apply for another pack that is still open, or we will contact you as a priority for the next edition.",
+      "ctaLabel": "See the other packs",
+      "homeLink": "Back to home"
     }
   },
   "home": {
-    "bourseTeaser": {
-      "statValue": "110",
-      "statLabel": "Scholarships Available",
-      "title": "110 Scholarships Available",
-      "description": "The Silicon Valley Africa Program is committed to inclusion. Thanks to our partners, more than a hundred delegates will receive partial or full funding for the 2026 cohort.",
-      "ctaLabel": "View Eligibility Criteria"
+    "processTitle": "Two phases, no hidden fees",
+    "processLead": "The same journey for every pack. You pay nothing until you're pre-selected.",
+    "phase1": {
+      "badge": "Phase 1 — Free",
+      "title": "Application",
+      "description": "A three-step eligibility form. Immediate answer, then an access code within 72 hours if you're retained."
     },
-    "delegate": {
-      "eyebrow": "Join The Delegation",
-      "title": "100 Strategic Seats For Africa's Elite",
-      "highlight1": {
-        "title": "Alumni Network",
-        "description": "Join a close-knit circle of 500+ African leaders who've already completed the program."
-      },
-      "highlight2": {
-        "title": "Business Facilitation",
-        "description": "Targeted introductions based on your sector — Fintech, Agritech, Healthcare."
-      },
-      "statValue": "100",
-      "statLabel": "Seats Reserved",
-      "subStat1Value": "40%",
-      "subStat1Label": "Women Leaders",
-      "subStat2Value": "15+",
-      "subStat2Label": "Tech Sectors"
+    "phase2": {
+      "badge": "Phase 2 — By code",
+      "title": "Verification",
+      "description": "Full details, the verification fee for your pack, then supporting documents. Checks start after payment."
     },
+    "bourseTitle": "75 scholarships available",
+    "bourseDescription": "12 fully funded places and 63 partially funded places, for high-potential applicants facing real financial constraints.",
+    "bourseCta": "See the eligibility criteria",
+    "delegateTitle": "60 paid delegate positions",
+    "delegateDescription": "Represent the program in your country for three months, earn 200 USD a month and secure guaranteed Laureate eligibility for the 2027 edition.",
+    "delegateCta": "Discover the delegate program",
     "closingCta": {
-      "title": "Ready To Apply?",
-      "description": "Selection is rigorous and the opportunity is rare. Don't let your vision wait until tomorrow.",
-      "ctaLabel": "Start My Application"
+      "title": "Applying is free and takes a few minutes.",
+      "description": "You'll know immediately whether your profile moves to Phase 2. No commitment, no payment at this stage.",
+      "ctaLabel": "Start my application"
     }
   },
   "footer": {
     "brand": "Silicon Valley Africa",
-    "description": "The bridge of excellence between African innovation and the world's most powerful tech ecosystem.",
+    "description": "The first technology immersion program built for Africa's exceptional leaders. Run by First Of All LLC.",
     "navigationTitle": "Navigation",
     "resourcesTitle": "Resources",
     "contact": "Contact",
     "faq": "FAQ",
-    "privacy": "Privacy",
-    "followTitle": "Follow Us",
+    "confiance": "Trust and security",
+    "delegues": "Delegate program",
+    "documents": "Get my documents",
+    "followTitle": "Follow us",
     "copyright": "© 2026 Silicon Valley Africa Program. All rights reserved.",
-    "legal": "Legal Notice",
-    "privacyLink": "Privacy Policy"
+    "legal": "Legal notice",
+    "privacyLink": "Privacy",
+    "terms": "Terms",
+    "refund": "Refunds",
+    "fraudNote": "You will never be asked to pay outside this site."
+  },
+  "portal": {
+    "eyebrow": "Phase 2 — Restricted access",
+    "title": "Get my documents",
+    "lead": "This page is for pre-selected applicants only. Enter your full name and the access code you received by email.",
+    "breadcrumbCurrent": "Get my documents",
+    "fullNameLabel": "Full name",
+    "fullNamePlaceholder": "First and last name",
+    "fullNameHint": "As it appears on your application. Accents and name order don't matter.",
+    "codeLabel": "Access code",
+    "codeHint": "Sent by email within 72 hours of your application.",
+    "submit": "Access my file",
+    "submitting": "Verifying...",
+    "errors": {
+      "required": "This field is required.",
+      "invalid": "Incorrect full name or access code. Check both and try again.",
+      "expired": "This code has expired. Request a new one below.",
+      "rateLimited": "Too many attempts. Try again in an hour, or contact support.",
+      "server": "Something went wrong. Please try again."
+    },
+    "resend": {
+      "trigger": "Resend code",
+      "title": "Resend my access code",
+      "description": "For security, your full name and email must match your application. A new code cancels the previous one.",
+      "emailLabel": "Application email",
+      "emailPlaceholder": "name@company.com",
+      "submit": "Send a new code",
+      "confirmation": "If an application matches these details, a new code has just been sent to that address. Check your spam folder too."
+    },
+    "info": {
+      "codeTitle": "Your access code",
+      "codeDescription": "The code is sent within {hours} hours of your application. It stays valid for {days} days and can only be used by you.",
+      "securityTitle": "Security",
+      "securityDescription": "The code is stored hashed on our servers and never displayed in plain text. Attempts are rate-limited and logged.",
+      "fraudTitle": "Beware of fraud",
+      "fraudDescription": "Never share your code by phone or on social media. No payment ever happens outside this site."
+    }
+  },
+  "phase2": {
+    "eyebrow": "Phase 2 — Verification",
+    "breadcrumbCurrent": "My file",
+    "stepLabel": "Step {current} of {total}",
+    "yes": "Yes",
+    "no": "No",
+    "continue": "Continue",
+    "saving": "Saving...",
+    "steps": {
+      "informations": {
+        "title": "Personal information",
+        "lead": "Enter your details exactly as they appear on your passport."
+      },
+      "evaluation": {
+        "title": "Risk assessment",
+        "lead": "This questionnaire assesses your ties and your commitment to return. Answer accurately."
+      },
+      "paiement": {
+        "title": "Verification fee",
+        "lead": "Payment triggers the start of the checks on your file."
+      },
+      "pieces": {
+        "title": "Supporting documents",
+        "lead": "ID document, liveness selfie and criminal record extract."
+      },
+      "consentements": {
+        "title": "Consents",
+        "lead": "The last step before verifications begin."
+      }
+    },
+    "errors": {
+      "session": "Your session has expired. Enter your name and code again.",
+      "server": "Something went wrong. Please try again."
+    },
+    "validation": {
+      "required": "This field is required.",
+      "tooLong": "This text is too long.",
+      "tooShort": "Please give a fuller answer.",
+      "phone": "Invalid phone number.",
+      "dateInvalid": "Invalid date.",
+      "dateNaissanceInvalid": "Invalid date of birth. The program is open to applicants aged 18 and over.",
+      "passeportInvalid": "Invalid passport number (5 to 20 alphanumeric characters).",
+      "passeportExpired": "Your passport must be valid at the time of travel.",
+      "consentRequired": "You must tick this box to continue."
+    },
+    "informations": {
+      "identitySection": "Identity",
+      "identityHint": "These details must match your identity document exactly. Any discrepancy can delay your visa file.",
+      "prenomsLabel": "First name(s)",
+      "prenomsPlaceholder": "As shown on your ID",
+      "nomFamilleLabel": "Family name",
+      "nomFamillePlaceholder": "As shown on your ID",
+      "dateNaissanceLabel": "Date of birth",
+      "lieuNaissanceLabel": "Place of birth",
+      "lieuNaissancePlaceholder": "City, country",
+      "nationaliteLabel": "Nationality",
+      "nationalitePlaceholder": "e.g. Cameroonian",
+      "passportSection": "Passport",
+      "passeportNumeroLabel": "Passport number",
+      "passeportNumeroPlaceholder": "e.g. AB1234567",
+      "passeportNumeroHint": "Encrypted on our servers. Only the last two characters remain readable by our team.",
+      "passeportExpirationLabel": "Passport expiry",
+      "contactSection": "Contact details",
+      "telephoneLabel": "Phone / WhatsApp",
+      "telephonePlaceholder": "+237 6 00 00 00 00",
+      "adresseLabel": "Full residential address",
+      "adressePlaceholder": "Street, neighbourhood, city, country",
+      "professionSection": "Professional situation",
+      "professionLabel": "Current profession or status",
+      "professionPlaceholder": "Choose an answer",
+      "employeurLabel": "Employer / Company",
+      "employeurPlaceholder": "Organisation name",
+      "emergencySection": "Emergency contact",
+      "contactUrgenceNomLabel": "Name",
+      "contactUrgenceLienLabel": "Relationship",
+      "contactUrgenceLienPlaceholder": "e.g. Spouse",
+      "contactUrgenceTelephoneLabel": "Phone",
+      "encryptionNote": "Your passport number is encrypted at rest. Your data is used solely to process your application."
+    },
+    "evaluation": {
+      "intro": "These answers are cross-checked against your Phase 1 application and your supporting documents. An inaccurate declaration can lead to permanent rejection.",
+      "selectPlaceholder": "Choose an answer",
+      "historySection": "History",
+      "refusEntreeLabel": "Have you ever been refused entry to a foreign country?",
+      "depassementVisaLabel": "Have you ever overstayed a visa?",
+      "refusUsaCountLabel": "Number of US visa refusals to date",
+      "tiesSection": "Ties and assets",
+      "attachesFamilialesLabel": "Family ties in your country",
+      "activitePaysLabel": "Activity in your country",
+      "patrimoineLabel": "Assets and property",
+      "familleUsaLabel": "Family in the United States",
+      "voyagesLabel": "Have you travelled outside Africa?",
+      "commitmentSection": "Commitment to return",
+      "engagementsRetourLabel": "Commitments guaranteeing your return home",
+      "engagementsRetourPlaceholder": "Describe precisely what awaits you on your return: job, business, family, ongoing obligations, committed projects.",
+      "motivationRetourLabel": "Motivation for returning home",
+      "motivationRetourPlaceholder": "Explain what you intend to do with what the program gives you, in your own country.",
+      "certificationHonneur": "I certify on my honour the accuracy and authenticity of the information and documents provided."
+    },
+    "paiement": {
+      "packLabel": "Your pack",
+      "packs": {
+        "laureat": "Laureate",
+        "boursier": "Scholar",
+        "delegue": "Delegate",
+        "business_visitor": "Business Visitor",
+        "vip_visitor": "VIP Visitor"
+      },
+      "feeLabel": "Verification fee",
+      "coversTitle": "What this fee covers",
+      "covers": {
+        "identity": "Verification of your identity and documents",
+        "criminalRecord": "Your criminal record check",
+        "riskTest": "The non-return risk assessment",
+        "processing": "Administrative processing of your file"
+      },
+      "notASeat": "This fee covers the verification of your file, not the award of a place. Places are limited and allocated after verification. If your file is rejected on administrative or eligibility grounds, the fee is refunded in full to your original payment method.",
+      "methodsTitle": "Payment methods",
+      "chooseMethod": "Choose your payment method",
+      "methods": {
+        "mobile_money": {
+          "title": "Mobile Money",
+          "description": "MTN, Orange or M-Pesa depending on your operator. You'll get a confirmation request on your phone."
+        },
+        "card": {
+          "title": "Bank card",
+          "description": "Visa or Mastercard. Secure payment — no card data is stored by the program."
+        }
+      },
+      "phoneLabel": "Mobile Money number",
+      "phonePlaceholder": "+237 6 00 00 00 00",
+      "phoneHint": "The number linked to your Mobile Money account. The confirmation request will arrive on this phone.",
+      "pay": "Proceed to payment",
+      "processing": "Starting...",
+      "waiting": {
+        "title": "Check your phone",
+        "instruction": "A confirmation request has just been sent to your phone. Enter your Mobile Money PIN to approve the payment.",
+        "amount": "Amount to confirm:",
+        "polling": "Waiting for confirmation...",
+        "dontClose": "Don't close this page. Approval can take up to two minutes."
+      },
+      "timeout": {
+        "title": "No confirmation yet",
+        "description": "We haven't received confirmation from your operator yet. If you approved the payment on your phone, it will be picked up automatically — refresh this page in a few minutes. Don't start a new payment without checking first.",
+        "refresh": "Refresh the page"
+      },
+      "errors": {
+        "server": "Something went wrong. Please try again.",
+        "network": "Connection lost. Check your network and try again.",
+        "session": "Your session has expired. Enter your name and code again.",
+        "invalidRequest": "Invalid request.",
+        "stepsIncomplete": "Complete the previous steps before paying.",
+        "methodUnavailable": "This payment method isn't available in your country.",
+        "phoneRequired": "A Mobile Money number is required.",
+        "checkoutFailed": "The payment couldn't be started. Try again shortly.",
+        "paymentFailed": "The payment didn't go through. Check your balance and try again.",
+        "notFound": "Payment not found."
+      }
+    },
+    "options": {
+      "profession": {
+        "dirigeant_3ans": "Company director (more than 3 years)",
+        "salarie_cdi": "Permanent employee",
+        "cadre": "Manager / executive",
+        "independant": "Self-employed",
+        "cdd": "Fixed-term employee",
+        "etudiant_ecole_fonction_publique": "Student at a civil-service entry school",
+        "sans_emploi": "Unemployed",
+        "etudiant_fin_cycle_sans_contrat": "Final-year student without a contract"
+      },
+      "refusUsaCount": {
+        "aucun": "None",
+        "1": "1",
+        "2": "2",
+        "3": "3"
+      },
+      "attachesFamiliales": {
+        "conjoint_enfants": "Spouse and/or children",
+        "famille_proche": "Close family",
+        "non": "None"
+      },
+      "activitePays": {
+        "entreprise_declaree": "Registered business",
+        "biens_immobiliers": "Property holdings",
+        "emploi_cdi": "Stable permanent employment",
+        "non": "None"
+      },
+      "voyages": {
+        "europe": "Europe",
+        "amerique_nord": "North America",
+        "asie_moyen_orient": "Asia / Middle East",
+        "jamais": "Never"
+      },
+      "patrimoine": {
+        "proprietaire": "Property owner",
+        "locataire_revenus_stables": "Tenant with documented stable banked income",
+        "heberge": "Living with family or hosted",
+        "aucun_actif": "No significant demonstrated financial assets"
+      },
+      "familleUsa": {
+        "aucune": "No family living in the United States",
+        "eloignee": "Extended family (cousins, uncles)",
+        "immediate": "Immediate family (parents, siblings, spouse)"
+      }
+    },
+    "pieces": {
+      "intro": "Your documents are encrypted and stored privately. Only the verification team can open them, through temporary and logged links.",
+      "optional": "(ID cards only)",
+      "choose": "Choose a file",
+      "replace": "Replace",
+      "uploading": "Uploading...",
+      "alreadyUploaded": "Document already submitted",
+      "saving": "Saving...",
+      "continue": "Continue",
+      "kinds": {
+        "id_recto": {
+          "label": "ID document — front",
+          "help": "Passport or national ID card. Sharp photo, all four corners visible, no glare."
+        },
+        "id_verso": {
+          "label": "ID document — back",
+          "help": "Required only for national ID cards. Not needed for a passport."
+        },
+        "selfie_liveness": {
+          "label": "Liveness selfie",
+          "help": "A photo of you holding your ID document, face clearly visible, no filter or sunglasses."
+        },
+        "casier_judiciaire": {
+          "label": "Criminal record extract",
+          "help": "Issued less than three months ago. Image or PDF. The whole document must be legible."
+        }
+      },
+      "casierSection": "Criminal record references",
+      "casierHint": "These references appear on your extract. It must be less than {months} months old.",
+      "casierDateLabel": "Date of issue",
+      "casierNumeroLabel": "Document number",
+      "casierLieuLabel": "Place of issue",
+      "casierLieuPlaceholder": "City",
+      "casierStructureLabel": "Issuing body",
+      "casierStructurePlaceholder": "e.g. Court of First Instance",
+      "storageNote": "Documents are encrypted at rest, accessible only to the verification team, and deleted at the end of the retention period.",
+      "validation": {
+        "required": "This field is required.",
+        "tooLong": "This text is too long.",
+        "dateInvalid": "Invalid date.",
+        "casierTooOld": "The extract must be less than three months old and cannot be dated in the future."
+      },
+      "errors": {
+        "documentsMissing": "Still missing:",
+        "server": "Something went wrong. Please try again.",
+        "network": "Connection lost. Check your network and try again.",
+        "session": "Your session has expired. Enter your name and code again.",
+        "paymentRequired": "The verification fee must be paid before documents can be submitted.",
+        "noFile": "No file selected.",
+        "invalidKind": "Unknown document type.",
+        "fileSize": "File too large (8 MB maximum).",
+        "fileType": "Unsupported format. Use JPEG, PNG, WebP or PDF.",
+        "heicUnsupported": "HEIC photos (iPhone) aren't supported. In Settings > Camera > Formats, choose “Most Compatible”, or re-save the photo as JPEG.",
+        "selfieMustBeImage": "The liveness selfie must be a photo, not a PDF.",
+        "casierFileFirst": "Upload the criminal record extract first."
+      }
+    },
+    "consentements": {
+      "intro": "Last step. By confirming, you authorise the checks on your file to begin.",
+      "items": {
+        "verificationTiers": "I authorise First Of All LLC and its approved third-party providers to verify my identity, my documents and my criminal record.",
+        "certificationHonneur": "I certify on my honour the accuracy and authenticity of the information and documents provided.",
+        "conditionsGenerales": "I accept the refund policy, the terms and conditions and the privacy policy.",
+        "fraudeSignalement": "I acknowledge that in the event of proven fraud, my application is rejected without refund and may be reported.",
+        "traitementDonnees": "I accept the processing of my personal data for the sole purpose of assessing my application."
+      },
+      "finalNote": "Once confirmed, verifications start automatically. You won't be able to change your file without contacting support.",
+      "submit": "Start the verifications",
+      "submitting": "Confirming...",
+      "validation": {
+        "consentRequired": "You must tick this box to continue."
+      },
+      "errors": {
+        "server": "Something went wrong. Please try again.",
+        "network": "Connection lost. Try again.",
+        "session": "Your session has expired. Enter your name and code again.",
+        "paymentRequired": "The verification fee must be paid first.",
+        "documentsMissing": "Some supporting documents are missing."
+      }
+    },
+    "termine": {
+      "title": "Your file is complete.",
+      "description": "We've received all your information and supporting documents. The verifications have started.",
+      "nextTitle": "What happens next",
+      "next": {
+        "checks": "Verification of your identity, documents and criminal record by our approved providers.",
+        "decision": "Review of your file and notification of the decision by email.",
+        "documents": "If validated: invitation letter, embassy confirmation letter and visa support sent by email."
+      },
+      "noAction": "No action is needed from you. Any communication about your file will come through the email address on your application — never by phone or social media.",
+      "ctaLabel": "Back to home"
+    }
+  },
+  "faq": {
+    "eyebrow": "Frequently asked questions",
+    "title": "Everything you need before applying",
+    "lead": "If your question isn't here, contact us — we answer.",
+    "breadcrumbCurrent": "FAQ",
+    "ctaTitle": "Ready to apply?",
+    "ctaLabel": "Submit my application",
+    "items": [
+      {
+        "q": "Is applying really free?",
+        "a": "Yes, entirely, for all five packs. No payment is requested in Phase 1. Verification fees apply only in Phase 2, only if you are pre-selected, and only on this site."
+      },
+      {
+        "q": "How do I reach Phase 2?",
+        "a": "If you're pre-selected, you receive an email within 72 hours containing a unique access code in the format SVAP-XXXX-XXXX. Then go to “Get my documents” and enter your full name along with that code."
+      },
+      {
+        "q": "What if I lose my access code?",
+        "a": "Use the “Resend code” button on the “Get my documents” page. Your full name and email must match your application. A new code automatically cancels the previous one."
+      },
+      {
+        "q": "How long does my code stay valid?",
+        "a": "14 days from issue. After that you can request a new one. Once the code is used, your session stays open for 72 hours and you can switch devices — start on a computer and photograph your documents with your phone, for instance."
+      },
+      {
+        "q": "What are the verification fees?",
+        "a": "Laureate 20 USD · Scholar 30 USD · Delegate 30 USD · Business Visitor 330 USD · VIP Visitor 330 USD. They cover identity verification, the criminal record check, the non-return risk assessment and the processing of your file."
+      },
+      {
+        "q": "Do these fees guarantee a place?",
+        "a": "No, and this matters. They cover the verification of your file, not the award of a place. Places are limited and allocated after verification. The number of pre-selections per pack is capped precisely to keep that imbalance reasonable."
+      },
+      {
+        "q": "Can I be refunded if my application is rejected after payment?",
+        "a": "Yes, in full, if the rejection is on administrative or eligibility grounds. The refund goes back to your original payment method. No refund is granted in the event of proven fraud."
+      },
+      {
+        "q": "How can I pay?",
+        "a": "By Mobile Money in Cameroon, Kenya and Ghana (MTN, Orange, M-Pesa depending on your operator), or by bank card from all six countries. Mobile Money isn't available in Morocco, Egypt and South Africa: card is the only method there."
+      },
+      {
+        "q": "How do I know the program is genuine?",
+        "a": "The program is run by First Of All LLC, a company registered in the United States (Santa Fe), with subsidiaries in London and Ontario. All payments go exclusively through our approved providers on this site, with an immediate receipt — never by personal transfer or Mobile Money sent to an individual. If someone asks you to pay outside the official site, it's attempted fraud."
+      },
+      {
+        "q": "Are my data and documents protected?",
+        "a": "Your passport number is encrypted at rest and never displayed in plain text. Your identity documents are held in private storage, reachable only through 60-second temporary links, and every access is logged. Access codes are hashed server-side. A DPO is appointed and you have rights of access, rectification and erasure."
+      },
+      {
+        "q": "What happens if my US visa is refused?",
+        "a": "Laureates receive a 1,000 USD premium, Scholars 500 USD and VIP Visitors 4,500 USD. Payment is subject to documentary verification of the official refusal issued by US consular authorities and to an internal audit, within 60 days of receiving the document."
+      },
+      {
+        "q": "What's the difference between the packs?",
+        "a": "Laureate and Scholar are scholarship places, fully or partly funded, awarded on file by a committee. Business Visitor and VIP Visitor are self-funded, with automatic selection if the eligibility criteria are met. VIP Visitor adds personalised pitch coaching and dedicated assistance. Delegate is a paid three-month role, not a trip."
+      },
+      {
+        "q": "Is the program open to all African countries?",
+        "a": "Not for this edition. Priority was given to countries still broadly eligible for B1 and B2 visas: South Africa, Morocco, Cameroon, Kenya, Ghana and Egypt. Further countries may be added in future editions."
+      }
+    ]
+  },
+  "delegues": {
+    "eyebrow": "Delegate program",
+    "breadcrumbCurrent": "Delegates",
+    "title": "60 positions to carry the program in your country",
+    "lead": "A paid three-month role, guaranteed Laureate eligibility for the 2027 edition, and entry into a network that doesn't close when the program ends.",
+    "roleTitle": "The role",
+    "roleBody": "Delegates represent and promote the Silicon Valley Africa Program in their region: passing on information, identifying and mobilising high-potential applicants, and raising the program's profile within their local network — universities, incubators, chambers of commerce, professional communities.",
+    "roleNote": "This is fieldwork. We're not looking for passive relays, but for people already listened to in their ecosystem.",
+    "benefitsTitle": "What you get",
+    "benefits": [
+      {
+        "title": "Compensation",
+        "description": "200 USD per month over 3 months — October, November and December 2026, i.e. 600 USD in total."
+      },
+      {
+        "title": "2027 edition",
+        "description": "Guaranteed eligibility for the Laureate pack: the full scholarship, trip funded 100%."
+      },
+      {
+        "title": "Certification",
+        "description": "Official First Of All certificate attesting to your role as a delegate."
+      },
+      {
+        "title": "Network",
+        "description": "Access to the First Of All Africa alumni community for 1 year."
+      }
+    ],
+    "conditionsTitle": "Conditions",
+    "conditions": [
+      "Be a national or resident of one of the 6 participating countries",
+      "Be between 18 and 65",
+      "Clean criminal record or legal equivalent",
+      "Have a real, active local network in your region",
+      "Be available for the full term (October to December 2026)"
+    ],
+    "processTitle": "The process",
+    "processBody": "Identical to the other packs. Applying is free. If your file is retained, you receive a unique access code by email within 72 hours. A 30 USD verification fee then covers the identity and criminal record checks, which are mandatory before any appointment.",
+    "processNote": "You will never be asked to pay before pre-selection, nor outside this site.",
+    "ctaLabel": "Apply as a delegate"
+  },
+  "confiance": {
+    "eyebrow": "Trust and transparency",
+    "breadcrumbCurrent": "Trust",
+    "title": "How to verify this program is legitimate",
+    "lead": "You're entrusting the program with identity documents and money. Here is precisely who we are, how we protect your data, and how to recognise an attempted fraud.",
+    "groupTitle": "The First Of All group",
+    "groupItems": [
+      {
+        "label": "Operating company",
+        "value": "First Of All LLC, headquartered in Santa Fe, United States"
+      },
+      {
+        "label": "Subsidiaries",
+        "value": "First Of All Overseas Limited (London) and First Of All Limited (Ontario)"
+      },
+      {
+        "label": "Registered trademark",
+        "value": "OAPI (Africa), EUIPO (Europe), USPTO (United States), United Kingdom and Canada"
+      },
+      {
+        "label": "Official site",
+        "value": "firstofall.net"
+      }
+    ],
+    "fraudTitle": "Recognising fraud",
+    "fraudLead": "These rules have no exceptions. If one of them is broken, you are not dealing with the program.",
+    "fraudRules": [
+      "You are never asked for payment before pre-selection.",
+      "All payments happen on this site, never by personal transfer or Mobile Money sent to an individual.",
+      "Every payment generates an immediate receipt sent by email.",
+      "Nobody will ask for your access code by phone, WhatsApp or social media.",
+      "All official communication goes through the email address on your application."
+    ],
+    "fraudReport": "If you're asked to pay outside this site, report it immediately via firstofall.net.",
+    "securityTitle": "Security of your data",
+    "securityItems": [
+      {
+        "title": "Encrypted passport number",
+        "description": "Encrypted at rest. Our team sees only the last two characters; full display is restricted to super-administrators and systematically logged."
+      },
+      {
+        "title": "Documents in private storage",
+        "description": "Your identity documents are reachable only through temporary links valid for 60 seconds. Every access is written to a tamper-proof audit log."
+      },
+      {
+        "title": "Hashed access codes",
+        "description": "Your code exists in plain text nowhere on our servers. It can't be displayed or recovered — a lost code is replaced, never retrieved."
+      },
+      {
+        "title": "Rate-limited attempts",
+        "description": "The number of attempts on the access page is capped and every attempt is logged."
+      },
+      {
+        "title": "Traceable payments",
+        "description": "Every transaction is recorded with its reference, amount and timestamp, and confirmed by the payment provider."
+      },
+      {
+        "title": "Your rights",
+        "description": "A data protection officer is appointed. You have rights of access, rectification and erasure of your data."
+      }
+    ],
+    "refundTitle": "Refund policy",
+    "refundRows": [
+      [
+        "Not pre-selected (Phase 1)",
+        "No fee was requested. Nothing to refund. Your file remains eligible for future editions."
+      ],
+      [
+        "Administrative or eligibility rejection (Phase 2)",
+        "Full refund of Phase 2 fees, to your original payment method."
+      ],
+      [
+        "Proven fraud",
+        "No refund. File permanently rejected, reporting possible."
+      ],
+      [
+        "Visa refusal — Laureate",
+        "1,000 USD premium, subject to documentary verification and internal audit. Paid within 60 days."
+      ],
+      [
+        "Visa refusal — Scholar",
+        "500 USD premium, subject to documentary verification and internal audit. Paid within 60 days."
+      ],
+      [
+        "Visa refusal — VIP Visitor",
+        "4,500 USD premium, subject to documentary verification and internal audit. Paid within 60 days."
+      ]
+    ],
+    "ctaTitle": "Questions before you start?",
+    "ctaFaq": "Read the FAQ",
+    "ctaApply": "Submit my application"
+  },
+  "legal": {
+    "eyebrow": "Legal information",
+    "lastUpdated": "Last updated: August 2026",
+    "pendingCounsel": "⚠️ Section to be completed by First Of All LLC's legal counsel before public launch. The final wording must be validated for each of the six jurisdictions concerned.",
+    "seeAlso": "See also",
+    "titles": {
+      "mentions-legales": "Legal notice",
+      "confidentialite": "Privacy",
+      "conditions-generales": "Terms",
+      "remboursement": "Refunds"
+    },
+    "mentions-legales": {
+      "title": "Legal notice",
+      "lead": "Site publisher, hosting and intellectual property.",
+      "sections": [
+        {
+          "title": "Site publisher",
+          "items": [
+            "First Of All LLC — headquartered in Santa Fe, United States",
+            "Subsidiary: First Of All Overseas Limited, London, United Kingdom",
+            "Subsidiary: First Of All Limited, Ontario, Canada",
+            "Group official site: firstofall.net"
+          ]
+        },
+        {
+          "title": "Registration numbers and legal representative",
+          "pending": true,
+          "body": "Company registration number, VAT number where applicable, name of the publication director and full registered-office details."
+        },
+        {
+          "title": "Intellectual property",
+          "body": "The First Of All trademark is registered with OAPI (Africa), EUIPO (Europe), USPTO (United States), and with the governments of the United Kingdom and Canada. All content on this site — text, visual identity, structure — is protected."
+        },
+        {
+          "title": "Hosting",
+          "pending": true,
+          "body": "Name, company name, address and telephone number of the site and database host."
+        },
+        {
+          "title": "Contact",
+          "body": "Any request concerning the program can be addressed via firstofall.net."
+        }
+      ]
+    },
+    "confidentialite": {
+      "title": "Privacy policy",
+      "lead": "What data we collect, why, how long we keep it and what your rights are.",
+      "sections": [
+        {
+          "title": "Data controller",
+          "body": "First Of All LLC, headquartered in Santa Fe, United States, acting as data controller for all data collected under the Silicon Valley Africa Program."
+        },
+        {
+          "title": "Data Protection Officer (DPO)",
+          "pending": true,
+          "body": "Name and direct contact details of the appointed DPO, to whom any request to exercise rights should be addressed."
+        },
+        {
+          "title": "Data collected in Phase 1",
+          "items": [
+            "Identity and contact details: first name, last name, email, WhatsApp number, age",
+            "Location: country and city of residence",
+            "Profile: sector, preferred pack, family situation",
+            "Eligibility declarations: criminal record, US visa refusal history",
+            "Free text: motivation and ties to your country",
+            "Application origin: how you heard about the program"
+          ]
+        },
+        {
+          "title": "Data collected in Phase 2",
+          "items": [
+            "Full identity as shown on your identity document",
+            "Passport number and expiry date",
+            "Full residential address, profession, employer",
+            "Emergency contact",
+            "Identity document (front and back), liveness selfie, criminal record extract",
+            "Answers to the non-return risk questionnaire",
+            "Payment data handled by our providers — no card data is stored by the program"
+          ]
+        },
+        {
+          "title": "Purpose of processing",
+          "body": "Your data is processed for the sole purpose of assessing your application: eligibility checks, identity and criminal record verification, file review, payment processing and, if validated, assembling the visa file."
+        },
+        {
+          "title": "Security measures actually implemented",
+          "items": [
+            "Your passport number is encrypted at rest (AES-256-GCM). It never appears in plain text in the admin interface; only the last two characters are visible.",
+            "Your supporting documents are held in private storage, reachable only through temporary links valid for 60 seconds.",
+            "Every document access and every passport-number display is written to a tamper-proof audit log, with the administrator's identity, the date and the IP address.",
+            "Access codes are hashed server-side and exist in plain text nowhere.",
+            "Phase 2 access attempts are rate-limited and logged.",
+            "Access to the most sensitive data is restricted to super-administrators."
+          ]
+        },
+        {
+          "title": "Retention period",
+          "body": "Identity documents are retained for 12 months from submission, then automatically deleted. Application data is retained for as long as necessary to assess the file and to meet applicable legal obligations.",
+          "pending": true
+        },
+        {
+          "title": "Your rights",
+          "body": "You have rights of access, rectification and erasure of your data, as well as rights of objection and portability. These requests should be addressed to the DPO. An identity check may be required before any request is processed."
+        },
+        {
+          "title": "International transfers and legal basis",
+          "pending": true,
+          "body": "Legal basis for processing, framework governing data transfers outside the applicant's country of residence, and the list of approved sub-processors (payment providers, verification services, host)."
+        }
+      ]
+    },
+    "conditions-generales": {
+      "title": "Terms and conditions",
+      "lead": "The rules governing application, verification and participation in the program.",
+      "sections": [
+        {
+          "title": "Purpose",
+          "body": "These terms govern applications to the Silicon Valley Africa Program, 2026 edition, operated by First Of All LLC."
+        },
+        {
+          "title": "Phase 1 is free",
+          "body": "Applying is entirely free for all five packs. No payment is requested before pre-selection. Any request for payment in Phase 1, or outside this site, is attempted fraud."
+        },
+        {
+          "title": "Verification fees — Phase 2",
+          "items": [
+            "Laureate: 20 USD",
+            "Scholar: 30 USD",
+            "Delegate: 30 USD",
+            "Business Visitor: 330 USD",
+            "VIP Visitor: 330 USD"
+          ]
+        },
+        {
+          "title": "What the verification fee covers",
+          "body": "The fee covers identity verification, the criminal record check, the non-return risk assessment and administrative processing of the file. It does not constitute the purchase of a place: places are limited and allocated after verification."
+        },
+        {
+          "title": "Access code",
+          "body": "The access code is personal, tied to your full name and email address, single-use and valid for 14 days. It cannot be shared or transferred. A new code automatically cancels the previous one."
+        },
+        {
+          "title": "Selection",
+          "body": "Phase 1 pre-selection is automatic and based on verifiable criteria. Final allocation of places for the Laureate, Scholar and Delegate packs is a committee decision made on file, and is never automatic. Business Visitor and VIP Visitor are selected automatically where eligibility criteria are met and verification is conclusive."
+        },
+        {
+          "title": "VIP Visitor sponsorship contribution",
+          "body": "The 7,000 USD sponsorship contribution applicable to the VIP Visitor pack is due only after the file has been validated following verification. It is arranged directly with the program administration and is never paid on this site."
+        },
+        {
+          "title": "Fraud",
+          "body": "In the event of proven documentary fraud, the application is permanently rejected, no refund is granted and a report to the competent authorities is possible."
+        },
+        {
+          "title": "Liability, governing law and jurisdiction",
+          "pending": true,
+          "body": "Limitation of liability, force majeure, program modification, governing law and competent court for each of the six jurisdictions concerned."
+        }
+      ]
+    },
+    "remboursement": {
+      "title": "Refund policy and premiums",
+      "lead": "When Phase 2 fees are refunded, and the conditions for paying visa-refusal premiums.",
+      "sections": [
+        {
+          "title": "Not pre-selected in Phase 1",
+          "body": "No fee was requested and none will be. There is therefore nothing to refund. Your file remains eligible for future editions of the program."
+        },
+        {
+          "title": "Administrative or eligibility rejection in Phase 2",
+          "body": "Verification fees are refunded in full, to the original payment method. A Mobile Money refund is credited to the wallet used for payment; a card refund is credited to the card used."
+        },
+        {
+          "title": "No place allocated after verification",
+          "body": "Places are limited. A file that passes verification but is not retained after review does not give rise to a refund of the verification fee, which covered a service actually rendered. The number of pre-selections per pack is capped in order to limit this situation."
+        },
+        {
+          "title": "Proven fraud",
+          "body": "No refund is granted. The file is permanently rejected and may be reported."
+        },
+        {
+          "title": "Premiums in the event of a US visa refusal",
+          "items": [
+            "Laureate: 1,000 USD",
+            "Scholar: 500 USD",
+            "VIP Visitor: 4,500 USD"
+          ]
+        },
+        {
+          "title": "Conditions for paying premiums",
+          "body": "Payment is subject to documentary verification of the official refusal issued by US consular authorities, and to an internal audit of the file. Payment is made within 60 days of receiving the refusal document."
+        },
+        {
+          "title": "Refund processing times",
+          "pending": true,
+          "body": "Contractual processing time for a refund request, complaints procedure and appeal arrangements."
+        }
+      ]
+    }
   }
 }

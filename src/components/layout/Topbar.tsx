@@ -13,10 +13,11 @@ export function Topbar() {
   const [open, setOpen] = useState(false);
 
   const links = [
-    { href: "/#why", label: t("programme"), active: pathname === "/" },
     { href: "/admission", label: t("admission"), active: pathname === "/admission" },
     { href: "/packs", label: t("packs"), active: pathname === "/packs" },
     { href: "/agenda", label: t("agenda"), active: pathname === "/agenda" },
+    { href: "/delegues", label: t("delegues"), active: pathname === "/delegues" },
+    { href: "/faq", label: t("faq"), active: pathname === "/faq" },
   ];
 
   // Lock background scroll and allow Escape to dismiss while the mobile
@@ -55,7 +56,7 @@ export function Topbar() {
                 href={link.href}
                 aria-current={link.active ? "page" : undefined}
                 className={`text-xs font-semibold uppercase tracking-[0.2em] transition-colors hover:text-terracotta ${
-                  link.active
+                  link.active  
                     ? "border-b border-terracotta text-terracotta"
                     : "text-ink-mid"
                 }`}

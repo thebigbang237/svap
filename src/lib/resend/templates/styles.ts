@@ -18,9 +18,16 @@ export const colors = {
 // Email clients don't reliably load custom web fonts, so headings fall back
 // to a web-safe serif (standing in for EB Garamond) and body text to a
 // web-safe sans-serif (standing in for Inter).
-const fontSerif = "Georgia, 'Times New Roman', Times, serif";
-const fontSans =
-  "Helvetica, Arial, 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif";
+//
+// The Arabic names are appended rather than swapped in: Georgia and Helvetica
+// carry no Arabic glyphs, so without a named Arabic family the client picks
+// its own fallback and line metrics vary wildly between Outlook, Gmail and
+// Apple Mail. Webfonts aren't an option here — these have to be locally
+// installed families.
+const arabicFallback =
+  "'Segoe UI', Tahoma, 'Geeza Pro', 'Arabic Typesetting', sans-serif";
+const fontSerif = `Georgia, 'Times New Roman', Times, ${arabicFallback}, serif`;
+const fontSans = `Helvetica, Arial, 'Segoe UI', -apple-system, BlinkMacSystemFont, ${arabicFallback}, sans-serif`;
 
 export const styles: Record<string, CSSProperties> = {
   body: {
@@ -66,6 +73,19 @@ export const styles: Record<string, CSSProperties> = {
     margin: "0 0 16px",
     paddingLeft: "16px",
     borderLeft: `2px solid ${colors.terracotta}`,
+  },
+  // Mirror of `quote` for RTL. Logical properties (padding-inline-start,
+  // border-inline-start) are still unreliable across email clients, so the
+  // physical sides are flipped by hand instead.
+  quoteRtl: {
+    fontFamily: fontSans,
+    fontSize: "15px",
+    lineHeight: 1.6,
+    color: colors.ink,
+    fontStyle: "italic",
+    margin: "0 0 16px",
+    paddingRight: "16px",
+    borderRight: `2px solid ${colors.terracotta}`,
   },
   label: {
     fontFamily: fontSans,

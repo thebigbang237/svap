@@ -1,9 +1,10 @@
 import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/marketing/PageHeader";
 import { SectionEyebrow } from "@/components/marketing/SectionEyebrow";
-import { PackCard, type PackFeature } from "@/components/marketing/PackCard";
+import { PackCard } from "@/components/marketing/PackCard";
 import { CTAButton } from "@/components/marketing/CTAButton";
 import { ArrowRightIcon } from "@/components/marketing/icons";
+import { PACKS, PACK_SPECS } from "@/lib/constants/program";
 
 function ProcessStep({
   number,
@@ -17,7 +18,7 @@ function ProcessStep({
   dark?: boolean;
 }) {
   return (
-    <div className="relative flex w-full flex-col items-center text-center md:w-1/5 md:items-start md:text-left">
+    <div className="relative flex w-full flex-col items-center text-center md:w-1/5 md:items-start md:text-start">
       <div
         className={[
           "z-10 mb-6 flex h-20 w-20 items-center justify-center",
@@ -38,142 +39,109 @@ function ProcessStep({
   );
 }
 
-/** Mark the last feature in a list as explicitly excluded (e.g. the
- * "Invité" pack's "Logement non inclus"). */
-function withLastExcluded(features: string[]): (string | PackFeature)[] {
-  return features.map((text, i) =>
-    i === features.length - 1 ? { text, included: false } : text,
-  );
-}
-
+/**
+ * The five packs.
+ *
+ * Places and verification fees are read from PACK_SPECS, never from the
+ * translation files — those numbers appear on the pack card, in the payment
+ * step, in the FAQ and in the database constraint, and the whole point of the
+ * single source of truth is that they cannot disagree.
+ */
 export default function PacksPage() {
   const tCommon = useTranslations("common");
-  const tPacks = useTranslations("packs");
+  const t = useTranslations("packs");
+  // Pack display names live in the candidature namespace — the form, the
+  // pack cards and the emails all read the same strings.
+  const tPack = useTranslations("candidature.options.pack");
 
   return (
     <>
       <PageHeader
         breadcrumbHome={tCommon("home")}
-        breadcrumbCurrent={tPacks("page.breadcrumbCurrent")}
-        eyebrow={tPacks("page.eyebrow")}
-        title={tPacks("page.title")}
-        lead={tPacks("page.lead")}
+        breadcrumbCurrent={t("page.breadcrumbCurrent")}
+        eyebrow={t("page.eyebrow")}
+        title={t("page.title")}
+        lead={t("page.lead")}
       />
 
-      {/* PACKS GRID */}
-      <section className="px-8 py-[120px]">
+      {/* The founding principle, stated before any price is shown. */}
+      <section className="px-8 pt-4">
         <div className="mx-auto max-w-[1280px]">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <PackCard
-              size="full"
-              variant="default"
-              name={tPacks("items.laureat.name")}
-              badgeLabel={tPacks("items.laureat.badgeLabel")}
-              placesCount={tPacks("items.laureat.placesCount")}
-              costLabel={tPacks("items.laureat.costLabel")}
-              costValue={tPacks("items.laureat.costValue")}
-              features={tPacks.raw("items.laureat.features")}
-              applicationFee={tPacks("items.laureat.applicationFee")}
-              ctaLabel={tPacks("items.laureat.ctaLabel")}
-              href="/candidature?pack=laureat"
-            />
-            <PackCard
-              size="full"
-              variant="featured"
-              name={tPacks("items.boursier.name")}
-              badgeLabel={tPacks("items.boursier.badgeLabel")}
-              placesCount={tPacks("items.boursier.placesCount")}
-              costLabel={tPacks("items.boursier.costLabel")}
-              costValue={tPacks("items.boursier.costValue")}
-              features={tPacks.raw("items.boursier.features")}
-              applicationFee={tPacks("items.boursier.applicationFee")}
-              ctaLabel={tPacks("items.boursier.ctaLabel")}
-              href="/candidature?pack=boursier"
-            />
-            <PackCard
-              size="full"
-              variant="default"
-              name={tPacks("items.invite.name")}
-              badgeLabel={tPacks("items.invite.badgeLabel")}
-              placesCount={tPacks("items.invite.placesCount")}
-              costLabel={tPacks("items.invite.costLabel")}
-              costValue={tPacks("items.invite.costValue")}
-              features={withLastExcluded(tPacks.raw("items.invite.features"))}
-              applicationFee={tPacks("items.invite.applicationFee")}
-              ctaLabel={tPacks("items.invite.ctaLabel")}
-              href="/candidature?pack=invite"
-            />
-            <PackCard
-              size="full"
-              variant="default"
-              name={tPacks("items.ambassadeur.name")}
-              badgeLabel={tPacks("items.ambassadeur.badgeLabel")}
-              placesCount={tPacks("items.ambassadeur.placesCount")}
-              costLabel={tPacks("items.ambassadeur.costLabel")}
-              costValue={tPacks("items.ambassadeur.costValue")}
-              features={tPacks.raw("items.ambassadeur.features")}
-              applicationFee={tPacks("items.ambassadeur.applicationFee")}
-              ctaLabel={tPacks("items.ambassadeur.ctaLabel")}
-              href="/candidature?pack=ambassadeur"
-            />
-          </div>
+          <p className="border-s-2 border-terracotta bg-sky-mid/60 p-6 text-ink">
+            {t("freeNotice")}
+          </p>
         </div>
       </section>
 
-      {/* PROCESS STEPS */}
+      <section className="px-8 py-[120px]">
+        <div className="mx-auto max-w-[1280px]">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+            {PACKS.map((pack) => {
+              const spec = PACK_SPECS[pack];
+              return (
+                <PackCard
+                  key={pack}
+                  size="full"
+                  variant={pack === "boursier" ? "featured" : "default"}
+                  name={tPack(pack)}
+                  badgeLabel={t(`items.${pack}.badgeLabel`)}
+                  placesCount={spec.places}
+                  costLabel={t(`items.${pack}.costLabel`)}
+                  costValue={t(`items.${pack}.costValue`)}
+                  features={t.raw(`items.${pack}.features`)}
+                  applicationFee={`${t("feePrefix")} $${spec.verificationFeeUsd} — ${t("feeSuffix")}`}
+                  ctaLabel={t(`items.${pack}.ctaLabel`)}
+                  href={`/candidature?pack=${pack}`}
+                />
+              );
+            })}
+          </div>
+
+          {/* The VIP sponsorship contribution is disclosed, and it is stated
+              plainly that it is never collected here — otherwise the amount
+              contradicts the anti-fraud guidance on /confiance. */}
+          <p className="mt-8 border border-ink-dim/20 bg-white p-6 text-sm text-ink-mid">
+            <span className="font-semibold text-ink">VIP Visitor — </span>
+            {t("items.vip_visitor.note")}
+          </p>
+        </div>
+      </section>
+
       <section className="overflow-hidden bg-sky-mid px-8 py-[120px]">
         <div className="mx-auto max-w-[1280px]">
           <div className="mb-16">
-            <SectionEyebrow label={tPacks("process.eyebrow")} className="mb-6" />
-            <h2 className="font-serif text-[32px] sm:text-[42px] font-normal text-blue-dark">
-              {tPacks("process.title")}
+            <SectionEyebrow label={t("process.eyebrow")} className="mb-6" />
+            <h2 className="font-serif text-[32px] font-normal text-blue-dark sm:text-[42px]">
+              {t("process.title")}
             </h2>
           </div>
           <div className="relative flex flex-col items-start gap-12 md:flex-row md:justify-between md:gap-0">
-            <div className="absolute top-10 left-0 hidden h-px w-full bg-ink-dim/20 md:block" />
-            <ProcessStep
-              number="01"
-              title={tPacks("process.steps.step1.title")}
-              description={tPacks("process.steps.step1.description")}
-            />
-            <ProcessStep
-              number="02"
-              title={tPacks("process.steps.step2.title")}
-              description={tPacks("process.steps.step2.description")}
-            />
-            <ProcessStep
-              number="03"
-              title={tPacks("process.steps.step3.title")}
-              description={tPacks("process.steps.step3.description")}
-            />
-            <ProcessStep
-              number="04"
-              title={tPacks("process.steps.step4.title")}
-              description={tPacks("process.steps.step4.description")}
-            />
-            <ProcessStep
-              number="05"
-              title={tPacks("process.steps.step5.title")}
-              description={tPacks("process.steps.step5.description")}
-              dark
-            />
+            <div className="absolute top-10 inset-s-0 hidden h-px w-full bg-ink-dim/20 md:block" />
+            {["step1", "step2", "step3", "step4", "step5"].map((step, i) => (
+              <ProcessStep
+                key={step}
+                number={String(i + 1).padStart(2, "0")}
+                title={t(`process.steps.${step}.title`)}
+                description={t(`process.steps.${step}.description`)}
+                dark={i === 4}
+              />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CLOSING CTA */}
       <section className="px-8 py-[120px] text-center">
         <div className="mx-auto max-w-3xl">
-          <h2 className="font-serif text-[32px] sm:text-[42px] font-normal text-blue-dark mb-8">
-            {tPacks("closingCta.title")}
+          <h2 className="mb-8 font-serif text-[32px] font-normal text-blue-dark sm:text-[42px]">
+            {t("closingCta.title")}
           </h2>
-          <p className="mb-12 text-ink-mid">{tPacks("closingCta.description")}</p>
+          <p className="mb-12 text-ink-mid">{t("closingCta.description")}</p>
           <CTAButton
             href="/candidature"
             variant="primary"
             icon={<ArrowRightIcon className="h-4 w-4" />}
           >
-            {tPacks("closingCta.ctaLabel")}
+            {t("closingCta.ctaLabel")}
           </CTAButton>
         </div>
       </section>

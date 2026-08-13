@@ -44,7 +44,7 @@ export default function CandidaturePage() {
               </ul>
             </div>
 
-            <div className="flex items-start gap-4 border-l-2 border-terracotta bg-sky-mid p-6">
+            <div className="flex items-start gap-4 border-s-2 border-terracotta bg-sky-mid p-6">
               <ShieldIcon className="h-8 w-8 shrink-0 text-terracotta" />
               <div>
                 <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-terracotta">

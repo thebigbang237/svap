@@ -1,6 +1,7 @@
 import { Body, Container, Head, Heading, Hr, Link, Preview, Section, Text, Html } from "react-email";
 import { styles } from "./styles";
-import { PAYS_LABELS, SECTEUR_LABELS, PACK_LABELS } from "../labels";
+import { paysLabel, secteurLabel, packLabel } from "../labels";
+import { getDirection } from "@/i18n/routing";
 import type { CandidatureData, Locale } from "../types";
 
 export interface AdminNewCandidatureEmailProps {
@@ -38,6 +39,23 @@ const copy = {
     },
     ctaLabel: "View in admin",
   },
+  // Kept locale-driven to preserve the existing documented behaviour, but
+  // worth revisiting: the admin UI is French-only by design, so an internal
+  // alert rendered in Arabic is harder for the team to triage than it is
+  // useful as a signal of which language to reply in.
+  ar: {
+    preview: "ترشيح جديد",
+    heading: "ترشيح جديد",
+    fields: {
+      name: "الاسم",
+      email: "البريد الإلكتروني",
+      telephone: "الهاتف",
+      pack: "الباقة",
+      pays: "البلد",
+      secteur: "القطاع",
+    },
+    ctaLabel: "عرض الملف في لوحة الإدارة",
+  },
 } as const;
 
 export function AdminNewCandidatureEmail({
@@ -48,7 +66,7 @@ export function AdminNewCandidatureEmail({
   const t = copy[locale];
 
   return (
-    <Html>
+    <Html lang={locale} dir={getDirection(locale)}>
       <Head />
       <Preview>{t.preview}</Preview>
       <Body style={styles.body}>
@@ -62,24 +80,28 @@ export function AdminNewCandidatureEmail({
             </Text>
 
             <Text style={styles.label}>{t.fields.email}</Text>
-            <Text style={styles.value}>{candidature.email}</Text>
+            <Text style={styles.value} dir="ltr">
+              {candidature.email}
+            </Text>
 
             <Text style={styles.label}>{t.fields.telephone}</Text>
-            <Text style={styles.value}>{candidature.telephone}</Text>
+            <Text style={styles.value} dir="ltr">
+              {candidature.telephone}
+            </Text>
 
             <Text style={styles.label}>{t.fields.pack}</Text>
             <Text style={styles.value}>
-              {PACK_LABELS[locale][candidature.pack] ?? candidature.pack}
+              {packLabel(locale, candidature.pack)}
             </Text>
 
             <Text style={styles.label}>{t.fields.pays}</Text>
             <Text style={styles.value}>
-              {PAYS_LABELS[locale][candidature.pays] ?? candidature.pays}
+              {paysLabel(locale, candidature.pays)}
             </Text>
 
             <Text style={styles.label}>{t.fields.secteur}</Text>
             <Text style={{ ...styles.value, margin: 0 }}>
-              {SECTEUR_LABELS[locale][candidature.secteur] ?? candidature.secteur}
+              {secteurLabel(locale, candidature.secteur)}
             </Text>
           </Section>
 

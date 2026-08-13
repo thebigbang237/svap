@@ -36,12 +36,18 @@ export function CrossIcon({ className = "" }: IconProps) {
   );
 }
 
+/**
+ * Points in the reading direction — "forward", not literally right. The
+ * mirror is baked in here rather than at the call sites so every CTA gets it
+ * for free. Check and cross are deliberately left alone: they're symbolic,
+ * not directional, and mirroring a checkmark just makes it look wrong.
+ */
 export function ArrowRightIcon({ className = "" }: IconProps) {
   return (
     <svg
       viewBox="0 0 20 20"
       fill="currentColor"
-      className={className}
+      className={`rtl:-scale-x-100 ${className}`}
       aria-hidden="true"
     >
       <path

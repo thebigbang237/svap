@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/supabase/require-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendStatusUpdateEmail } from "@/lib/resend/client";
 import { STATUS_OPTIONS } from "@/lib/constants/admin-options";
+import { recordAudit } from "@/lib/admin/audit";
 import type { CandidatureStatus } from "@/lib/resend/types";
 import type { CandidatureRow } from "@/lib/supabase/types";
 
@@ -83,6 +84,18 @@ export async function PATCH(
       { success: false, error: "Update failed" },
       { status: 500 },
     );
+  }
+
+  if (statusChanged) {
+    await recordAudit({
+      actorId: admin.userId,
+      actorEmail: admin.profile.full_name,
+      action: "candidature.status",
+      entityType: "candidature",
+      entityId: updated.id,
+      request,
+      metadata: { from: existing.status, to: updated.status },
+    });
   }
 
   if (statusChanged && NOTIFIABLE_STATUSES.includes(updated.status)) {

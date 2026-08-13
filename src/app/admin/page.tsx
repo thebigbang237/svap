@@ -3,8 +3,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getDashboardStats } from "@/lib/admin/dashboard-stats";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { STATUS_OPTIONS, STATUS_LABELS_FR } from "@/lib/constants/admin-options";
-import { PACK_OPTIONS } from "@/lib/constants/candidature-options";
-import { PACK_LABELS } from "@/lib/resend/labels";
+import { PACKS } from "@/lib/constants/program";
+import { packLabel } from "@/lib/resend/labels";
 
 function StatCard({ label, value }: { label: string; value: number }) {
   return (
@@ -53,10 +53,10 @@ export default async function AdminDashboardPage() {
           Par pack
         </h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
-          {PACK_OPTIONS.map((pack) => (
+          {PACKS.map((pack) => (
             <StatCard
               key={pack}
-              label={PACK_LABELS.fr[pack] ?? pack}
+              label={packLabel("fr", pack)}
               value={byPack[pack] ?? 0}
             />
           ))}
@@ -102,7 +102,7 @@ export default async function AdminDashboardPage() {
                   </td>
                   <td className="px-4 py-3 text-ink-mid">{row.email}</td>
                   <td className="px-4 py-3">
-                    {PACK_LABELS.fr[row.pack] ?? row.pack}
+                    {packLabel("fr", row.pack)}
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={row.status} />

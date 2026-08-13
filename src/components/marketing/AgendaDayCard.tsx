@@ -1,3 +1,5 @@
+import { Ltr } from "@/components/layout/Ltr";
+
 export interface AgendaDayItem {
   time: string;
   description: string;
@@ -63,7 +65,7 @@ export function AgendaDayCard({
     >
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute -left-2 -top-6 z-0 font-serif text-[100px] sm:text-[160px] font-normal leading-none text-blue/5 transition-colors group-hover:text-terracotta/10"
+        className="pointer-events-none absolute -inset-s-2 -top-6 z-0 font-serif text-[100px] sm:text-[160px] font-normal leading-none text-blue/5 transition-colors group-hover:text-terracotta/10"
       >
         {dayNumber}
       </span>
@@ -78,12 +80,12 @@ export function AgendaDayCard({
           {items.map((item, i) => (
             <li
               key={i}
-              className="flex gap-4 border-l-2 border-blue-light pl-4 text-ink"
+              className="flex gap-4 border-s-2 border-blue-light ps-4 text-ink"
             >
               {item.time && (
-                <span className="font-semibold whitespace-nowrap">
+                <Ltr className="font-semibold whitespace-nowrap">
                   {item.time}
-                </span>
+                </Ltr>
               )}
               <span>{item.description}</span>
             </li>

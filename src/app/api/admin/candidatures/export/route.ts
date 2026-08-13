@@ -5,8 +5,9 @@ import {
   parseCandidaturesFilters,
   buildCandidaturesQuery,
 } from "@/lib/admin/candidatures-query";
-import { PAYS_LABELS, SECTEUR_LABELS, PACK_LABELS } from "@/lib/resend/labels";
+import { paysLabel, secteurLabel, packLabel } from "@/lib/resend/labels";
 import { STATUS_LABELS_FR } from "@/lib/constants/admin-options";
+import { recordAudit } from "@/lib/admin/audit";
 import type { CandidatureRow } from "@/lib/supabase/types";
 
 // This GET route has no dynamic segment, so without this it's a candidate
@@ -18,9 +19,9 @@ const COLUMNS: { header: string; value: (row: CandidatureRow) => string }[] = [
   { header: "Nom", value: (r) => r.nom },
   { header: "Email", value: (r) => r.email },
   { header: "Téléphone", value: (r) => r.telephone },
-  { header: "Pays", value: (r) => PAYS_LABELS.fr[r.pays] ?? r.pays },
-  { header: "Secteur", value: (r) => SECTEUR_LABELS.fr[r.secteur] ?? r.secteur },
-  { header: "Pack", value: (r) => PACK_LABELS.fr[r.pack] ?? r.pack },
+  { header: "Pays", value: (r) => paysLabel("fr", r.pays) },
+  { header: "Secteur", value: (r) => secteurLabel("fr", r.secteur) },
+  { header: "Pack", value: (r) => packLabel("fr", r.pack) },
   { header: "Statut", value: (r) => STATUS_LABELS_FR[r.status] ?? r.status },
   { header: "Date de soumission", value: (r) => new Date(r.created_at).toLocaleString("fr-FR") },
   { header: "Notes internes", value: (r) => r.notes_admin ?? "" },
@@ -57,6 +58,19 @@ export async function GET(request: Request) {
       COLUMNS.map((c) => toCsvField(c.value(row))).join(","),
     ),
   ];
+
+  // An export lifts candidate personal data out of the system entirely,
+  // beyond any access control it has — which makes it exactly the kind of
+  // access §8's audit obligation exists for. Row count and filters are
+  // recorded so the scope of what left is reconstructable.
+  await recordAudit({
+    actorId: admin.userId,
+    actorEmail: admin.profile.full_name,
+    action: "candidature.export",
+    entityType: "candidature",
+    request,
+    metadata: { rowCount: rows?.length ?? 0, filters },
+  });
 
   // Leading BOM so Excel opens the UTF-8 file (accented characters) correctly.
   const csv = "﻿" + lines.join("\r\n");

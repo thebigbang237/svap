@@ -1,13 +1,13 @@
-import { STATUS_LABELS_FR, STATUS_BADGE_CLASSES } from "@/lib/constants/admin-options";
+import { statusLabel, statusBadgeClasses } from "@/lib/constants/admin-options";
 
 export function StatusBadge({ status }: { status: string }) {
   return (
     <span
-      className={`inline-block px-2 py-1 text-[11px] font-semibold uppercase tracking-wide ${
-        STATUS_BADGE_CLASSES[status] ?? "bg-sky-mid text-ink-mid"
-      }`}
+      className={`inline-block px-2 py-1 text-[11px] font-semibold uppercase tracking-wide ${statusBadgeClasses(
+        status,
+      )}`}
     >
-      {STATUS_LABELS_FR[status] ?? status}
+      {statusLabel(status)}
     </span>
   );
 }

@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { CTAButton } from "./CTAButton";
+import { Ltr } from "@/components/layout/Ltr";
 import { CheckIcon, CrossIcon } from "./icons";
 
 export interface PackFeature {
@@ -75,7 +76,7 @@ export function PackCard({
         ].join(" ")}
       >
         {featured && (
-          <div className="absolute -top-4 right-8 bg-terracotta px-4 py-1 text-[10px] font-semibold uppercase tracking-widest text-white">
+          <div className="absolute -top-4 inset-e-8 bg-terracotta px-4 py-1 text-[10px] font-semibold uppercase tracking-widest text-white">
             {t("mostPopular")}
           </div>
         )}
@@ -117,6 +118,10 @@ export function PackCard({
       ].join(" ")}
     >
       {featured && (
+        // `left-1/2` is correct here and must NOT become `inset-s-1/2`:
+        // Tailwind doesn't mirror transforms, so pairing a logical inset with
+        // `-translate-x-1/2` would push the badge off-centre in RTL. Physical
+        // left + physical translate stays centred in both directions.
         <div className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 bg-terracotta px-4 py-1 text-[10px] font-semibold uppercase tracking-widest text-white">
           {t("mostPopular")}
         </div>
@@ -132,9 +137,9 @@ export function PackCard({
           {badgeLabel}
         </span>
         <div className="flex items-baseline gap-2">
-          <span className={`font-serif text-[40px] sm:text-[56px] font-normal leading-none ${accentText}`}>
+          <Ltr className={`font-serif text-[40px] sm:text-[56px] font-normal leading-none ${accentText}`}>
             {placesCount}
-          </span>
+          </Ltr>
           <span className={`text-xs font-semibold uppercase tracking-[0.2em] ${mutedText}`}>
             {t("places")}
           </span>

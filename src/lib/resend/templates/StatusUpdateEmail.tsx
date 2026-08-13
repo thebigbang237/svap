@@ -1,5 +1,6 @@
 import { Body, Container, Head, Heading, Hr, Html, Preview, Text } from "react-email";
 import { styles, colors } from "./styles";
+import { getDirection } from "@/i18n/routing";
 import type { CandidatureData, CandidatureStatus, Locale } from "../types";
 
 export interface StatusUpdateEmailProps {
@@ -67,6 +68,36 @@ const copy = {
       next: "If a spot opens up among admitted candidates, we'll reach out right away by email. No action is needed from you at this time.",
     },
   },
+  // ⚠️ First-pass Arabic, pending professional review — see
+  // docs/plan-edition-2026.md §3.
+  ar: {
+    brand: "Silicon Valley Africa",
+    footer: "Silicon Valley Africa Program 2026 — تتعلق هذه الرسالة بترشيحكم.",
+    preselection: {
+      preview: "تمّ اختياركم أوليًا — Silicon Valley Africa Program",
+      heading: (prenom: string) => `خبر سار، ${prenom}.`,
+      body: "اجتاز ترشيحكم المرحلة الأولى من التقييم: لقد تمّ اختياركم أوليًا لبرنامج Silicon Valley Africa Program 2026. تواصل لجنتنا الآن الدراسة المعمّقة لملفكم.",
+      next: "سنعود إليكم عبر البريد الإلكتروني بمجرد اتخاذ القرار النهائي. لا يُطلب منكم أي إجراء في الوقت الحالي.",
+    },
+    accepte: {
+      preview: "تهانينا — تمّ قبول ترشيحكم!",
+      heading: (prenom: string) => `تهانينا، ${prenom}!`,
+      body: "يسعدنا أن نعلمكم بقبول ترشيحكم لبرنامج Silicon Valley Africa Program 2026.",
+      next: "سيتواصل معكم فريقنا قريبًا عبر البريد الإلكتروني لاستكمال تسجيلكم وإطلاعكم على الخطوات التالية (الدفع، اللوجستيك، التحضير للسفر).",
+    },
+    refuse: {
+      preview: "بخصوص ترشيحكم — Silicon Valley Africa Program",
+      heading: (prenom: string) => `عزيزي/عزيزتي ${prenom}،`,
+      body: "بعد دراسة متأنية لملفكم من قبل لجنة الاختيار، يؤسفنا أنه لم يكن بإمكاننا قبول ترشيحكم لنسخة 2026 من برنامج Silicon Valley Africa Program.",
+      next: "إن انتقائية هذا البرنامج لا تعكس بأي حال جودة ملفكم. نشجعكم بشدة على التقدّم مجددًا في نسخة قادمة.",
+    },
+    liste_attente: {
+      preview: "أنتم على قائمة الانتظار — Silicon Valley Africa Program",
+      heading: (prenom: string) => `عزيزي/عزيزتي ${prenom}،`,
+      body: "لفت ترشيحكم انتباه لجنتنا، وأنتم الآن على قائمة انتظار برنامج Silicon Valley Africa Program 2026.",
+      next: "إذا شغر مقعد بين المترشحين المقبولين، سنتواصل معكم فورًا عبر البريد الإلكتروني. لا يُطلب منكم أي إجراء في الوقت الحالي.",
+    },
+  },
 } as const;
 
 const statusAccent: Record<CandidatureStatus, string> = {
@@ -85,7 +116,7 @@ export function StatusUpdateEmail({
   const statusCopy = t[status];
 
   return (
-    <Html>
+    <Html lang={locale} dir={getDirection(locale)}>
       <Head />
       <Preview>{statusCopy.preview}</Preview>
       <Body style={styles.body}>
