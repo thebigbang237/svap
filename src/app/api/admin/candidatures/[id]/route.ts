@@ -4,15 +4,13 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendStatusUpdateEmail } from "@/lib/resend/client";
 import { STATUS_OPTIONS } from "@/lib/constants/admin-options";
 import { recordAudit } from "@/lib/admin/audit";
-import type { CandidatureStatus } from "@/lib/resend/types";
+import { NOTIFIABLE_STATUSES } from "@/lib/resend/types";
+import type { NotifiableStatus } from "@/lib/resend/types";
 import type { CandidatureRow } from "@/lib/supabase/types";
 
-const NOTIFIABLE_STATUSES: readonly string[] = [
-  "preselection",
-  "accepte",
-  "refuse",
-  "liste_attente",
-];
+// Imported rather than re-declared: this list previously held the pre-0006
+// status names, so the membership check below never matched and no decision
+// email was ever sent.
 
 export async function PATCH(
   request: Request,
@@ -98,7 +96,10 @@ export async function PATCH(
     });
   }
 
-  if (statusChanged && NOTIFIABLE_STATUSES.includes(updated.status)) {
+  if (
+    statusChanged &&
+    (NOTIFIABLE_STATUSES as readonly string[]).includes(updated.status)
+  ) {
     sendStatusUpdateEmail(
       {
         id: updated.id,
@@ -114,7 +115,7 @@ export async function PATCH(
         motivation: updated.motivation,
         locale: updated.locale,
       },
-      updated.status as CandidatureStatus,
+      updated.status as NotifiableStatus,
     ).catch((err) => {
       console.error("Failed to send status update email:", err);
     });

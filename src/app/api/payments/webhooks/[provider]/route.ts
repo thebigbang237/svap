@@ -1,13 +1,8 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { providerById } from "@/lib/payments/registry";
-import {
-  applyWebhookEvent,
-  markCandidaturePaid,
-} from "@/lib/payments/record";
-import { sendPaymentReceiptEmail } from "@/lib/resend/client";
+import { applyWebhookEvent, settlePayment } from "@/lib/payments/record";
 import type { PaymentProviderId } from "@/lib/payments/types";
-import type { CandidatureRow } from "@/lib/supabase/types";
 
 const KNOWN: PaymentProviderId[] = ["pawapay", "stripe", "flutterwave"];
 
@@ -74,40 +69,11 @@ export async function POST(
   }
 
   if (result.becamePaid) {
-    await markCandidaturePaid(supabase, result.payment.candidature_id);
-
-    const { data: candidature } = await supabase
-      .from("candidatures")
-      .select("prenom, email, locale, pack")
-      .eq("id", result.payment.candidature_id)
-      .maybeSingle<
-        Pick<CandidatureRow, "prenom" | "email" | "locale" | "pack">
-      >();
-
-    if (candidature) {
-      try {
-        await sendPaymentReceiptEmail({
-          prenom: candidature.prenom,
-          email: candidature.email,
-          locale: candidature.locale,
-          amountUsd: result.payment.amount_usd,
-          amountLocal: result.payment.amount_local,
-          currency: result.payment.currency,
-          reference: result.payment.provider_ref,
-          paidAt: new Date(),
-        });
-
-        await supabase
-          .from("payments")
-          .update({ receipt_sent_at: new Date().toISOString() })
-          .eq("id", result.payment.id);
-      } catch (error) {
-        // The payment is recorded and the dossier has advanced. A missing
-        // receipt is a support ticket; returning non-200 here would make the
-        // provider retry an event already applied.
-        console.error("Receipt email failed:", (error as Error).message);
-      }
-    }
+    // Shared with the status-poll path, so whichever observes settlement
+    // first advances the dossier and sends the receipt — exactly once.
+    // Never throws: a failure here must not make the provider retry an event
+    // that was already applied.
+    await settlePayment(supabase, result.payment);
   }
 
   return NextResponse.json({ received: true, applied: true });

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { readSession } from "@/lib/access-code/session";
 import { providerById } from "@/lib/payments/registry";
-import { markCandidaturePaid, type PaymentRow } from "@/lib/payments/record";
+import { settlePayment, type PaymentRow } from "@/lib/payments/record";
 import type { PaymentProviderId } from "@/lib/payments/types";
 
 /**
@@ -70,7 +70,10 @@ export async function GET(request: Request) {
         .eq("id", payment.id);
 
       if (becamePaid) {
-        await markCandidaturePaid(supabase, session.cid);
+        // Same settlement path as the webhook. This is what makes a lost or
+        // delayed provider callback survivable: the poll finishes the job,
+        // receipt included, and the shared guard stops a double-send.
+        await settlePayment(supabase, { ...payment, status: "paye" });
       }
     }
 

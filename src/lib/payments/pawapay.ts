@@ -153,21 +153,55 @@ export const pawapayProvider: PaymentProvider = {
 
     const payload = JSON.parse(rawBody) as {
       depositId?: string;
+      refundId?: string;
+      payoutId?: string;
       status?: string;
       failureReason?: { failureMessage?: string };
     };
 
-    if (!payload.depositId) return null;
+    const state = payload.status ?? "unknown";
 
+    // Refund callbacks. A completed refund is a distinct terminal state, not
+    // a deposit transition — mapping it through mapStatus would mark the
+    // payment "paye" all over again.
+    if (payload.refundId) {
+      return {
+        eventId: `refund:${payload.refundId}:${state}`,
+        eventType: `refund.${state.toLowerCase()}`,
+        // Refund callbacks reference the deposit they reverse, which is how
+        // the payment row is found.
+        providerRef: payload.depositId ?? "",
+        status: mapStatus(state) === "paye" ? "rembourse" : mapStatus(state),
+        failureReason: payload.failureReason?.failureMessage,
+        raw: payload,
+      } satisfies WebhookEvent;
+    }
+
+    if (payload.depositId) {
+      return {
+        // pawaPay callbacks carry no separate event id, so the idempotency
+        // key is composed from the deposit and the state it reports. A retry
+        // of the same transition collides; a genuine later transition does
+        // not.
+        eventId: `${payload.depositId}:${state}`,
+        eventType: `deposit.${state.toLowerCase()}`,
+        providerRef: payload.depositId,
+        status: mapStatus(state),
+        failureReason: payload.failureReason?.failureMessage,
+        raw: payload,
+      } satisfies WebhookEvent;
+    }
+
+    // Payouts and hosted Checkouts: the signature verified, so this is
+    // genuinely from pawaPay, but we never initiate either. Acknowledged with
+    // an empty providerRef so the route records it and returns 200 rather
+    // than 400 — a rejection would put pawaPay into an endless retry loop
+    // over a callback that will never become relevant.
     return {
-      // pawaPay callbacks carry no separate event id, so the idempotency key
-      // is composed from the deposit and the state it reports. A retry of the
-      // same transition collides; a genuine later transition does not.
-      eventId: `${payload.depositId}:${payload.status ?? "unknown"}`,
-      eventType: `deposit.${(payload.status ?? "unknown").toLowerCase()}`,
-      providerRef: payload.depositId,
-      status: mapStatus(payload.status ?? ""),
-      failureReason: payload.failureReason?.failureMessage,
+      eventId: `unhandled:${payload.payoutId ?? rawBody.slice(0, 64)}:${state}`,
+      eventType: "unhandled",
+      providerRef: "",
+      status: "en_cours",
       raw: payload,
     } satisfies WebhookEvent;
   },

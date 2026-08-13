@@ -27,18 +27,55 @@ re-running is not safe unless the file explicitly says so.
 | 0010 | `payments` | `payments`, `payment_events` (idempotency), `visa_refusal_claims` | Checkout and webhooks fail |
 | 0011 | `audit_log` | Append-only admin audit trail | Document views and refunds go unrecorded |
 
-### Running them
-
-**Supabase CLI (recommended):**
+### Running them on an empty database
 
 ```bash
+# 1. Point the CLI at your project (once)
 supabase link --project-ref <your-project-ref>
-supabase db push            # applies every unapplied migration, in order
+
+# 2. Apply everything, in order
+supabase db push
+
+# 3. Confirm all 11 landed
+supabase migration list
 ```
 
 **Or by hand:** open the Supabase SQL editor and paste each file **in numeric
 order**, 0001 → 0011, one at a time. Stop at the first error rather than
 continuing — a partially applied migration set is worse than none.
+
+### ⚠️ Step 4: expose the `svap` schema — nothing works without this
+
+Every table lives in the **`svap` schema**, not `public`. Migration 0002 grants
+the roles `USAGE` on it, but PostgREST additionally refuses to serve any schema
+that isn't on its exposed list, and that list is **dashboard configuration, not
+SQL** — no migration can set it.
+
+> **Supabase Dashboard → Project Settings → API → Exposed schemas**
+> Add `svap` alongside `public`, then save.
+
+Skip this and every query fails with *"The schema must be one of the following"*
+even though the tables exist and the grants are correct. It is the single most
+likely reason a correctly-migrated project appears completely broken.
+
+### Step 5: create your admin account
+
+There is no sign-up flow in the admin panel, deliberately — an admin can read
+every candidate's passport scan and issue refunds.
+
+1. **Dashboard → Authentication → Users → Add user.** Use a real work email, set
+   a password, tick **Auto Confirm User**.
+2. Open `supabase/seed-admin.sql`, replace the email and full name, and run it
+   in the SQL editor.
+
+Start colleagues as `reviewer`; only give `super_admin` to people who genuinely
+need to decrypt passport numbers and issue refunds.
+
+### Step 6: verify the storage bucket exists
+
+Migration 0009 creates the private `svap-documents` bucket. Confirm under
+**Storage** in the dashboard that it exists and is **not** public. If it's
+missing, 0009 didn't run.
 
 ### Two things worth knowing
 
@@ -84,29 +121,110 @@ database.
 
 ---
 
+## 2b. Email inventory
+
+Seven transactional emails, all wired. Resend is the only provider.
+
+| Email | Trigger | Recipient | Languages |
+|---|---|---|---|
+| Candidature reçue | Phase-1 submit, **pre-selected only** | Applicant | fr/en/ar |
+| Décision — non éligible | Phase-1 submit, failed a gate | Applicant | fr/en/ar |
+| Décision — pack complet | Phase-1 submit, cap reached | Applicant | fr/en/ar |
+| Nouvelle candidature | Every Phase-1 submit | `ADMIN_NOTIFICATION_EMAIL` | fr/en/ar |
+| **Code d'accès** | Cron, 72h after pre-selection | Applicant | fr/en/ar |
+| **Code expire bientôt** | Cron, day 7 and day 12 of 14 | Applicant | fr/en/ar |
+| **Reçu de paiement** | Payment webhook, on settlement | Applicant | fr/en/ar |
+| Décision — validé / rejeté | Admin changes status | Applicant | fr/en/ar |
+
+Notes that matter:
+
+- The access-code email contains **no QR code**. Gmail strips `data:` images,
+  remote images are blocked by default, and hosting the QR at a URL would put
+  the code into server logs. A large tappable deep link achieves the same thing
+  and works everywhere.
+- The expiry reminder deliberately contains **no code** — it isn't recoverable
+  (only the hash is stored), and a reminder is a lower-trust context.
+- Receipts are sent from the **webhook only**, never from the browser's return
+  from a hosted payment page — that would issue receipts for payments that never
+  completed.
+
+**Resend setup:** verify your sending domain in Resend and set
+`RESEND_FROM_EMAIL` to an address on it. The fallback (`onboarding@resend.dev`)
+only delivers to your own Resend account address — fine for local testing, and
+silently useless for real applicants.
+
+---
+
 ## 3. Scheduled job
 
-One cron entry drives the entire access-code lifecycle. Point an hourly
-scheduler at:
+One cron entry drives the entire access-code lifecycle. `vercel.json` already
+declares it:
 
-```
-POST /api/cron/access-codes
-Authorization: Bearer <CRON_SECRET>
+```json
+{ "crons": [{ "path": "/api/cron/access-codes", "schedule": "0 * * * *" }] }
 ```
 
 On each run it: issues and emails codes for applications pre-selected more than
 72h ago; sends expiry reminders at day 7 and day 12; and expires codes past their
 14-day window. Every step is idempotent, so a double-fire cannot double-send.
 
-On Vercel, add to `vercel.json`:
+**Vercel injects the auth header for you.** When `CRON_SECRET` is set as an
+environment variable, Vercel sends `Authorization: Bearer $CRON_SECRET` on cron
+invocations — which is exactly what the route checks. Nothing else to wire.
 
-```json
-{ "crons": [{ "path": "/api/cron/access-codes", "schedule": "0 * * * *" }] }
-```
+⚠️ **Hobby plan caps crons at once per day.** Codes would then go out up to 24h
+after the 72h mark rather than within the hour. Functional, but the Pro plan is
+what makes the "sous 72 heures" promise on the site literally true.
 
 **The endpoint returns 404 to unauthenticated callers by design** — so if the
 secret is wrong, it will look like nothing is wrong while no codes are ever sent.
-Check the logs after the first scheduled run.
+Check the logs for `Cron access-codes run:` after the first scheduled run.
+
+---
+
+## 3b. Domain and deployment
+
+Production domain: **`siliconvalleyafricaprogram.com`**
+Current Vercel URL: `https://svap-zeta.vercel.app`
+
+### Configure these against the final domain, not the Vercel URL
+
+Attach the domain in **Vercel → Settings → Domains** *before* registering the
+URLs below. Three of these are painful to change afterwards, and re-doing them
+risks leaving one pointing at a dead host.
+
+| Where | Value | Notes |
+|---|---|---|
+| Vercel env | `NEXT_PUBLIC_SITE_URL=https://siliconvalleyafricaprogram.com` | Drives `metadataBase`, hreflang, the access-code deep link and the admin email link |
+| pawaPay dashboard | `https://siliconvalleyafricaprogram.com/api/payments/webhooks/pawapay` | Same URL for Deposits, Refunds, Payouts and Checkouts — the adapter handles all four |
+| Stripe → Webhooks | `https://siliconvalleyafricaprogram.com/api/payments/webhooks/stripe` | Subscribe to `checkout.session.completed`, `.expired`, `.async_payment_succeeded`, `.async_payment_failed`. Copy the signing secret into `STRIPE_WEBHOOK_SECRET` |
+| Resend → Domains | `siliconvalleyafricaprogram.com` | Add the SPF/DKIM/DMARC records. Then `RESEND_FROM_EMAIL="Silicon Valley Africa <programme@siliconvalleyafricaprogram.com>"` |
+| Supabase → Auth → URL config | Site URL + `https://siliconvalleyafricaprogram.com/**` in redirect allowlist | Otherwise admin login redirects fail in production |
+
+### If you want to test on the Vercel URL first
+
+Everything works on `https://svap-zeta.vercel.app` — set `NEXT_PUBLIC_SITE_URL`
+to it and register the same paths. Then when the domain is attached, update:
+
+1. `NEXT_PUBLIC_SITE_URL` in Vercel env → redeploy
+2. pawaPay callback URLs (editable in their dashboard)
+3. Stripe webhook endpoint — **create a new one and copy the new signing
+   secret**; the secret is per-endpoint, so pointing the old one elsewhere
+   isn't enough
+4. Resend domain verification — this one is genuinely domain-bound. Emails sent
+   from an unverified domain land in spam, so if you only do one thing against
+   the real domain first, make it this one.
+
+### Deploy
+
+```bash
+vercel --prod
+```
+
+Vercel builds with `pnpm build`. Set every variable from §2 in
+**Settings → Environment Variables** first — a missing `ACCESS_CODE_PEPPER` or
+`FIELD_ENCRYPTION_KEY` throws at request time, not at build time, so the deploy
+will succeed and the feature will fail.
 
 ---
 

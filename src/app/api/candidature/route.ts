@@ -6,6 +6,7 @@ import { evaluatePreselection } from "@/lib/candidature/preselection";
 import {
   sendCandidatureReceivedEmail,
   sendAdminNotificationEmail,
+  sendStatusUpdateEmail,
 } from "@/lib/resend/client";
 import type { CandidatureEmailData } from "@/lib/resend/types";
 
@@ -146,17 +147,20 @@ export async function POST(request: Request) {
     locale,
   };
 
-  // Only pre-selected candidates get the "we received it, your code is
-  // coming" email — telling someone their code is on the way when it never
-  // will be is the worst possible message. Non-eligible and at-capacity
-  // outcomes are communicated on the result page, and get their own emails
-  // once those templates exist (W3 follow-up).
+  // Every applicant hears back, but not with the same message. Telling
+  // someone their access code is on the way when it never will be is the
+  // worst possible email, so the non-advancing outcomes get their own —
+  // each one stating that no fee was charged and the dossier stays eligible
+  // for future editions.
   //
   // The admin notification always fires: the team needs to see volume and
   // rejection reasons, not only the successes.
   const emails: Promise<unknown>[] = [sendAdminNotificationEmail(emailData)];
+
   if (verdict.status === "preselectionne") {
     emails.push(sendCandidatureReceivedEmail(emailData));
+  } else {
+    emails.push(sendStatusUpdateEmail(emailData, verdict.status));
   }
 
   // Never let a Resend failure block the response — the row is already

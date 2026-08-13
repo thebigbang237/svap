@@ -1,6 +1,8 @@
 import "server-only";
 import type { AdminClient } from "@/lib/supabase/admin";
-import type { PaymentMethod, PaymentProviderId, PaymentStatus, WebhookEvent, Money } from "./types";
+import type { Locale } from "@/i18n/routing";
+import { sendPaymentReceiptEmail } from "@/lib/resend/client";
+import type { PaymentMethod, PaymentProviderId, WebhookEvent, Money } from "./types";
 
 /**
  * Persistence for payments and the webhook idempotency ledger.
@@ -172,5 +174,67 @@ export async function markCandidaturePaid(
 
   if (error) {
     console.error("Failed to mark candidature paid:", error.message);
+  }
+}
+
+/**
+ * Everything that must happen exactly once when a fee settles: advance the
+ * dossier, and send the receipt.
+ *
+ * Shared by BOTH settlement paths — the provider webhook and the status poll.
+ * Previously the receipt lived only in the webhook, which meant a lost or
+ * delayed callback left a candidate who had genuinely paid with no proof of
+ * it. Whichever path observes the settlement first now does the whole job.
+ *
+ * `receipt_sent_at` is the idempotency guard: the update is scoped to rows
+ * where it is still null, and the email only goes out if that update actually
+ * claimed the row. Two concurrent settlements therefore send one receipt.
+ */
+export async function settlePayment(
+  supabase: AdminClient,
+  payment: PaymentRow,
+): Promise<void> {
+  await markCandidaturePaid(supabase, payment.candidature_id);
+
+  if (payment.receipt_sent_at) return;
+
+  // Claim the right to send before sending. Doing it the other way round
+  // would double-send whenever a webhook and a poll land together.
+  const { data: claimed } = await supabase
+    .from("payments")
+    .update({ receipt_sent_at: new Date().toISOString() })
+    .eq("id", payment.id)
+    .is("receipt_sent_at", null)
+    .select("id");
+
+  if (!claimed || claimed.length === 0) return;
+
+  const { data: candidature } = await supabase
+    .from("candidatures")
+    .select("prenom, email, locale")
+    .eq("id", payment.candidature_id)
+    .maybeSingle<{ prenom: string; email: string; locale: Locale }>();
+
+  if (!candidature) return;
+
+  try {
+    await sendPaymentReceiptEmail({
+      prenom: candidature.prenom,
+      email: candidature.email,
+      locale: candidature.locale,
+      amountUsd: payment.amount_usd,
+      amountLocal: payment.amount_local,
+      currency: payment.currency,
+      reference: payment.provider_ref,
+      paidAt: new Date(),
+    });
+  } catch (error) {
+    // Release the claim so a later poll or webhook retries the receipt. The
+    // payment itself is settled and the dossier has advanced either way.
+    await supabase
+      .from("payments")
+      .update({ receipt_sent_at: null })
+      .eq("id", payment.id);
+    console.error("Receipt email failed:", (error as Error).message);
   }
 }

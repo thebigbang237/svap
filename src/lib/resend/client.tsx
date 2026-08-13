@@ -6,7 +6,7 @@ import { AdminNewCandidatureEmail } from "./templates/AdminNewCandidatureEmail";
 import { AccessCodeEmail } from "./templates/AccessCodeEmail";
 import { CodeExpiringEmail } from "./templates/CodeExpiringEmail";
 import { PaymentReceiptEmail } from "./templates/PaymentReceiptEmail";
-import type { CandidatureEmailData, CandidatureStatus, Locale } from "./types";
+import type { CandidatureEmailData, NotifiableStatus, Locale } from "./types";
 
 // Lazily instantiated: the Resend constructor throws immediately if no API
 // key is present, and Next.js loads this module during build-time page-data
@@ -33,25 +33,30 @@ const subjects = {
     ar: "تم استلام ترشيحكم",
   },
   statusUpdate: {
-    preselection: {
-      fr: "Vous êtes présélectionné(e)",
-      en: "You've been shortlisted",
-      ar: "تمّ اختياركم أوليًا",
+    preselectionne: {
+      fr: "Vous êtes pré-sélectionné(e)",
+      en: "You've been pre-selected",
+      ar: "تم اختياركم أوليًا",
     },
-    accepte: {
-      fr: "Félicitations — votre candidature est acceptée",
-      en: "Congratulations — you're in!",
-      ar: "تهانينا — تمّ قبول ترشيحكم",
-    },
-    refuse: {
+    non_eligible: {
       fr: "Concernant votre candidature",
       en: "About your application",
       ar: "بخصوص ترشيحكم",
     },
-    liste_attente: {
-      fr: "Vous êtes sur liste d'attente",
-      en: "You're on the waitlist",
-      ar: "أنتم على قائمة الانتظار",
+    complet: {
+      fr: "Votre dossier est éligible, mais ce pack est complet",
+      en: "Your application is eligible, but this pack is full",
+      ar: "ملفكم مؤهّل، لكن هذه الباقة مكتملة",
+    },
+    valide: {
+      fr: "Félicitations — votre dossier est validé",
+      en: "Congratulations — your file has been validated",
+      ar: "تهانينا — تمت المصادقة على ملفكم",
+    },
+    rejete: {
+      fr: "Concernant votre dossier",
+      en: "About your file",
+      ar: "بخصوص ملفكم",
     },
   },
   adminNotification: {
@@ -208,7 +213,7 @@ export async function sendAdminNotificationEmail(
 
 export async function sendStatusUpdateEmail(
   candidature: CandidatureEmailData,
-  newStatus: CandidatureStatus,
+  newStatus: NotifiableStatus,
 ) {
   const { locale, ...data } = candidature;
 
