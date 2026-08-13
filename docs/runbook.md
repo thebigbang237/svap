@@ -375,7 +375,99 @@ For each of `/fr`, `/en`, `/ar`:
 
 ---
 
-## 6. Before going live
+## 6. Promoting staging → production
+
+You are testing on `https://svap-zeta.vercel.app`. Here is the order to move to
+`siliconvalleyafricaprogram.com` without breaking anything mid-flight.
+
+### The decision that comes first: one Supabase project, or two?
+
+**Use a separate Supabase project for production.** Not optional in my view:
+
+- Your staging database will be full of test candidatures, fake passport
+  numbers and sandbox payments. Launching on top of that means real applicants
+  share a table with junk, and the pre-selection **capacity caps count test
+  rows** — 24 test Lauréat applications would close the pack before a single
+  real one arrived.
+- Sandbox payment references would sit alongside live ones in the same
+  `payments` table, making reconciliation guesswork.
+- A staging service-role key leaking is then an embarrassment, not a breach of
+  real passport data.
+
+Creating one means running §1 again against the new project: migrations, expose
+the `svap` schema, seed an admin, verify the bucket.
+
+⚠️ **If you instead reuse the staging project, `ACCESS_CODE_PEPPER` and
+`FIELD_ENCRYPTION_KEY` must carry over unchanged** — changing them orphans every
+issued code and makes stored passport numbers undecryptable. With a fresh
+project, generate fresh secrets.
+
+### Order of operations
+
+**1 — Domain**
+Vercel → Settings → Domains → add `siliconvalleyafricaprogram.com`, follow the
+DNS instructions, wait for the certificate.
+
+**2 — Resend** *(start early; DNS propagation is the slow part)*
+Add the domain in Resend, publish the SPF/DKIM/DMARC records, wait for
+verification. Emails from an unverified domain go to spam.
+
+**3 — Production Supabase project**
+Run §1 end to end against it. Note the new URL, anon key and service-role key.
+
+**4 — Environment variables** — set for the **Production** environment only in
+Vercel. Preview keeps pointing at staging.
+
+| Variable | Change |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | `https://siliconvalleyafricaprogram.com` |
+| `NEXT_PUBLIC_SUPABASE_URL` / `..._ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Production project |
+| `ACCESS_CODE_PEPPER`, `PHASE2_SESSION_SECRET`, `FIELD_ENCRYPTION_KEY`, `CRON_SECRET` | Fresh values — `openssl rand -hex 32` each |
+| `RESEND_FROM_EMAIL` | An address on the verified domain |
+| `PAWAPAY_ENV` | `sandbox` → `live` |
+| `PAWAPAY_API_TOKEN` / `PAWAPAY_WEBHOOK_SECRET` | Live credentials — **different from sandbox** |
+| `STRIPE_SECRET_KEY` | `sk_test_…` → `sk_live_…` |
+| `STRIPE_WEBHOOK_SECRET` | From a **new live-mode endpoint**, see below |
+| `FX_RATES_USD` | Current rates — see the warning in §2 |
+
+**5 — Payment providers, in live mode**
+
+- **Stripe:** switch the dashboard to live mode, create a webhook endpoint at
+  `https://siliconvalleyafricaprogram.com/api/payments/webhooks/stripe`,
+  subscribe to the four `checkout.session.*` events, copy the new signing
+  secret. Test-mode and live-mode endpoints are separate objects with separate
+  secrets.
+- **pawaPay:** switch to the live environment, set all four callback URLs to
+  `https://siliconvalleyafricaprogram.com/api/payments/webhooks/pawapay`,
+  generate the live API token and webhook secret.
+
+**6 — Supabase Auth**
+Authentication → URL Configuration → Site URL
+`https://siliconvalleyafricaprogram.com`, and add `.../**` to the redirect
+allowlist. Otherwise admin login breaks in production.
+
+**7 — Deploy and verify**
+
+```bash
+vercel --prod
+```
+
+Then, on the live domain:
+- Submit one real application end to end and confirm the email arrives from the
+  verified domain, not in spam.
+- Force a cron run and confirm `Cron access-codes run:` appears in the logs.
+- Make one real low-value payment (a $20 Lauréat fee) with a real card, confirm
+  the receipt, then **refund it from the admin** to confirm that path works
+  before you need it under pressure.
+
+### After launch, before announcing
+
+Check `svap.candidatures` contains **no test rows**. If any leaked in, delete
+them — they consume pre-selection capacity that belongs to real applicants.
+
+---
+
+## 7. Before going live
 
 - [ ] Replace `FX_RATES_USD` with a live rate feed — the manual table **will**
       go stale and either under- or over-charge candidates.

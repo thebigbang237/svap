@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { SectionEyebrow } from "@/components/marketing/SectionEyebrow";
 import { StatBlock } from "@/components/marketing/StatBlock";
 import { PackCard } from "@/components/marketing/PackCard";
+import { HeroBackdrop } from "@/components/marketing/HeroBackdrop";
 import { CTAButton } from "@/components/marketing/CTAButton";
 import { Ltr } from "@/components/layout/Ltr";
 import {
@@ -87,7 +88,12 @@ export default function HomePage() {
     <>
       {/* HERO */}
       <section className="relative overflow-hidden bg-linear-to-b from-sky to-sky-mid px-8 pt-16 pb-[120px]">
-        <div className="mx-auto max-w-[1280px]">
+        {/* Drop a photograph in by passing imageSrc — see the brief in
+            HeroBackdrop. Layout, masking and RTL behaviour are identical
+            either way. */}
+        <HeroBackdrop />
+
+        <div className="relative z-10 mx-auto max-w-[1280px]">
           <div className="mb-8 flex flex-wrap gap-2" aria-hidden="true">
             {COUNTRIES.map((c) => (
               <span key={c} className="text-2xl">
