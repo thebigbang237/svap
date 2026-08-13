@@ -1,0 +1,59 @@
+name: Access codes cron
+
+# Hourly driver for the access-code lifecycle, running on GitHub Actions
+# rather than Vercel Cron.
+#
+# Why: Vercel's Hobby plan caps cron jobs at once per day. With a daily run,
+# a code is delivered between 72h and 96h after the application — which would
+# break the "code d'accès sous 72 heures" promise made on the site, in the
+# FAQ, and in the confirmation email. GitHub Actions schedules are free and
+# hourly, so the promise stays true without a plan upgrade.
+#
+# The Vercel cron in vercel.json stays in place as a daily safety net: if this
+# workflow is ever disabled, codes still go out, just later.
+#
+# ⚠️ GitHub disables scheduled workflows in repositories with no activity for
+# 60 days, and delays schedules under platform load. Neither is fatal here —
+# every step is idempotent and a late run simply catches up — but it is the
+# reason the Vercel daily cron is kept as a backstop rather than removed.
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  # Lets you fire a run by hand from the Actions tab, which is the easiest way
+  # to test the whole code-issuing path without waiting for the hour.
+  workflow_dispatch:
+
+# Never let two runs overlap — the job is idempotent, but concurrent runs
+# would waste provider calls racing over the same batch.
+concurrency:
+  group: access-codes-cron
+  cancel-in-progress: false
+
+jobs:
+  invoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger access-code cron
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SITE_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::SITE_URL and CRON_SECRET must be set as repository secrets."
+            exit 1
+          fi
+
+          # --fail-with-body so a non-2xx exits non-zero AND prints the body.
+          # A 404 here means CRON_SECRET doesn't match the deployment — the
+          # endpoint hides itself from unauthenticated callers, so without
+          # this check a wrong secret would look like a silent success while
+          # no codes were ever sent.
+          response=$(curl --fail-with-body -sS -X POST \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Content-Length: 0" \
+            "${SITE_URL}/api/cron/access-codes")
+
+          echo "Response: ${response}"

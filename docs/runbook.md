@@ -157,28 +157,75 @@ silently useless for real applicants.
 
 ## 3. Scheduled job
 
-One cron entry drives the entire access-code lifecycle. `vercel.json` already
-declares it:
+`POST /api/cron/access-codes` drives the whole access-code lifecycle. On each
+run it issues and emails codes for applications pre-selected more than 72h ago,
+sends expiry reminders at day 7 and day 12, and expires codes past their 14-day
+window. Every step is idempotent, so a double-fire cannot double-send.
 
-```json
-{ "crons": [{ "path": "/api/cron/access-codes", "schedule": "0 * * * *" }] }
-```
+**The endpoint returns 404 to unauthenticated callers by design** — so a wrong
+secret looks exactly like nothing being wrong, while no codes are ever sent.
+Check the logs for `Cron access-codes run:` after the first run.
 
-On each run it: issues and emails codes for applications pre-selected more than
-72h ago; sends expiry reminders at day 7 and day 12; and expires codes past their
-14-day window. Every step is idempotent, so a double-fire cannot double-send.
+### ⚠️ The Hobby plan cannot deliver this on its own
 
-**Vercel injects the auth header for you.** When `CRON_SECRET` is set as an
-environment variable, Vercel sends `Authorization: Bearer $CRON_SECRET` on cron
-invocations — which is exactly what the route checks. Nothing else to wire.
+Two separate Hobby limits bite here:
 
-⚠️ **Hobby plan caps crons at once per day.** Codes would then go out up to 24h
-after the 72h mark rather than within the hour. Functional, but the Pro plan is
-what makes the "sous 72 heures" promise on the site literally true.
+1. **Minimum interval is once per day.** A more frequent expression doesn't
+   degrade — it **fails deployment** with *"Hobby accounts are limited to daily
+   cron jobs."*
+2. **Timing is only accurate to the hour** (±59 min).
 
-**The endpoint returns 404 to unauthenticated callers by design** — so if the
-secret is wrong, it will look like nothing is wrong while no codes are ever sent.
-Check the logs for `Cron access-codes run:` after the first scheduled run.
+With a daily run, a code is delivered somewhere between **72h and 96h** after
+the application. The site, the FAQ and the confirmation email all promise
+"sous 72 heures" — so a daily-only schedule would make the product quietly
+break its own stated commitment for most applicants.
+
+### The setup that ships
+
+**Two schedulers, deliberately.**
+
+| | Schedule | Role |
+|---|---|---|
+| GitHub Actions (`.github/workflows/access-codes-cron.yml`) | Hourly | Primary — keeps the 72h promise |
+| Vercel Cron (`vercel.json`) | Daily, 06:00 UTC | Backstop — if the workflow is disabled, codes still go out |
+
+Both hit the same endpoint, and every operation is idempotent, so them
+overlapping is harmless by design.
+
+**To enable the GitHub Actions one**, add two repository secrets under
+Settings → Secrets and variables → Actions:
+
+| Secret | Value |
+|---|---|
+| `SITE_URL` | `https://svap-zeta.vercel.app` (later the production domain) |
+| `CRON_SECRET` | The same value as the Vercel environment variable |
+
+Then fire it once by hand from the **Actions** tab (`Run workflow`) to confirm
+it authenticates — the workflow fails loudly on a non-2xx rather than passing
+silently, so a mismatched secret shows up immediately as a red run.
+
+Two caveats worth knowing: GitHub **disables scheduled workflows after 60 days
+of repository inactivity**, and delays schedules under platform load. Neither
+is fatal — a late run just catches up — but they're the reason the Vercel daily
+cron stays in place rather than being removed.
+
+**Vercel injects the auth header for its own cron.** When `CRON_SECRET` is set
+as an environment variable, Vercel sends `Authorization: Bearer $CRON_SECRET`
+automatically. Nothing to wire for that path.
+
+### If you move to Pro
+
+Change `vercel.json` to `"0 * * * *"` and delete the GitHub workflow. One
+scheduler, per-minute precision, no 60-day inactivity concern.
+
+### A free alternative if you'd rather not use GitHub Actions
+
+Reduce `ACCESS_CODE.sendDelayHours` in `src/lib/constants/program.ts` from 72
+to **44**, and rely on the daily Vercel cron alone. With a once-daily run, a
+44h threshold delivers every code between 44h and 69h after application —
+always inside the promised 72h. It's less precise and less obvious to a future
+reader, which is why it isn't the default, but it costs nothing and needs no
+second service.
 
 ---
 
