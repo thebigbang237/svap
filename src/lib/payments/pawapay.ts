@@ -15,12 +15,15 @@ import {
 /**
  * pawaPay — mobile money across Cameroun, Kenya and Ghana.
  *
+ * Written against the **v2** API. v1 named the mobile money operator
+ * `correspondent` at the top level of `payer`; v2 renames it to `provider` and
+ * moves it inside `accountDetails`, alongside `phoneNumber`. Sending the v1
+ * shape fails with `Missing required creator property 'correspondent'`.
+ *
  * Deposits are ASYNCHRONOUS by nature: pawaPay pushes a prompt to the payer's
  * handset, they approve it with their PIN, and settlement lands seconds to
  * minutes later via callback. Nothing here can be resolved from the browser,
  * which is why `asynchronous` is true and the UI polls `getStatus`.
- *
- * Plain REST — no SDK exists worth the dependency.
  */
 
 const SANDBOX_BASE = "https://api.sandbox.pawapay.io";
@@ -45,27 +48,130 @@ function config() {
   }
   return {
     token,
-    baseUrl:
-      process.env.PAWAPAY_ENV === "live" ? LIVE_BASE : SANDBOX_BASE,
-    webhookSecret: process.env.PAWAPAY_WEBHOOK_SECRET,
+    baseUrl: process.env.PAWAPAY_ENV === "live" ? LIVE_BASE : SANDBOX_BASE,
   };
 }
 
-/** pawaPay deposit states → our lifecycle. */
-function mapStatus(raw: string): PaymentStatus {
+/**
+ * v2 deposit states → our lifecycle.
+ *
+ * ACCEPTED / PROCESSING mean the prompt is with the payer.
+ * IN_RECONCILIATION means pawaPay is still resolving it with the operator —
+ * deliberately NOT treated as failed, because those frequently settle.
+ */
+function mapStatus(raw: string | undefined): PaymentStatus {
   switch (raw?.toUpperCase()) {
     case "COMPLETED":
       return "paye";
     case "FAILED":
-      return "echoue";
     case "REJECTED":
       return "echoue";
     case "CANCELLED":
       return "annule";
-    // ACCEPTED / SUBMITTED / PROCESSING — the prompt is with the payer.
     default:
       return "en_cours";
   }
+}
+
+async function pawapayFetch(path: string, init?: RequestInit) {
+  const { token, baseUrl } = config();
+  return fetch(`${baseUrl}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+      ...(init?.headers ?? {}),
+    },
+    cache: "no-store",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Operator discovery
+// ---------------------------------------------------------------------------
+
+export interface MobileMoneyOperator {
+  /** e.g. "MTN_MOMO_CMR" — goes into the deposit payload verbatim. */
+  provider: string;
+  /** e.g. "MTN MoMo" — what the payer actually recognises. */
+  displayName: string;
+  currency: string;
+  minAmount?: string;
+  maxAmount?: string;
+  /** OPERATIONAL | DELAYED | CLOSED */
+  status?: string;
+}
+
+/**
+ * Which operators can actually take a deposit in this country, right now.
+ *
+ * v2 requires the operator id in the deposit payload, so it can't be guessed —
+ * and hard-coding a list would go stale silently the moment pawaPay enables a
+ * new one or takes another offline for maintenance. `/v2/active-conf` reports
+ * exactly what *this account* is configured for, including per-operator
+ * availability, so a CLOSED operator is never offered to a candidate.
+ */
+export async function listOperators(
+  country: Country,
+): Promise<MobileMoneyOperator[]> {
+  if (!COUNTRY_PAYMENT[country].mobileMoney) return [];
+
+  const response = await pawapayFetch(
+    `/v2/active-conf?country=${COUNTRY_CODES[country]}&operationType=DEPOSIT`,
+  );
+
+  if (!response.ok) {
+    throw new Error(`pawaPay active-conf failed (${response.status})`);
+  }
+
+  const data = (await response.json()) as {
+    countries?: {
+      country?: string;
+      providers?: {
+        provider?: string;
+        displayName?: string;
+        nameDisplayedToCustomer?: string;
+        currencies?: {
+          currency?: string;
+          operationTypes?: {
+            DEPOSIT?: {
+              minAmount?: string;
+              maxAmount?: string;
+              status?: string;
+            };
+          };
+        }[];
+      }[];
+    }[];
+  };
+
+  const operators: MobileMoneyOperator[] = [];
+
+  for (const entry of data.countries ?? []) {
+    for (const provider of entry.providers ?? []) {
+      for (const currency of provider.currencies ?? []) {
+        const deposit = currency.operationTypes?.DEPOSIT;
+        if (!deposit || !provider.provider) continue;
+        // CLOSED means the operator isn't taking deposits at all. Offering it
+        // would guarantee a failed payment.
+        if (deposit.status && deposit.status.toUpperCase() === "CLOSED") continue;
+
+        operators.push({
+          provider: provider.provider,
+          displayName:
+            provider.nameDisplayedToCustomer ??
+            provider.displayName ??
+            provider.provider,
+          currency: currency.currency ?? COUNTRY_PAYMENT[country].currency,
+          minAmount: deposit.minAmount,
+          maxAmount: deposit.maxAmount,
+          status: deposit.status,
+        });
+      }
+    }
+  }
+
+  return operators;
 }
 
 export const pawapayProvider: PaymentProvider = {
@@ -76,11 +182,14 @@ export const pawapayProvider: PaymentProvider = {
   },
 
   async createCheckout(input: CheckoutInput): Promise<CheckoutResult> {
-    const { token, baseUrl } = config();
-
     if (!input.phone) {
       throw new PaymentConfigError(
         "A phone number is required for a mobile money deposit.",
+      );
+    }
+    if (!input.operator) {
+      throw new PaymentConfigError(
+        "A mobile money operator is required — v2 deposits carry the provider in the payload.",
       );
     }
 
@@ -89,24 +198,23 @@ export const pawapayProvider: PaymentProvider = {
     // then leaves a payment we can poll, not an orphaned charge.
     const depositId = randomUUID();
 
-    const response = await fetch(`${baseUrl}/deposits`, {
+    const response = await pawapayFetch("/v2/deposits", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({
         depositId,
+        payer: {
+          type: "MMO",
+          accountDetails: {
+            // Digits only, no '+' — pawaPay rejects the E.164 prefix here.
+            phoneNumber: input.phone.replace(/\D/g, ""),
+            provider: input.operator,
+          },
+        },
         amount: String(input.money.amountLocal),
         currency: input.money.currency,
-        country: COUNTRY_CODES[input.country],
-        // Digits only, no '+' — pawaPay rejects the E.164 prefix here.
-        payer: {
-          type: "MSISDN",
-          address: { value: input.phone.replace(/\D/g, "") },
-        },
-        customerTimestamp: new Date().toISOString(),
-        statementDescription: input.description.slice(0, 22),
+        clientReferenceId: input.candidatureId,
+        // 4–22 characters, and it appears on the payer's own statement.
+        customerMessage: "SVAP 2026",
       }),
     });
 
@@ -117,10 +225,16 @@ export const pawapayProvider: PaymentProvider = {
       );
     }
 
-    const data = (await response.json()) as { status?: string };
+    // v2 initiation returns ACCEPTED | REJECTED | DUPLICATE_IGNORED.
+    const data = (await response.json()) as {
+      status?: string;
+      failureReason?: { failureMessage?: string };
+    };
 
-    if (data.status && mapStatus(data.status) === "echoue") {
-      throw new Error(`pawaPay rejected the deposit: ${data.status}`);
+    if (data.status && data.status.toUpperCase() === "REJECTED") {
+      throw new Error(
+        `pawaPay rejected the deposit: ${data.failureReason?.failureMessage ?? "unknown reason"}`,
+      );
     }
 
     return { providerRef: depositId, asynchronous: true };
@@ -151,15 +265,18 @@ export const pawapayProvider: PaymentProvider = {
     const b = Buffer.from(expected);
     if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
 
+    // v2 consolidated rejectionReason/failureReason/error into one
+    // `failureReason: { failureCode, failureMessage }`.
     const payload = JSON.parse(rawBody) as {
       depositId?: string;
       refundId?: string;
       payoutId?: string;
       status?: string;
-      failureReason?: { failureMessage?: string };
+      failureReason?: { failureCode?: string; failureMessage?: string };
     };
 
     const state = payload.status ?? "unknown";
+    const failureReason = payload.failureReason?.failureMessage;
 
     // Refund callbacks. A completed refund is a distinct terminal state, not
     // a deposit transition — mapping it through mapStatus would mark the
@@ -172,7 +289,7 @@ export const pawapayProvider: PaymentProvider = {
         // the payment row is found.
         providerRef: payload.depositId ?? "",
         status: mapStatus(state) === "paye" ? "rembourse" : mapStatus(state),
-        failureReason: payload.failureReason?.failureMessage,
+        failureReason,
         raw: payload,
       } satisfies WebhookEvent;
     }
@@ -187,7 +304,7 @@ export const pawapayProvider: PaymentProvider = {
         eventType: `deposit.${state.toLowerCase()}`,
         providerRef: payload.depositId,
         status: mapStatus(state),
-        failureReason: payload.failureReason?.failureMessage,
+        failureReason,
         raw: payload,
       } satisfies WebhookEvent;
     }
@@ -207,48 +324,61 @@ export const pawapayProvider: PaymentProvider = {
   },
 
   async getStatus(providerRef: string) {
-    const { token, baseUrl } = config();
-
-    const response = await fetch(`${baseUrl}/deposits/${providerRef}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: "no-store",
-    });
+    const response = await pawapayFetch(`/v2/deposits/${providerRef}`);
 
     if (!response.ok) {
       throw new Error(`pawaPay status lookup failed (${response.status})`);
     }
 
-    // The endpoint answers with an array holding the single deposit.
-    const data = (await response.json()) as
-      | { status?: string; failureReason?: { failureMessage?: string } }[]
-      | { status?: string; failureReason?: { failureMessage?: string } };
+    // v2 wraps the result: { status: FOUND | NOT_FOUND, data: { ... } }.
+    const body = (await response.json()) as {
+      status?: string;
+      data?: {
+        status?: string;
+        failureReason?: { failureMessage?: string };
+      };
+    };
 
-    const deposit = Array.isArray(data) ? data[0] : data;
+    if (body.status === "NOT_FOUND") {
+      // The deposit we created isn't known to pawaPay. Reporting "still
+      // pending" would poll forever, so surface it as failed and let the
+      // candidate retry.
+      return { status: "echoue" as PaymentStatus, failureReason: "NOT_FOUND" };
+    }
 
     return {
-      status: mapStatus(deposit?.status ?? ""),
-      failureReason: deposit?.failureReason?.failureMessage,
+      status: mapStatus(body.data?.status),
+      failureReason: body.data?.failureReason?.failureMessage,
     };
   },
 
   async refund(providerRef: string): Promise<RefundResult> {
-    const { token, baseUrl } = config();
-
-    const response = await fetch(`${baseUrl}/refunds`, {
+    const response = await pawapayFetch("/v2/refunds", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ refundId: randomUUID(), depositId: providerRef }),
     });
 
     if (!response.ok) {
       const body = await response.text().catch(() => "");
-      return { refunded: false, reason: `${response.status}: ${body.slice(0, 200)}` };
+      return {
+        refunded: false,
+        reason: `${response.status}: ${body.slice(0, 200)}`,
+      };
     }
 
-    const data = (await response.json()) as { refundId?: string };
+    const data = (await response.json()) as {
+      refundId?: string;
+      status?: string;
+      failureReason?: { failureMessage?: string };
+    };
+
+    if (data.status && data.status.toUpperCase() === "REJECTED") {
+      return {
+        refunded: false,
+        reason: data.failureReason?.failureMessage ?? "rejected",
+      };
+    }
+
     // Refunds are asynchronous too: accepted here means queued, and the
     // callback confirms. The admin UI shows "refund requested" accordingly.
     return { refunded: true, providerRefundRef: data.refundId };

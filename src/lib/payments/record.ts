@@ -30,6 +30,7 @@ export async function createPaymentRecord(
     providerRef: string;
     method: PaymentMethod;
     money: Money;
+    operator?: string;
   },
 ): Promise<PaymentRow | null> {
   const { data, error } = await supabase
@@ -39,6 +40,7 @@ export async function createPaymentRecord(
       provider: input.provider,
       provider_ref: input.providerRef,
       method: input.method,
+      mmo_operator: input.operator ?? null,
       amount_usd: input.money.amountUsd,
       amount_local: input.money.amountLocal,
       currency: input.money.currency,

@@ -24,12 +24,25 @@ const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 
 type Phase = "choose" | "waiting" | "failed" | "timeout";
 
+interface Operator {
+  provider: string;
+  displayName: string;
+  currency: string;
+}
+
 export function PaymentForm({
   methods,
   defaultPhone,
+  amountUsd,
+  amountLocal,
+  currency,
 }: {
   methods: PaymentMethod[];
   defaultPhone: string;
+  amountUsd: number;
+  /** Local-currency equivalent, null where the country is card-only. */
+  amountLocal: number | null;
+  currency: string | null;
 }) {
   const t = useTranslations("phase2.paiement");
   const router = useRouter();
@@ -40,6 +53,39 @@ export function PaymentForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [charged, setCharged] = useState<{ amount: number; currency: string } | null>(null);
+  const [operators, setOperators] = useState<Operator[]>([]);
+  const [operator, setOperator] = useState<string>("");
+  const [operatorsLoading, setOperatorsLoading] = useState(false);
+
+  // pawaPay v2 carries the operator in the deposit payload, so it has to be
+  // chosen. The list comes from their active configuration rather than a
+  // hard-coded table, so an operator down for maintenance is never offered.
+  useEffect(() => {
+    if (!methods.includes("mobile_money")) return;
+    let cancelled = false;
+
+    setOperatorsLoading(true);
+    fetch("/api/payments/operators")
+      .then((res) => res.json())
+      .then((body: { operators?: Operator[] }) => {
+        if (cancelled) return;
+        const list = body.operators ?? [];
+        setOperators(list);
+        // A single operator is the common case in several markets — preselect
+        // it rather than making it a pointless decision.
+        if (list.length === 1) setOperator(list[0].provider);
+      })
+      .catch(() => {
+        /* card remains available; the picker simply stays empty */
+      })
+      .finally(() => {
+        if (!cancelled) setOperatorsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [methods]);
 
   const timers = useRef<{ poll?: number; timeout?: number }>({});
 
@@ -95,6 +141,7 @@ export function PaymentForm({
         body: JSON.stringify({
           method,
           phone: method === "mobile_money" ? phone : undefined,
+          operator: method === "mobile_money" ? operator : undefined,
         }),
       });
 
@@ -228,7 +275,61 @@ export function PaymentForm({
       </fieldset>
 
       {method === "mobile_money" && (
-        <div className="md:w-2/3">
+        <div className="space-y-8">
+          {/* The candidate pays in their own currency. Showing only USD
+              leaves them unable to check the figure against the prompt that
+              arrives on their handset. */}
+          {amountLocal !== null && currency && (
+            <div className="border border-ink-dim/20 bg-white p-6">
+              <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-ink-dim">
+                {t("amountToPay")}
+              </span>
+              <Ltr className="font-serif text-[32px] font-normal leading-none text-terracotta">
+                {`${amountLocal.toLocaleString("en-US")} ${currency}`}
+              </Ltr>
+              <p className="mt-2 text-xs text-ink-dim">
+                {t("amountEquivalent", { usd: amountUsd })}
+              </p>
+            </div>
+          )}
+
+          <fieldset className="space-y-3">
+            <legend className={labelClasses}>{t("operatorLabel")}</legend>
+            {operatorsLoading ? (
+              <p className="pt-2 text-sm text-ink-dim">{t("operatorLoading")}</p>
+            ) : operators.length === 0 ? (
+              <p className="pt-2 text-sm text-terracotta">
+                {t("operatorUnavailable")}
+              </p>
+            ) : (
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {operators.map((op) => (
+                  <label
+                    key={op.provider}
+                    className={[
+                      "flex cursor-pointer items-center gap-3 border p-4 transition-colors",
+                      operator === op.provider
+                        ? "border-terracotta bg-white"
+                        : "border-ink-dim/20 bg-white hover:border-blue",
+                    ].join(" ")}
+                  >
+                    <input
+                      type="radio"
+                      name="operator"
+                      value={op.provider}
+                      checked={operator === op.provider}
+                      onChange={() => setOperator(op.provider)}
+                      className="h-4 w-4 accent-terracotta"
+                    />
+                    <span className="text-sm font-medium text-ink">
+                      {op.displayName}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </fieldset>
+
           <TextField
             id="paymentPhone"
             type="tel"
@@ -245,10 +346,28 @@ export function PaymentForm({
         </div>
       )}
 
+      {method === "card" && (
+        <div className="border border-ink-dim/20 bg-white p-6">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-ink-dim">
+            {t("amountToPay")}
+          </span>
+          <Ltr className="font-serif text-[32px] font-normal leading-none text-terracotta">
+            {`$${amountUsd}`}
+          </Ltr>
+          {/* Cards settle in USD against the US entity and the issuer converts
+              at its own rate, so quoting a local figure here would be a number
+              we cannot honour. */}
+          <p className="mt-2 text-xs text-ink-dim">{t("cardConversionNote")}</p>
+        </div>
+      )}
+
       <div className="flex flex-col items-start gap-3 border-t border-ink-dim/20 pt-10">
         <CTAButton
           variant="primary"
-          disabled={busy || (method === "mobile_money" && phone.trim().length < 6)}
+          disabled={
+            busy ||
+            (method === "mobile_money" && (phone.trim().length < 6 || !operator))
+          }
           onClick={startCheckout}
           icon={<ArrowRightIcon className="h-4 w-4" />}
         >

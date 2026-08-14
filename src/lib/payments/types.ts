@@ -35,6 +35,12 @@ export interface CheckoutInput {
   money: Money;
   /** Applicant's phone in E.164 — required by mobile money, ignored by card. */
   phone?: string;
+  /**
+   * Mobile money operator id, e.g. "MTN_MOMO_CMR". Required by pawaPay v2,
+   * which carries the provider inside the deposit payload rather than
+   * inferring it from the phone number. Ignored by card providers.
+   */
+  operator?: string;
   email: string;
   locale: string;
   /** Where the provider returns the payer after a hosted flow. */

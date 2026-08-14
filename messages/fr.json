@@ -831,8 +831,15 @@
         "phoneRequired": "Un numéro Mobile Money est requis.",
         "checkoutFailed": "Le paiement n'a pas pu être initialisé. Réessayez dans quelques instants.",
         "paymentFailed": "Le paiement n'a pas abouti. Vérifiez votre solde et réessayez.",
-        "notFound": "Paiement introuvable."
-      }
+        "notFound": "Paiement introuvable.",
+        "operatorRequired": "Sélectionnez votre opérateur Mobile Money."
+      },
+      "amountToPay": "Montant à régler",
+      "amountEquivalent": "Équivalent de {usd} USD au taux du jour.",
+      "cardConversionNote": "Débité en USD. Votre banque applique sa propre conversion.",
+      "operatorLabel": "Votre opérateur Mobile Money",
+      "operatorLoading": "Chargement des opérateurs...",
+      "operatorUnavailable": "Aucun opérateur Mobile Money disponible actuellement. Utilisez la carte bancaire."
     },
     "options": {
       "profession": {

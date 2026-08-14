@@ -13,6 +13,13 @@ const checkoutSchema = z.object({
   method: z.enum(["mobile_money", "card"]),
   /** Required for mobile money; the prompt goes to this handset. */
   phone: z.string().trim().regex(/^[0-9+\s().-]{6,20}$/).optional(),
+  /**
+   * Mobile money operator id from /api/payments/operators, e.g.
+   * "MTN_MOMO_CMR". pawaPay v2 carries the provider in the deposit payload,
+   * so the candidate has to pick it. Pattern-bounded rather than free text
+   * because it is forwarded to the provider verbatim.
+   */
+  operator: z.string().trim().regex(/^[A-Z0-9_]{3,40}$/).optional(),
 });
 
 export async function POST(request: Request) {
@@ -61,8 +68,16 @@ export async function POST(request: Request) {
     );
   }
 
-  if (parsed.data.method === "mobile_money" && !parsed.data.phone) {
-    return NextResponse.json({ error: "errors.phoneRequired" }, { status: 400 });
+  if (parsed.data.method === "mobile_money") {
+    if (!parsed.data.phone) {
+      return NextResponse.json({ error: "errors.phoneRequired" }, { status: 400 });
+    }
+    if (!parsed.data.operator) {
+      return NextResponse.json(
+        { error: "errors.operatorRequired" },
+        { status: 400 },
+      );
+    }
   }
 
   // Mobile money collects in local currency; cards settle in USD against the
@@ -90,6 +105,7 @@ export async function POST(request: Request) {
       country,
       money,
       phone: parsed.data.phone,
+      operator: parsed.data.operator,
       email: progress.candidature.email,
       locale: progress.candidature.locale,
       returnUrl,
@@ -102,6 +118,9 @@ export async function POST(request: Request) {
       providerRef: checkout.providerRef,
       method: parsed.data.method,
       money,
+      // Recorded for reconciliation: "pawapay" alone doesn't say whether the
+      // money moved over MTN or Orange, which is the first thing support asks.
+      operator: parsed.data.operator,
     });
 
     if (!payment) {

@@ -831,8 +831,15 @@
         "phoneRequired": "A Mobile Money number is required.",
         "checkoutFailed": "The payment couldn't be started. Try again shortly.",
         "paymentFailed": "The payment didn't go through. Check your balance and try again.",
-        "notFound": "Payment not found."
-      }
+        "notFound": "Payment not found.",
+        "operatorRequired": "Select your Mobile Money operator."
+      },
+      "amountToPay": "Amount to pay",
+      "amountEquivalent": "Equivalent of {usd} USD at today's rate.",
+      "cardConversionNote": "Charged in USD. Your bank applies its own conversion.",
+      "operatorLabel": "Your Mobile Money operator",
+      "operatorLoading": "Loading operators...",
+      "operatorUnavailable": "No Mobile Money operator is available right now. Please use a bank card."
     },
     "options": {
       "profession": {
