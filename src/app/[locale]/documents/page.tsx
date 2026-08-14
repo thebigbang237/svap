@@ -75,10 +75,7 @@ function PortalContent() {
               icon={<MailIcon className="h-5 w-5" />}
               title={t("info.codeTitle")}
             >
-              {t("info.codeDescription", {
-                hours: ACCESS_CODE.sendDelayHours,
-                days: ACCESS_CODE.validityDays,
-              })}
+              {t("info.codeDescription", { days: ACCESS_CODE.validityDays })}
             </InfoCard>
 
             <InfoCard

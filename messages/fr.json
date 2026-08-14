@@ -175,8 +175,8 @@
           "description": "Le système vérifie les critères d'éligibilité dès la soumission. Réponse immédiate."
         },
         "step3": {
-          "title": "Code d'accès sous 72h",
-          "description": "Un code unique, lié à votre nom et votre email, vous ouvre la Phase 2 pendant 14 jours."
+          "title": "Code d'accès immédiat",
+          "description": "Un code unique, lié à votre nom et votre email, vous est envoyé immédiatement et ouvre la Phase 2 pendant 14 jours."
         },
         "step4": {
           "title": "Vérification",
@@ -362,7 +362,7 @@
     },
     "automatic": {
       "title": "Ce que le système vérifie automatiquement",
-      "lead": "Dès la soumission, quatre critères sont contrôlés instantanément. Si vous les remplissez, vous êtes pré-sélectionné(e) et recevez un code d'accès sous 72 heures.",
+      "lead": "Dès la soumission, quatre critères sont contrôlés instantanément. Si vous les remplissez, vous êtes pré-sélectionné(e) et votre code d'accès vous est envoyé par email immédiatement.",
       "items": [
         "Votre pays de résidence figure parmi les 6 pays participants",
         "Vous avez 18 ans ou plus",
@@ -424,7 +424,7 @@
   "candidature": {
     "page": {
       "title": "Votre candidature en ligne",
-      "lead": "Traitement sous 72h · Réponse garantie · Confidentialité totale",
+      "lead": "Réponse immédiate · Code d'accès par email · Confidentialité totale",
       "breadcrumbCurrent": "Candidature"
     },
     "sidebar": {
@@ -567,7 +567,7 @@
     },
     "success": {
       "title": "Candidature reçue.",
-      "description": "Merci. Votre candidature a passé la présélection automatique. Vous recevrez votre code d'accès unique par email sous 72 heures — il vous ouvrira la page « Obtenir mes documents » et restera valide 14 jours.",
+      "description": "Merci. Votre candidature a passé la présélection automatique et votre code d'accès unique vient de vous être envoyé par email. Il reste valable 14 jours — vous pouvez enchaîner sur la Phase 2 dès maintenant.",
       "ctaLabel": "Retour à l'accueil"
     },
     "nonEligible": {
@@ -601,7 +601,7 @@
     "phase1": {
       "badge": "Phase 1 — Gratuite",
       "title": "Candidature",
-      "description": "Un formulaire d'éligibilité en trois étapes. Réponse immédiate, puis code d'accès sous 72 heures si vous êtes retenu(e)."
+      "description": "Un formulaire d'éligibilité en trois étapes. Réponse immédiate, et votre code d'accès par email dans la foulée si vous êtes retenu(e)."
     },
     "phase2": {
       "badge": "Phase 2 — Sur code",
@@ -647,7 +647,7 @@
     "fullNamePlaceholder": "Prénom et nom",
     "fullNameHint": "Tel qu'indiqué sur votre candidature. Les accents et l'ordre des noms n'ont pas d'importance.",
     "codeLabel": "Code d'accès",
-    "codeHint": "Reçu par email sous 72 heures après votre candidature.",
+    "codeHint": "Reçu par email dès la validation de votre candidature.",
     "submit": "Accéder à mon dossier",
     "submitting": "Vérification...",
     "errors": {
@@ -668,7 +668,7 @@
     },
     "info": {
       "codeTitle": "Votre code d'accès",
-      "codeDescription": "Le code est envoyé sous {hours} heures après le dépôt de votre candidature. Il reste valable {days} jours et ne peut être utilisé que par vous.",
+      "codeDescription": "Votre code vous est envoyé par email dès que votre candidature est pré-sélectionnée. Il reste valable {days} jours et ne peut être utilisé que par vous.",
       "securityTitle": "Sécurité",
       "securityDescription": "Le code est stocké haché sur nos serveurs et n'est jamais affiché en clair. Les tentatives sont limitées et journalisées.",
       "fraudTitle": "Attention à la fraude",
@@ -988,7 +988,7 @@
       },
       {
         "q": "Comment accéder à la Phase 2 ?",
-        "a": "Si vous êtes pré-sélectionné(e), vous recevez sous 72 heures un e-mail contenant un code d'accès unique au format SVAP-XXXX-XXXX. Rendez-vous ensuite sur « Obtenir mes documents » et saisissez votre nom complet ainsi que ce code."
+        "a": "Si vous êtes pré-sélectionné(e), votre code d'accès unique au format SVAP-XXXX-XXXX vous est envoyé par email immédiatement après la soumission de votre candidature. Rendez-vous ensuite sur « Obtenir mes documents » et saisissez votre nom complet ainsi que ce code."
       },
       {
         "q": "Que faire si je perds mon code d'accès ?",
@@ -1072,7 +1072,7 @@
       "Être disponible sur toute la durée du mandat (octobre à décembre 2026)"
     ],
     "processTitle": "Le processus",
-    "processBody": "Identique aux autres packs. La candidature est gratuite. Si votre dossier est retenu, vous recevez sous 72 heures un code d'accès unique par e-mail. Des frais de vérification de 30 USD couvrent alors le contrôle d'identité et la vérification du casier judiciaire, obligatoires avant toute nomination.",
+    "processBody": "Identique aux autres packs. La candidature est gratuite. Si votre dossier est retenu, votre code d'accès unique vous est envoyé par email immédiatement. Des frais de vérification de 30 USD couvrent alors le contrôle d'identité et la vérification du casier judiciaire, obligatoires avant toute nomination.",
     "processNote": "Aucun paiement ne vous sera jamais demandé avant la pré-sélection, ni en dehors de ce site.",
     "ctaLabel": "Candidater comme délégué"
   },

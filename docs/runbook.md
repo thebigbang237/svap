@@ -26,6 +26,7 @@ re-running is not safe unless the file explicitly says so.
 | 0009 | `documents_storage` | Private `svap-documents` bucket, admin-only read policy, `purge_after` | Document uploads fail |
 | 0010 | `payments` | `payments`, `payment_events` (idempotency), `visa_refusal_claims` | Checkout and webhooks fail |
 | 0011 | `audit_log` | Append-only admin audit trail | Document views and refunds go unrecorded |
+| 0012 | `service_role_grants` | `USAGE` + table privileges on `svap` for `service_role` | **Everything server-side fails** with `permission denied for schema svap` (42501) |
 
 ### Running them on an empty database
 
@@ -57,6 +58,18 @@ SQL** — no migration can set it.
 Skip this and every query fails with *"The schema must be one of the following"*
 even though the tables exist and the grants are correct. It is the single most
 likely reason a correctly-migrated project appears completely broken.
+
+**Telling the two failures apart.** They look similar and have different fixes:
+
+| Error | Cause | Fix |
+|---|---|---|
+| `The schema must be one of the following` | `svap` not in Exposed schemas | Dashboard setting above |
+| `permission denied for schema svap` (42501) | `service_role` lacks `USAGE` | Migration 0012 |
+
+The second one catches people out because the service key is assumed to bypass
+everything. It bypasses **row level security** — it is not a superuser, so
+ordinary schema and table grants still apply, and a custom schema grants
+nothing by default.
 
 ### Step 5: create your admin account
 
@@ -337,12 +350,47 @@ email twice → the second is rejected with a duplicate-email error.
 
 ### Flow 3 — Access code
 
-1. Either wait 72h, or temporarily set `sendDelayHours: 0` in
-   `src/lib/constants/program.ts`, then trigger the cron:
-   ```bash
-   curl -X POST -H "Authorization: Bearer $CRON_SECRET" \
-     http://localhost:3000/api/cron/access-codes
-   ```
+**The code is sent 72h after submission.** Not receiving one an hour after
+applying is correct behaviour, not a fault. To exercise the path without
+waiting three days, backdate the application rather than changing any code:
+
+```sql
+-- Supabase SQL editor. Makes the dossier due immediately.
+update svap.candidatures
+set created_at = now() - interval '73 hours'
+where email = 'your-test@address.com'
+  and status = 'preselectionne';
+```
+
+Then fire the cron by hand:
+
+```bash
+curl -i -X POST -H "Authorization: Bearer $CRON_SECRET" \
+  https://svap-zeta.vercel.app/api/cron/access-codes
+```
+
+Expect `{"success":true,"issued":1,...}`. If it returns **404**, `CRON_SECRET`
+doesn't match the deployment — the endpoint hides itself from unauthenticated
+callers, so 404 is what a wrong secret looks like.
+
+You can also trigger it from the **Actions** tab once the repository secrets
+are set (`Run workflow` on *Access codes cron*).
+
+**If `issued` comes back 0**, work through these in order — they're the only
+ways the query can miss a row:
+
+```sql
+select id, email, status, created_at, preselection_reason
+from svap.candidatures order by created_at desc limit 5;
+```
+
+| What you see | Meaning |
+|---|---|
+| No rows at all | The submission never landed — check the API logs |
+| `status = 'non_eligible'` | Failed a gate; `preselection_reason` says which. No code is ever issued |
+| `status = 'complet'` | Pack cap reached |
+| `status = 'code_envoye'` | Already sent — check spam, and `svap.access_codes` for `last_sent_at` |
+| `status = 'preselectionne'` but `created_at` recent | Simply not due yet — backdate as above |
 2. ✅ Response reports `{ issued: 1 }`; the applicant receives a code email with
    a `SVAP-XXXX-XXXX` code and an "Ouvrir la page" deep link.
 3. ✅ The admin dossier shows issue/expiry dates but **never the code itself** —

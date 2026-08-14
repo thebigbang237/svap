@@ -15,7 +15,7 @@ const copy = {
     brand: "Silicon Valley Africa",
     heading: (prenom: string) => `Merci, ${prenom}.`,
     intro:
-      "Nous avons bien reçu votre candidature au Silicon Valley Africa Program 2026. Notre comité l'examinera avec attention.",
+      "Nous avons bien reçu votre candidature au Silicon Valley Africa Program 2026 et elle a été pré-sélectionnée.",
     summaryTitle: "Résumé de votre candidature",
     labels: {
       pack: "Pack souhaité",
@@ -25,7 +25,7 @@ const copy = {
       telephone: "Téléphone",
     },
     timeline:
-      "Vous recevrez une réponse par email sous 72 heures ouvrées. Aucune action n'est requise de votre part pour l'instant.",
+      "Votre code d'accès vous parvient dans un e-mail séparé, d'ici quelques minutes. S'il n'arrive pas, utilisez le bouton « Renvoyer le code » sur la page « Obtenir mes documents ».",
     footer:
       "Silicon Valley Africa Program 2026 — cet email a été envoyé automatiquement suite à votre candidature.",
   },
@@ -34,7 +34,7 @@ const copy = {
     brand: "Silicon Valley Africa",
     heading: (prenom: string) => `Thank you, ${prenom}.`,
     intro:
-      "We've received your application to the Silicon Valley Africa Program 2026. Our committee will review it carefully.",
+      "We've received your application to the Silicon Valley Africa Program 2026, and it has been pre-selected.",
     summaryTitle: "Your Application Summary",
     labels: {
       pack: "Desired Pack",
@@ -44,7 +44,7 @@ const copy = {
       telephone: "Phone Number",
     },
     timeline:
-      "You'll hear back by email within 72 business hours. No further action is needed from you at this time.",
+      "Your access code is on its way in a separate email, within a few minutes. If it doesn't arrive, use the “Resend code” button on the “Get my documents” page.",
     footer:
       "Silicon Valley Africa Program 2026 — this email was sent automatically following your application.",
   },
@@ -55,7 +55,7 @@ const copy = {
     brand: "Silicon Valley Africa",
     heading: (prenom: string) => `شكرًا لك، ${prenom}.`,
     intro:
-      "لقد استلمنا ترشيحكم لبرنامج Silicon Valley Africa Program 2026. ستتولى لجنتنا دراسته بعناية.",
+      "لقد استلمنا ترشيحكم لبرنامج Silicon Valley Africa Program 2026، وقد تم اختياره أوليًا.",
     summaryTitle: "ملخّص ترشيحكم",
     labels: {
       pack: "الباقة المطلوبة",
@@ -65,12 +65,20 @@ const copy = {
       telephone: "الهاتف",
     },
     timeline:
-      "ستصلكم إجابة عبر البريد الإلكتروني خلال 72 ساعة عمل. لا يُطلب منكم أي إجراء في الوقت الحالي.",
+      "يصلكم رمز الدخول في رسالة منفصلة خلال دقائق. إن لم يصل، استعملوا زر «إعادة إرسال الرمز» في صفحة «احصل على وثائقي».",
     footer:
       "Silicon Valley Africa Program 2026 — تم إرسال هذه الرسالة تلقائيًا عقب ترشيحكم.",
   },
 } as const;
 
+/**
+ * Fallback acknowledgement.
+ *
+ * Sent only when issuing or emailing the access code failed during
+ * submission. On the normal path the candidate receives the access-code email
+ * instead, which carries the code and the next step — two emails for one
+ * event would be noise.
+ */
 export function CandidatureReceivedEmail({
   candidature,
   locale,

@@ -10,12 +10,21 @@ name: Access codes cron
 # hourly, so the promise stays true without a plan upgrade.
 #
 # The Vercel cron in vercel.json stays in place as a daily safety net: if this
-# workflow is ever disabled, codes still go out, just later.
+# workflow is disabled or unconfigured, codes still go out, just later.
 #
 # ⚠️ GitHub disables scheduled workflows in repositories with no activity for
 # 60 days, and delays schedules under platform load. Neither is fatal here —
 # every step is idempotent and a late run simply catches up — but it is the
 # reason the Vercel daily cron is kept as a backstop rather than removed.
+#
+# ---------------------------------------------------------------------------
+# Required repository secrets (Settings → Secrets and variables → Actions)
+#   SITE_URL     https://svap-zeta.vercel.app   (later the production domain)
+#   CRON_SECRET  the same value as the Vercel environment variable
+# Until both are set this workflow SKIPS with a warning rather than failing —
+# an unconfigured schedule is a setup state, not an incident, and an hourly
+# red run would train everyone to ignore the notifications that do matter.
+# ---------------------------------------------------------------------------
 
 on:
   schedule:
@@ -34,26 +43,38 @@ jobs:
   invoke:
     runs-on: ubuntu-latest
     steps:
+      - name: Check configuration
+        id: config
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "${SITE_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=Cron not configured::SITE_URL and CRON_SECRET are not set as repository secrets, so access codes are not being sent hourly. Vercel's daily cron in vercel.json is still running as a fallback. See docs/runbook.md §3."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Trigger access-code cron
+        if: steps.config.outputs.configured == 'true'
         env:
           SITE_URL: ${{ secrets.SITE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           set -euo pipefail
 
-          if [ -z "${SITE_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
-            echo "::error::SITE_URL and CRON_SECRET must be set as repository secrets."
-            exit 1
-          fi
-
           # --fail-with-body so a non-2xx exits non-zero AND prints the body.
           # A 404 here means CRON_SECRET doesn't match the deployment — the
           # endpoint hides itself from unauthenticated callers, so without
           # this check a wrong secret would look like a silent success while
           # no codes were ever sent.
+          #
+          # Failing here IS worth a notification: the job is configured and
+          # the request was rejected, which is a real problem.
           response=$(curl --fail-with-body -sS -X POST \
             -H "Authorization: Bearer ${CRON_SECRET}" \
             -H "Content-Length: 0" \
-            "${SITE_URL}/api/cron/access-codes")
+            "${SITE_URL%/}/api/cron/access-codes")
 
           echo "Response: ${response}"

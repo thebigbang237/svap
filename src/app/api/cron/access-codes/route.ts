@@ -15,13 +15,12 @@ import type { CandidatureRow } from "@/lib/supabase/types";
  * Three jobs, all idempotent so a scheduler that fires twice — or retries a
  * timed-out run — cannot double-send:
  *
- *   1. issue + send codes for dossiers pre-selected more than 72h ago;
+ *   1. retry codes whose send failed during Phase-1 submission;
  *   2. remind candidates at day 7 and day 12 of the 14-day window;
  *   3. expire codes whose window has closed.
  *
- * Intended to run hourly. `sendDelayHours` is read from program.ts, so if the
- * client settles on "within 72h" as an SLA rather than a fixed delay, this
- * becomes a constant change rather than a rewrite.
+ * Job 1 is a safety net, not the normal path — codes are issued and emailed
+ * synchronously when the application is submitted. Intended to run hourly.
  */
 
 // Batch size per run. Keeps a single invocation inside serverless time limits;
@@ -56,13 +55,18 @@ export async function POST(request: Request) {
   const report = { issued: 0, reminded: 0, expired: 0, failed: 0 };
 
   // -------------------------------------------------------------------------
-  // 1. Issue and send codes past the 72h mark
+  // 1. Retry codes that failed to send at submission time
   // -------------------------------------------------------------------------
-  // The `status = 'preselectionne'` filter is what makes this idempotent: a
-  // successful send flips the row to 'code_envoye', so it cannot be picked up
-  // again. A send that fails leaves the status alone and is retried next run.
+  // Codes are normally issued and emailed synchronously inside the Phase-1
+  // submission, so a pre-selected dossier reaches 'code_envoye' within
+  // seconds. Anything still sitting at 'preselectionne' after the retry
+  // window had its send fail — a mail-provider outage, a transient error —
+  // and gets another attempt here.
+  //
+  // That status filter is also what makes this idempotent: a successful send
+  // flips the row to 'code_envoye', so it cannot be picked up twice.
   const dueBefore = new Date(
-    Date.now() - ACCESS_CODE.sendDelayHours * 3_600_000,
+    Date.now() - ACCESS_CODE.retryAfterMinutes * 60_000,
   ).toISOString();
 
   const { data: due, error: dueError } = await supabase

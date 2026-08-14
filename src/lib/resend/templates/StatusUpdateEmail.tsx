@@ -25,8 +25,8 @@ const copy = {
     preselectionne: {
       preview: "Vous êtes pré-sélectionné(e) — Silicon Valley Africa Program",
       heading: (prenom: string) => `Bonne nouvelle, ${prenom}.`,
-      body: "Votre candidature a passé l'étape de pré-sélection. Vous recevrez sous 72 heures un e-mail contenant votre code d'accès unique, qui vous ouvrira la page « Obtenir mes documents ».",
-      next: "Aucune action n'est requise pour l'instant. Surveillez votre boîte de réception, et pensez à vérifier vos spams.",
+      body: "Votre candidature a passé l'étape de pré-sélection. Un e-mail séparé contient votre code d'accès unique, qui vous ouvre la page « Obtenir mes documents ».",
+      next: "Si vous ne trouvez pas cet e-mail, vérifiez vos spams ou utilisez le bouton « Renvoyer le code » sur la page « Obtenir mes documents ».",
     },
     non_eligible: {
       preview: "Concernant votre candidature — Silicon Valley Africa Program",
@@ -60,8 +60,8 @@ const copy = {
     preselectionne: {
       preview: "You've been pre-selected — Silicon Valley Africa Program",
       heading: (prenom: string) => `Good news, ${prenom}.`,
-      body: "Your application has passed pre-selection. Within 72 hours you'll receive an email containing your unique access code, which opens the “Get my documents” page.",
-      next: "No action is needed right now. Keep an eye on your inbox, and do check your spam folder.",
+      body: "Your application has passed pre-selection. A separate email contains your unique access code, which opens the “Get my documents” page.",
+      next: "If you can't find that email, check your spam folder or use the “Resend code” button on the “Get my documents” page.",
     },
     non_eligible: {
       preview: "About your application — Silicon Valley Africa Program",
@@ -94,8 +94,8 @@ const copy = {
     preselectionne: {
       preview: "تم اختياركم أوليًا — Silicon Valley Africa Program",
       heading: (prenom: string) => `خبر سار، ${prenom}.`,
-      body: "اجتاز ترشيحكم مرحلة الاختيار الأولي. ستتوصّلون خلال 72 ساعة برسالة تتضمّن رمز الدخول الفريد الخاص بكم، الذي يفتح صفحة «احصل على وثائقي».",
-      next: "لا يُطلب منكم أي إجراء في الوقت الحالي. تابعوا صندوق بريدكم، ولا تنسوا تفقّد الرسائل غير المرغوب فيها.",
+      body: "اجتاز ترشيحكم مرحلة الاختيار الأولي. تتضمّن رسالة منفصلة رمز الدخول الفريد الخاص بكم، الذي يفتح صفحة «احصل على وثائقي».",
+      next: "إن لم تجدوا هذه الرسالة، تفقّدوا الرسائل غير المرغوب فيها أو استعملوا زر «إعادة إرسال الرمز» في صفحة «احصل على وثائقي».",
     },
     non_eligible: {
       preview: "بخصوص ترشيحكم — Silicon Valley Africa Program",

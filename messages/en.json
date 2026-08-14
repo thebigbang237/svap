@@ -175,8 +175,8 @@
           "description": "The system checks the eligibility criteria on submission. Immediate answer."
         },
         "step3": {
-          "title": "Access code within 72h",
-          "description": "A unique code, tied to your name and email, opens Phase 2 for 14 days."
+          "title": "Immediate access code",
+          "description": "A unique code, tied to your name and email, is sent immediately and opens Phase 2 for 14 days."
         },
         "step4": {
           "title": "Verification",
@@ -362,7 +362,7 @@
     },
     "automatic": {
       "title": "What the system checks automatically",
-      "lead": "On submission, four criteria are checked instantly. If you meet them, you're pre-selected and receive an access code within 72 hours.",
+      "lead": "On submission, four criteria are checked instantly. If you meet them, you're pre-selected and your access code is emailed to you immediately.",
       "items": [
         "Your country of residence is one of the 6 participating countries",
         "You are 18 or over",
@@ -424,7 +424,7 @@
   "candidature": {
     "page": {
       "title": "Your Online Application",
-      "lead": "Processed within 72h · Guaranteed Response · Total Confidentiality",
+      "lead": "Immediate answer · Access code by email · Total confidentiality",
       "breadcrumbCurrent": "Application"
     },
     "sidebar": {
@@ -567,7 +567,7 @@
     },
     "success": {
       "title": "Application received.",
-      "description": "Thank you. Your application passed automatic pre-selection. You will receive your unique access code by email within 72 hours — it opens the “Get my documents” page and stays valid for 14 days.",
+      "description": "Thank you. Your application passed automatic pre-selection and your unique access code has just been emailed to you. It stays valid for 14 days — you can continue to Phase 2 right now.",
       "ctaLabel": "Back to home"
     },
     "nonEligible": {
@@ -601,7 +601,7 @@
     "phase1": {
       "badge": "Phase 1 — Free",
       "title": "Application",
-      "description": "A three-step eligibility form. Immediate answer, then an access code within 72 hours if you're retained."
+      "description": "A three-step eligibility form. Immediate answer, and your access code by email straight away if you're retained."
     },
     "phase2": {
       "badge": "Phase 2 — By code",
@@ -647,7 +647,7 @@
     "fullNamePlaceholder": "First and last name",
     "fullNameHint": "As it appears on your application. Accents and name order don't matter.",
     "codeLabel": "Access code",
-    "codeHint": "Sent by email within 72 hours of your application.",
+    "codeHint": "Emailed to you as soon as your application is accepted.",
     "submit": "Access my file",
     "submitting": "Verifying...",
     "errors": {
@@ -668,7 +668,7 @@
     },
     "info": {
       "codeTitle": "Your access code",
-      "codeDescription": "The code is sent within {hours} hours of your application. It stays valid for {days} days and can only be used by you.",
+      "codeDescription": "Your code is emailed to you the moment your application is pre-selected. It stays valid for {days} days and can only be used by you.",
       "securityTitle": "Security",
       "securityDescription": "The code is stored hashed on our servers and never displayed in plain text. Attempts are rate-limited and logged.",
       "fraudTitle": "Beware of fraud",
@@ -988,7 +988,7 @@
       },
       {
         "q": "How do I reach Phase 2?",
-        "a": "If you're pre-selected, you receive an email within 72 hours containing a unique access code in the format SVAP-XXXX-XXXX. Then go to “Get my documents” and enter your full name along with that code."
+        "a": "If you're pre-selected, your unique access code in the format SVAP-XXXX-XXXX is emailed to you immediately after you submit. Then go to “Get my documents” and enter your full name along with that code."
       },
       {
         "q": "What if I lose my access code?",
@@ -1072,7 +1072,7 @@
       "Be available for the full term (October to December 2026)"
     ],
     "processTitle": "The process",
-    "processBody": "Identical to the other packs. Applying is free. If your file is retained, you receive a unique access code by email within 72 hours. A 30 USD verification fee then covers the identity and criminal record checks, which are mandatory before any appointment.",
+    "processBody": "Identical to the other packs. Applying is free. If your file is retained, your unique access code is emailed to you immediately. A 30 USD verification fee then covers the identity and criminal record checks, which are mandatory before any appointment.",
     "processNote": "You will never be asked to pay before pre-selection, nor outside this site.",
     "ctaLabel": "Apply as a delegate"
   },

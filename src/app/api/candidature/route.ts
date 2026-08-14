@@ -7,7 +7,9 @@ import {
   sendCandidatureReceivedEmail,
   sendAdminNotificationEmail,
   sendStatusUpdateEmail,
+  sendAccessCodeEmail,
 } from "@/lib/resend/client";
+import { issueAccessCode } from "@/lib/access-code/issue";
 import type { CandidatureEmailData } from "@/lib/resend/types";
 
 /**
@@ -158,6 +160,10 @@ export async function POST(request: Request) {
     );
   }
 
+  // Reported back so the success page can promise the inbox rather than a
+  // three-day wait — and can soften that promise if the send didn't happen.
+  let codeSent = false;
+
   const emailData: CandidatureEmailData = {
     id,
     prenom: data.prenom,
@@ -173,19 +179,49 @@ export async function POST(request: Request) {
     locale,
   };
 
-  // Every applicant hears back, but not with the same message. Telling
-  // someone their access code is on the way when it never will be is the
-  // worst possible email, so the non-advancing outcomes get their own —
-  // each one stating that no fee was charged and the dossier stays eligible
-  // for future editions.
-  //
   // The admin notification always fires: the team needs to see volume and
   // rejection reasons, not only the successes.
   const emails: Promise<unknown>[] = [sendAdminNotificationEmail(emailData)];
 
   if (verdict.status === "preselectionne") {
-    emails.push(sendCandidatureReceivedEmail(emailData));
+    // Issue and send the access code NOW, inside the request.
+    //
+    // The specification described a fixed 72-hour delay before this email.
+    // That was dropped: a candidate who qualifies should be able to continue
+    // immediately, and three days of enforced waiting is friction with no
+    // corresponding benefit.
+    //
+    // Awaited rather than fired-and-forgotten, because the success page tells
+    // the candidate to go and check their inbox — that claim has to be true
+    // by the time they read it.
+    try {
+      const { code, expiresAt } = await issueAccessCode(supabase, id);
+
+      await sendAccessCodeEmail({
+        prenom: data.prenom,
+        email: data.email,
+        code,
+        expiresAt,
+        locale,
+      });
+
+      await supabase
+        .from("candidatures")
+        .update({ status: "code_envoye" })
+        .eq("id", id);
+
+      codeSent = true;
+    } catch (error) {
+      // Deliberately non-fatal. The dossier is committed and pre-selected;
+      // leaving the status at `preselectionne` is what makes the cron pick it
+      // up and retry. The candidate gets the acknowledgement email below
+      // instead, so they aren't left wondering whether anything happened.
+      console.error("Failed to issue/send access code at submit:", error);
+      emails.push(sendCandidatureReceivedEmail(emailData));
+    }
   } else {
+    // Non-advancing outcomes get their own message — each one stating that no
+    // fee was charged and the dossier stays eligible for future editions.
     emails.push(sendStatusUpdateEmail(emailData, verdict.status));
   }
 
@@ -203,5 +239,6 @@ export async function POST(request: Request) {
     id,
     status: verdict.status,
     reason: verdict.reason,
+    codeSent,
   });
 }

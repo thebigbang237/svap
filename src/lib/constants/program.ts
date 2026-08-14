@@ -406,6 +406,19 @@ export const ACCESS_CODE = {
   groupLength: 4,
   /** Expires this many days after issue if Phase 2 isn't completed. */
   validityDays: 14,
-  /** Delay between Phase-1 submission and the code email. */
-  sendDelayHours: 72,
+  /**
+   * How long a pre-selected dossier may sit un-emailed before the cron
+   * retries it.
+   *
+   * NOT a deliberate waiting period. Codes are issued and emailed
+   * synchronously inside the Phase-1 submission, so a pre-selected candidate
+   * has theirs within seconds. This window only exists to catch the case
+   * where that send failed — a Resend outage, a transient network error —
+   * leaving a dossier stuck at `preselectionne`.
+   *
+   * (The original specification described a fixed 72-hour delay. It was
+   * dropped: it added three days of friction to a funnel whose whole
+   * advantage is that Phase 1 is free and instant, with nothing gained.)
+   */
+  retryAfterMinutes: 30,
 } as const;
