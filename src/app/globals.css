@@ -16,8 +16,12 @@
   --spacing-section-y: 120px;
   --spacing-gutter: 32px;
 
-  --font-serif: var(--font-eb-garamond);
-  --font-sans: var(--font-inter);
+  /* Families come from the self-hosted @fontsource packages imported in
+     lib/fonts.ts. Named directly rather than through next/font's generated
+     CSS variables, which no longer exist now that the fonts aren't fetched
+     from Google at build time. */
+  --font-serif: "EB Garamond", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 /*
@@ -36,19 +40,19 @@ body {
 /*
  * ARABIC / RTL
  *
- * The layout only ships the font files for the active script, so in the
- * Arabic tree --font-eb-garamond and --font-inter are simply absent. These
- * rules repoint the semantic --font-serif / --font-sans tokens at the Arabic
- * pair, which means every `font-serif` and `font-sans` utility in the app
- * keeps working untouched.
+ * Repoints the semantic --font-serif / --font-sans tokens at the Arabic pair,
+ * so every `font-serif` and `font-sans` utility in the app keeps working
+ * untouched. The Latin families stay in the stack as a fallback for the Latin
+ * runs that appear inside Arabic copy — brand names like "Business Visitor",
+ * and every access code and amount.
  *
  * `html[lang="ar"]` rather than `[lang="ar"]`: the @theme block above emits
  * into `:root` inside Tailwind's `theme` layer, and matching its specificity
  * exactly would leave the winner up to source order.
  */
 html[lang="ar"] {
-  --font-serif: var(--font-noto-kufi-arabic);
-  --font-sans: var(--font-ibm-plex-sans-arabic);
+  --font-serif: "Noto Kufi Arabic", "EB Garamond", Georgia, serif;
+  --font-sans: "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif;
 }
 
 /*

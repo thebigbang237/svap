@@ -2,13 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
-import { routing, getDirection, type Locale } from "@/i18n/routing";
-import {
-  ebGaramond,
-  inter,
-  notoKufiArabic,
-  ibmPlexSansArabic,
-} from "@/lib/fonts";
+import { routing, getDirection } from "@/i18n/routing";
+// Side-effect import: registers every @font-face. Self-hosted, so nothing is
+// fetched from a third party at build time or at runtime.
+import "@/lib/fonts";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import "../globals.css";
@@ -67,7 +64,7 @@ export default async function RootLayout({
       // variant, every logical property, and the browser's own bidi
       // resolution all read it.
       dir={getDirection(locale)}
-      className={`${fontVariables(locale)} h-full antialiased`}
+      className="h-full antialiased"
     >
       <body className="min-h-full flex flex-col bg-sky text-ink">
         <NextIntlClientProvider messages={messages}>
@@ -80,15 +77,7 @@ export default async function RootLayout({
   );
 }
 
-/**
- * Only load the font files the locale actually renders in. Shipping the
- * Arabic faces to French readers (or vice versa) would roughly double the
- * font payload for no benefit — these scripts share no glyphs.
- *
- * globals.css maps --font-serif / --font-sans onto whichever pair is present.
- */
-function fontVariables(locale: Locale): string {
-  return locale === "ar"
-    ? `${notoKufiArabic.variable} ${ibmPlexSansArabic.variable}`
-    : `${ebGaramond.variable} ${inter.variable}`;
-}
+// Per-locale font loading is no longer done here: each @fontsource stylesheet
+// declares `unicode-range` per subset, so the browser downloads only the
+// files it actually needs to render the page. Same saving, one less thing to
+// keep in sync.

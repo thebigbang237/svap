@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ebGaramond, inter } from "@/lib/fonts";
+import "@/lib/fonts";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/admin/LogoutButton";
 import "../globals.css";
@@ -62,10 +62,7 @@ export default async function AdminLayout({
   const isAuthenticated = adminRole !== null;
 
   return (
-    <html
-      lang="fr"
-      className={`${ebGaramond.variable} ${inter.variable} h-full antialiased`}
-    >
+    <html lang="fr" className="h-full antialiased">
       <body className="min-h-full bg-sky text-ink">
         {isAuthenticated ? (
           <div className="flex min-h-screen">
