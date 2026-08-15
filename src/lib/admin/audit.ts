@@ -4,6 +4,7 @@ import { clientIp } from "@/lib/access-code/rate-limit";
 
 export type AuditAction =
   | "document.view"
+  | "dossier.download"
   | "passport.reveal"
   | "candidature.status"
   | "candidature.export"

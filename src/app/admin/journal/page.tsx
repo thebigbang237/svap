@@ -23,7 +23,12 @@ interface AuditRow {
 }
 
 /** Actions that touch a candidate's most sensitive data. */
-const SENSITIVE = new Set(["passport.reveal", "document.view", "payment.refund"]);
+const SENSITIVE = new Set([
+  "passport.reveal",
+  "document.view",
+  "dossier.download",
+  "payment.refund",
+]);
 
 export default async function AuditLogPage() {
   const supabase = createAdminClient();

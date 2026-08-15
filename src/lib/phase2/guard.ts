@@ -45,6 +45,13 @@ export async function guardPhase2Step(
   // as unauthenticated rather than crashing the page.
   if (!progress) redirect({ href: "/documents", locale });
 
+  // Submitted dossiers are read-only. Without this, a candidate clicking the
+  // original email link weeks later would be handed the personal-information
+  // form again and could overwrite the data their review is based on.
+  if (progress.locked) {
+    redirect({ href: "/documents/termine", locale });
+  }
+
   if (!canAccessStep(step, progress)) {
     redirect({ href: PHASE2_PATHS[progress.nextStep], locale });
   }

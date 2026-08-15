@@ -35,6 +35,21 @@ export const PHASE2_PATHS: Record<Phase2Step, string> = {
   consentements: "/documents/consentements",
 };
 
+/**
+ * Statuses at which Phase 2 is finished and closed for editing.
+ *
+ * Once verifications have started, the dossier is what the reviewers — and
+ * potentially a consulate — are working from. A candidate re-opening the
+ * email link weeks later must not be able to silently overwrite the personal
+ * information or risk answers that decision is based on, or re-upload a
+ * different passport scan after the fact.
+ */
+export const PHASE2_LOCKED_STATUSES = ["verification", "valide", "rejete"];
+
+export function isPhase2Locked(status: string): boolean {
+  return PHASE2_LOCKED_STATUSES.includes(status);
+}
+
 export interface Phase2Progress {
   candidature: Pick<
     CandidatureRow,
@@ -53,6 +68,8 @@ export interface Phase2Progress {
   hasRiskAssessment: boolean;
   hasPaid: boolean;
   documentKinds: string[];
+  /** Dossier submitted — every step is now read-only. */
+  locked: boolean;
   /** First step the candidate still has work to do on. */
   nextStep: Phase2Step;
 }
@@ -114,6 +131,7 @@ export async function loadPhase2Progress(
     hasRiskAssessment,
     hasPaid,
     documentKinds,
+    locked: isPhase2Locked(candidature.status),
     nextStep: resolveNextStep({
       hasPersonalInfo,
       hasRiskAssessment,

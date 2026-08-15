@@ -39,6 +39,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "errors.paymentRequired" }, { status: 402 });
   }
 
+  // Read-only once submitted. Enforced here as well as in the page guard: a
+  // direct POST would otherwise overwrite a dossier that is already under
+  // review.
+  if (progress.locked) {
+    return NextResponse.json({ error: "errors.locked" }, { status: 409 });
+  }
+
   const form = await request.formData().catch(() => null);
   const file = form?.get("file");
   const kind = String(form?.get("kind") ?? "");

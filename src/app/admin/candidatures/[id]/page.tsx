@@ -280,6 +280,8 @@ export default async function CandidatureDetailPage({
             candidatureId={candidature.id}
             initialStatus={candidature.status}
             initialNotes={candidature.notes_admin}
+            canDownload={isSuperAdmin}
+            candidateName={`${candidature.prenom} ${candidature.nom}`}
           />
 
           {dossier.accessCode && (

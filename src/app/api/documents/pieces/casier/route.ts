@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { readSession } from "@/lib/access-code/session";
+import { loadPhase2Progress } from "@/lib/phase2/steps";
 import { casierMetadataSchema } from "@/lib/validations/phase2";
 
 /**
@@ -27,6 +28,12 @@ export async function POST(request: Request) {
   }
 
   const supabase = createAdminClient();
+
+  // Same lock as the page guard, enforced server-side.
+  const progress = await loadPhase2Progress(supabase, session.cid);
+  if (progress?.locked) {
+    return NextResponse.json({ error: "errors.locked" }, { status: 409 });
+  }
 
   const { data, error } = await supabase
     .from("phase2_documents")

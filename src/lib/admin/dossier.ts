@@ -52,6 +52,8 @@ export interface RiskAssessmentView {
 export interface DocumentView {
   id: string;
   kind: string;
+  /** Needed by the dossier export, which reads the file server-side. */
+  storage_path: string;
   mime_type: string;
   size_bytes: number;
   uploaded_at: string;
@@ -120,7 +122,7 @@ export async function loadDossier(
       supabase
         .from("phase2_documents")
         .select(
-          "id, kind, mime_type, size_bytes, uploaded_at, sha256, casier_date, casier_numero, casier_lieu, casier_structure",
+          "id, kind, storage_path, mime_type, size_bytes, uploaded_at, sha256, casier_date, casier_numero, casier_lieu, casier_structure",
         )
         .eq("candidature_id", candidatureId)
         .returns<DocumentView[]>(),

@@ -106,6 +106,7 @@ export const PAYMENT_STATUS_LABELS_FR: Record<string, string> = {
 
 export const AUDIT_ACTION_LABELS_FR: Record<string, string> = {
   "document.view": "Consultation d'un document",
+  "dossier.download": "Téléchargement du dossier complet",
   "passport.reveal": "Affichage d'un n° de passeport",
   "candidature.status": "Changement de statut",
   "candidature.export": "Export CSV",

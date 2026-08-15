@@ -6,6 +6,8 @@ import { redirect } from "@/i18n/navigation";
 import { PageHeader } from "@/components/marketing/PageHeader";
 import { AccessCodeForm } from "@/components/forms/AccessCodeForm";
 import { readSession } from "@/lib/access-code/session";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { loadPhase2Progress, PHASE2_PATHS } from "@/lib/phase2/steps";
 import { ACCESS_CODE } from "@/lib/constants/program";
 import { LockIcon, ShieldIcon, MailIcon } from "@/components/marketing/icons";
 
@@ -23,7 +25,19 @@ export default async function DocumentsPortalPage({
 }) {
   const { locale } = await params;
   const session = await readSession();
-  if (session) redirect({ href: "/documents/informations", locale });
+
+  if (session) {
+    // Send a returning candidate to where they actually stand: the completion
+    // page if their dossier is already submitted, otherwise their next step.
+    const supabase = createAdminClient();
+    const progress = await loadPhase2Progress(supabase, session.cid);
+    redirect({
+      href: progress?.locked
+        ? "/documents/termine"
+        : (progress ? PHASE2_PATHS[progress.nextStep] : "/documents/informations"),
+      locale,
+    });
+  }
 
   return <PortalContent />;
 }

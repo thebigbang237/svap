@@ -46,6 +46,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ alreadyPaid: true }, { status: 409 });
   }
 
+  // Read-only once submitted. Enforced here as well as in the page guard: a
+  // direct POST would otherwise overwrite a dossier that is already under
+  // review.
+  if (progress.locked) {
+    return NextResponse.json({ error: "errors.locked" }, { status: 409 });
+  }
+
   // The earlier steps have to be done — this is also the server-side twin of
   // the page guard, so a direct POST can't skip them.
   if (!progress.hasPersonalInfo || !progress.hasRiskAssessment) {
