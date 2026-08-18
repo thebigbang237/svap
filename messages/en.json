@@ -13,6 +13,25 @@
       "age": "Age"
     }
   },
+  "countdown": {
+    "eyebrow": "2026 edition",
+    "title": "Applications close in",
+    "remainingLabel": "Time left to apply",
+    "units": {
+      "days": "Days",
+      "hours": "Hours",
+      "minutes": "Min",
+      "seconds": "Sec"
+    },
+    "deadlineLabel": "Applications close",
+    "eventLabel": "Event dates",
+    "cta": "Submit my application",
+    "close": "Collapse",
+    "collapsed": "{days} days left to apply",
+    "collapsedClosed": "Applications closed",
+    "closedTitle": "Applications are closed",
+    "closedBody": "Applications for this edition are no longer accepted. Files already submitted are progressing normally, and you can still open yours with your access code."
+  },
   "nav": {
     "brand": "Silicon Valley Africa",
     "programme": "The program",
@@ -819,8 +838,11 @@
       "waiting": {
         "title": "Check your phone",
         "instruction": "A confirmation request has just been sent to your phone. Enter your Mobile Money PIN to approve the payment.",
+        "merchantName": "The request will show the name <strong>{name}</strong>. If a different name appears, do not enter your PIN.",
         "amount": "Amount to confirm:",
         "polling": "Waiting for confirmation...",
+        "noPrompt": "Didn't get the PIN prompt?",
+        "dialNow": "Dial the code now",
         "dontClose": "Don't close this page. Approval can take up to two minutes."
       },
       "timeout": {
@@ -839,7 +861,12 @@
         "checkoutFailed": "The payment couldn't be started. Try again shortly.",
         "paymentFailed": "The payment didn't go through. Check your balance and try again.",
         "notFound": "Payment not found.",
-        "operatorRequired": "Select your Mobile Money operator."
+        "operatorRequired": "Select your Mobile Money operator.",
+        "phoneInvalid": "Your operator doesn't recognise this number. Check it and try again.",
+        "operatorUnavailableNow": "This operator isn't accepting payments right now. Choose another one, or try again in a few minutes.",
+        "amountTooSmall": "The amount is below this operator's minimum. Please contact support.",
+        "amountTooLarge": "The amount is above your Mobile Money wallet limit. Ask your operator to raise it, or pay by card.",
+        "amountOutOfBounds": "The amount is outside your Mobile Money wallet limits. Contact your operator, or pay by card."
       },
       "amountToPay": "Amount to pay",
       "amountEquivalent": "Equivalent of {usd} USD at today's rate.",

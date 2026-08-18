@@ -1,6 +1,7 @@
 import "server-only";
-import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { COUNTRY_PAYMENT, type Country } from "@/lib/constants/program";
+import { verifyPawapaySignature } from "./pawapay-signature";
 import {
   PaymentConfigError,
   type CheckoutInput,
@@ -41,6 +42,20 @@ const COUNTRY_CODES: Record<Country, string> = {
   egy: "EGY",
 };
 
+/**
+ * Country calling codes, for normalising what a candidate types.
+ *
+ * pawaPay wants an MSISDN — country code included, no '+'. Candidates
+ * overwhelmingly type their number the way they'd dial it locally ("6 70 00 00
+ * 00"), which is not that. `predict-provider` sanitises the rest, but it needs
+ * the country code to be there first.
+ */
+const CALLING_CODES: Partial<Record<Country, string>> = {
+  cmr: "237",
+  ken: "254",
+  gha: "233",
+};
+
 function config() {
   const token = process.env.PAWAPAY_API_TOKEN;
   if (!token) {
@@ -51,6 +66,30 @@ function config() {
     baseUrl: process.env.PAWAPAY_ENV === "live" ? LIVE_BASE : SANDBOX_BASE,
   };
 }
+
+/** Raised when pawaPay refuses the deposit outright, with its own wording. */
+export class PawapayRejection extends Error {
+  // Assigned explicitly rather than as a constructor parameter property: those
+  // need a full TypeScript compile, and this module is loaded directly by the
+  // diagnostic scripts under node's strip-only type handling.
+  readonly failureCode: string;
+
+  constructor(failureCode: string, message: string) {
+    super(message);
+    this.failureCode = failureCode;
+  }
+}
+
+/**
+ * Raised when we genuinely cannot tell whether the deposit was accepted — an
+ * HTTP 500, a socket timeout, an `UNKNOWN_ERROR`.
+ *
+ * Distinct from PawapayRejection because the handling is opposite: a rejection
+ * is safe to report as failed and retry, whereas this must NOT be, since the
+ * deposit may be live. The caller leaves the payment pending for the
+ * reconciliation cycle to resolve.
+ */
+export class PawapayIndeterminate extends Error {}
 
 /**
  * v2 deposit states → our lifecycle.
@@ -93,13 +132,48 @@ async function pawapayFetch(path: string, init?: RequestInit) {
 export interface MobileMoneyOperator {
   /** e.g. "MTN_MOMO_CMR" — goes into the deposit payload verbatim. */
   provider: string;
-  /** e.g. "MTN MoMo" — what the payer actually recognises. */
+  /** e.g. "MTN" — the operator, as the payer knows it. */
   displayName: string;
+  /**
+   * The merchant name that appears on the PIN prompt, e.g. "PAWAPAY".
+   *
+   * NOT a label for the operator picker — an earlier version used it as one,
+   * which showed every operator as "PAWAPAY" instead of MTN/Orange. Its actual
+   * job is the waiting screen: telling the payer which name to expect on the
+   * prompt is what stops a genuine request looking like a scam.
+   */
+  nameDisplayedToCustomer?: string;
+  /** Operator logo served by pawaPay, so a newly-enabled operator needs no asset work. */
+  logo?: string;
   currency: string;
   minAmount?: string;
   maxAmount?: string;
+  /** NONE | TWO_PLACES — some rails reject fractional amounts outright. */
+  decimalsInAmount?: string;
   /** OPERATIONAL | DELAYED | CLOSED */
   status?: string;
+  /** PROVIDER_AUTH (PIN prompt) | PREAUTH | REDIRECT_AUTH */
+  authType?: string;
+  /** AUTOMATIC — prompt arrives by itself; MANUAL — the payer must dial in. */
+  pinPrompt?: string;
+  pinPromptRevivable?: boolean;
+  /** Localised, step-by-step instructions for raising the PIN prompt. */
+  pinPromptInstructions?: PinPromptInstructions;
+}
+
+export interface PinPromptInstructions {
+  channels?: {
+    type?: string;
+    displayName?: Record<string, string>;
+    quickLink?: string;
+    instructions?: Record<string, { text?: string }[]>;
+  }[];
+}
+
+export interface OperatorListing {
+  /** Country calling code, shown in front of the phone input. */
+  prefix?: string;
+  operators: MobileMoneyOperator[];
 }
 
 /**
@@ -111,10 +185,53 @@ export interface MobileMoneyOperator {
  * exactly what *this account* is configured for, including per-operator
  * availability, so a CLOSED operator is never offered to a candidate.
  */
+interface ActiveConfResponse {
+  companyName?: string;
+  signatureConfiguration?: {
+    signedRequestsOnly?: boolean;
+    signedCallbacks?: boolean;
+  };
+  countries?: {
+    country?: string;
+    prefix?: string;
+    providers?: {
+      provider?: string;
+      /** The operator: "MTN", "Orange". This is the picker's label. */
+      displayName?: string;
+      /** The MERCHANT, as shown on the PIN prompt — not an operator name. */
+      nameDisplayedToCustomer?: string;
+      logo?: string;
+      currencies?: {
+        currency?: string;
+        operationTypes?: {
+          DEPOSIT?: {
+            minAmount?: string;
+            maxAmount?: string;
+            // The API reference documents the limits under these names while
+            // the live API returns the pair above. Both are read, so a rename
+            // in either direction doesn't silently disable the limit checks.
+            minTransactionLimit?: string;
+            maxTransactionLimit?: string;
+            decimalsInAmount?: string;
+            status?: string;
+            authType?: string;
+            pinPrompt?: string;
+            pinPromptRevivable?: boolean;
+            pinPromptInstructions?: PinPromptInstructions;
+          };
+        };
+      }[];
+    }[];
+  }[];
+}
+
+/** Logged once per process, not per request — this is a config problem. */
+let warnedAboutUnsignedCallbacks = false;
+
 export async function listOperators(
   country: Country,
-): Promise<MobileMoneyOperator[]> {
-  if (!COUNTRY_PAYMENT[country].mobileMoney) return [];
+): Promise<OperatorListing> {
+  if (!COUNTRY_PAYMENT[country].mobileMoney) return { operators: [] };
 
   const response = await pawapayFetch(
     `/v2/active-conf?country=${COUNTRY_CODES[country]}&operationType=DEPOSIT`,
@@ -124,54 +241,165 @@ export async function listOperators(
     throw new Error(`pawaPay active-conf failed (${response.status})`);
   }
 
-  const data = (await response.json()) as {
-    countries?: {
-      country?: string;
-      providers?: {
-        provider?: string;
-        displayName?: string;
-        nameDisplayedToCustomer?: string;
-        currencies?: {
-          currency?: string;
-          operationTypes?: {
-            DEPOSIT?: {
-              minAmount?: string;
-              maxAmount?: string;
-              status?: string;
-            };
-          };
-        }[];
-      }[];
-    }[];
-  };
+  const data = (await response.json()) as ActiveConfResponse;
+
+  // pawaPay reports its own signing configuration here, which makes a
+  // misconfigured account self-diagnosing: our callback endpoint refuses
+  // unsigned callbacks, so with this off every callback is dropped and
+  // settlement falls entirely to the poll and the reconciliation cron.
+  if (
+    data.signatureConfiguration &&
+    data.signatureConfiguration.signedCallbacks === false &&
+    !warnedAboutUnsignedCallbacks
+  ) {
+    warnedAboutUnsignedCallbacks = true;
+    console.warn(
+      "pawaPay account has signed callbacks DISABLED. Enable them in the " +
+        "pawaPay dashboard (Settings → Signatures). Until then every callback " +
+        "is refused and payments settle only via /api/payments/status and " +
+        "/api/cron/payments.",
+    );
+  }
 
   const operators: MobileMoneyOperator[] = [];
+  let prefix = CALLING_CODES[country];
 
   for (const entry of data.countries ?? []) {
+    if (entry.prefix) prefix = entry.prefix;
+
     for (const provider of entry.providers ?? []) {
       for (const currency of provider.currencies ?? []) {
         const deposit = currency.operationTypes?.DEPOSIT;
         if (!deposit || !provider.provider) continue;
+
         // CLOSED means the operator isn't taking deposits at all. Offering it
-        // would guarantee a failed payment.
-        if (deposit.status && deposit.status.toUpperCase() === "CLOSED") continue;
+        // would guarantee a failed payment. DELAYED is still offered — those
+        // do settle, just slowly, and withholding the only operator a
+        // candidate has is worse than a slow payment.
+        if (deposit.status?.toUpperCase() === "CLOSED") continue;
+
+        // Only PIN-prompt operators are offered. PREAUTH needs an OTP the
+        // payer generates first, and REDIRECT_AUTH needs a hand-off to the
+        // provider's own page — neither flow is built, and offering an
+        // operator we cannot complete is worse than not listing it. None of
+        // Cameroun, Kenya or Ghana uses them today; this is the guard for the
+        // day pawaPay enables one on the account.
+        if (deposit.authType && deposit.authType.toUpperCase() !== "PROVIDER_AUTH") {
+          continue;
+        }
 
         operators.push({
           provider: provider.provider,
-          displayName:
-            provider.nameDisplayedToCustomer ??
-            provider.displayName ??
-            provider.provider,
+          displayName: provider.displayName ?? provider.provider,
+          nameDisplayedToCustomer: provider.nameDisplayedToCustomer,
+          logo: provider.logo,
           currency: currency.currency ?? COUNTRY_PAYMENT[country].currency,
-          minAmount: deposit.minAmount,
-          maxAmount: deposit.maxAmount,
+          minAmount: deposit.minAmount ?? deposit.minTransactionLimit,
+          maxAmount: deposit.maxAmount ?? deposit.maxTransactionLimit,
+          decimalsInAmount: deposit.decimalsInAmount,
           status: deposit.status,
+          authType: deposit.authType,
+          pinPrompt: deposit.pinPrompt,
+          pinPromptRevivable: deposit.pinPromptRevivable,
+          pinPromptInstructions: deposit.pinPromptInstructions,
         });
       }
     }
   }
 
-  return operators;
+  return { prefix, operators };
+}
+
+// ---------------------------------------------------------------------------
+// Phone number validation
+// ---------------------------------------------------------------------------
+
+export interface PredictedProvider {
+  /** MSISDN, sanitised by pawaPay — the form to send to /v2/deposits. */
+  phoneNumber: string;
+  /** pawaPay's guess at the operator for this number. */
+  provider?: string;
+  country?: string;
+}
+
+/**
+ * Sanitises and validates a phone number, and predicts its operator.
+ *
+ * Worth the round trip for two reasons the docs are explicit about: several of
+ * these countries don't strictly follow ITU E.164, so local heuristics get
+ * leading zeros and digit counts wrong; and the returned MSISDN is the exact
+ * form `/v2/deposits` expects, which removes a whole class of
+ * INVALID_PHONE_NUMBER rejections after the candidate has already committed.
+ *
+ * Returns null when pawaPay says the number isn't valid.
+ */
+export async function predictProvider(
+  phone: string,
+  country?: Country,
+): Promise<PredictedProvider | null> {
+  const digits = phone.replace(/\D/g, "");
+  if (!digits) return null;
+
+  // Prepend the country code when the candidate typed a local number. Cheap
+  // to get wrong in the other direction, so only when it's clearly missing.
+  const callingCode = country ? CALLING_CODES[country] : undefined;
+  const candidate =
+    callingCode && !digits.startsWith(callingCode)
+      ? `${callingCode}${digits.replace(/^0+/, "")}`
+      : digits;
+
+  const response = await pawapayFetch("/v2/predict-provider", {
+    method: "POST",
+    body: JSON.stringify({ phoneNumber: candidate }),
+  });
+
+  if (!response.ok) return null;
+
+  const data = (await response.json()) as {
+    phoneNumber?: string;
+    provider?: string;
+    country?: string;
+  };
+
+  if (!data.phoneNumber) return null;
+
+  return {
+    phoneNumber: data.phoneNumber,
+    provider: data.provider,
+    country: data.country,
+  };
+}
+
+/**
+ * Formats the amount the way this operator will accept it.
+ *
+ * Two rails' worth of rejections avoided here: `decimalsInAmount: "NONE"`
+ * means a fractional amount is refused outright (INVALID_AMOUNT), and every
+ * operator has wallet limits (AMOUNT_OUT_OF_BOUNDS). Both are known before
+ * initiation, so neither should ever reach the candidate as a failed payment.
+ */
+export function formatAmountForOperator(
+  amountLocal: number,
+  operator: Pick<MobileMoneyOperator, "decimalsInAmount" | "minAmount" | "maxAmount">,
+): { amount: string } | { error: "too_small" | "too_large"; limit: string } {
+  const rounded =
+    operator.decimalsInAmount?.toUpperCase() === "TWO_PLACES"
+      ? Math.round(amountLocal * 100) / 100
+      : Math.round(amountLocal);
+
+  if (operator.minAmount && rounded < Number(operator.minAmount)) {
+    return { error: "too_small", limit: operator.minAmount };
+  }
+  if (operator.maxAmount && rounded > Number(operator.maxAmount)) {
+    return { error: "too_large", limit: operator.maxAmount };
+  }
+
+  return {
+    amount:
+      operator.decimalsInAmount?.toUpperCase() === "TWO_PLACES"
+        ? rounded.toFixed(2)
+        : String(rounded),
+  };
 }
 
 export const pawapayProvider: PaymentProvider = {
@@ -179,6 +407,12 @@ export const pawapayProvider: PaymentProvider = {
 
   supports(country: Country, method: PaymentMethod) {
     return method === "mobile_money" && COUNTRY_PAYMENT[country].mobileMoney;
+  },
+
+  // The depositId. Generated here and persisted by the caller BEFORE the
+  // deposit is initiated — see PaymentProvider.newReference.
+  newReference() {
+    return randomUUID();
   },
 
   async createCheckout(input: CheckoutInput): Promise<CheckoutResult> {
@@ -192,78 +426,112 @@ export const pawapayProvider: PaymentProvider = {
         "A mobile money operator is required — v2 deposits carry the provider in the payload.",
       );
     }
-
-    // We generate the id rather than letting pawaPay assign one, so the row
-    // exists under a known reference before the network call — a timeout
-    // then leaves a payment we can poll, not an orphaned charge.
-    const depositId = randomUUID();
-
-    const response = await pawapayFetch("/v2/deposits", {
-      method: "POST",
-      body: JSON.stringify({
-        depositId,
-        payer: {
-          type: "MMO",
-          accountDetails: {
-            // Digits only, no '+' — pawaPay rejects the E.164 prefix here.
-            phoneNumber: input.phone.replace(/\D/g, ""),
-            provider: input.operator,
-          },
-        },
-        amount: String(input.money.amountLocal),
-        currency: input.money.currency,
-        clientReferenceId: input.candidatureId,
-        // 4–22 characters, and it appears on the payer's own statement.
-        customerMessage: "SVAP 2026",
-      }),
-    });
-
-    if (!response.ok) {
-      const body = await response.text().catch(() => "");
-      throw new Error(
-        `pawaPay deposit failed (${response.status}): ${body.slice(0, 300)}`,
+    if (!input.reference) {
+      throw new PaymentConfigError(
+        "A depositId must be generated and stored before initiating a pawaPay deposit.",
       );
     }
 
-    // v2 initiation returns ACCEPTED | REJECTED | DUPLICATE_IGNORED.
-    const data = (await response.json()) as {
-      status?: string;
-      failureReason?: { failureMessage?: string };
-    };
+    const depositId = input.reference;
 
-    if (data.status && data.status.toUpperCase() === "REJECTED") {
-      throw new Error(
-        `pawaPay rejected the deposit: ${data.failureReason?.failureMessage ?? "unknown reason"}`,
+    let response: Response;
+    try {
+      response = await pawapayFetch("/v2/deposits", {
+        method: "POST",
+        body: JSON.stringify({
+          depositId,
+          payer: {
+            type: "MMO",
+            accountDetails: {
+              // Already an MSISDN: the checkout route runs it through
+              // predict-provider, which is what pawaPay asks for.
+              phoneNumber: input.phone.replace(/\D/g, ""),
+              provider: input.operator,
+            },
+          },
+          amount: input.amountOverride ?? String(input.money.amountLocal),
+          currency: input.money.currency,
+          clientReferenceId: input.candidatureId,
+          // 4–22 characters, and it appears on the payer's own statement.
+          customerMessage: "SVAP 2026",
+        }),
+      });
+    } catch (error) {
+      // Socket timeout, DNS, TLS — the request may or may not have landed.
+      // Never report this as a failure: the deposit could be live and a retry
+      // would charge the candidate twice.
+      throw new PawapayIndeterminate(
+        `pawaPay deposit initiation did not complete: ${(error as Error).message}`,
+      );
+    }
+
+    const raw = await response.text().catch(() => "");
+    let data: {
+      status?: string;
+      failureReason?: { failureCode?: string; failureMessage?: string };
+    } = {};
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
+      /* handled below by the !response.ok branch */
+    }
+
+    const failureCode = data.failureReason?.failureCode?.toUpperCase();
+
+    if (!response.ok) {
+      // Documented explicitly: on a 5xx or UNKNOWN_ERROR the outcome is
+      // unknown and must be resolved with a status check, never assumed
+      // failed.
+      if (response.status >= 500 || failureCode === "UNKNOWN_ERROR") {
+        throw new PawapayIndeterminate(
+          `pawaPay deposit returned ${response.status} (${failureCode ?? "no code"}) — status unknown.`,
+        );
+      }
+      throw new PawapayRejection(
+        failureCode ?? "HTTP_ERROR",
+        data.failureReason?.failureMessage ??
+          `pawaPay deposit failed (${response.status}): ${raw.slice(0, 200)}`,
+      );
+    }
+
+    const status = data.status?.toUpperCase();
+
+    if (status === "REJECTED") {
+      throw new PawapayRejection(
+        failureCode ?? "REJECTED",
+        data.failureReason?.failureMessage ?? "pawaPay rejected the deposit.",
+      );
+    }
+
+    // Should be unreachable — every depositId is a fresh UUID — but if it
+    // happens, the deposit already exists and its real state has to be read
+    // rather than guessed.
+    if (status === "DUPLICATE_IGNORED") {
+      throw new PawapayIndeterminate(
+        `pawaPay reports depositId ${depositId} as a duplicate — reconcile against the existing deposit.`,
       );
     }
 
     return { providerRef: depositId, asynchronous: true };
   },
 
-  async verifyWebhook(rawBody, headers) {
-    // Reads the secret directly rather than going through config(): callback
-    // verification needs only the signing secret, and requiring the API token
-    // here would turn a forged webhook into a 500 (which providers retry)
-    // instead of a clean rejection.
-    const webhookSecret = process.env.PAWAPAY_WEBHOOK_SECRET;
+  async verifyWebhook(rawBody, request) {
+    // RFC-9421, verified against pawaPay's published public key — see
+    // pawapay-signature.ts. Fails closed: an unverifiable callback is
+    // indistinguishable from a forged one, and this endpoint is the only thing
+    // that can mark a dossier paid without the candidate present.
+    const { token, baseUrl } = config();
 
-    // Fail closed. An unsigned callback endpoint would let anyone mark any
-    // payment as settled by POSTing a deposit id.
-    if (!webhookSecret) {
-      console.error(
-        "PAWAPAY_WEBHOOK_SECRET is not configured — rejecting callback.",
-      );
-      return null;
-    }
+    const verified = await verifyPawapaySignature({
+      rawBody,
+      headers: request.headers,
+      method: request.method,
+      path: new URL(request.url).pathname,
+      baseUrl,
+      token,
+    });
 
-    const signature = headers.get("x-pawapay-signature") ?? "";
-    const expected = createHmac("sha256", webhookSecret)
-      .update(rawBody)
-      .digest("hex");
-
-    const a = Buffer.from(signature);
-    const b = Buffer.from(expected);
-    if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+    if (!verified) return null;
 
     // v2 consolidated rejectionReason/failureReason/error into one
     // `failureReason: { failureCode, failureMessage }`.

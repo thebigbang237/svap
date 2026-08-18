@@ -6,8 +6,15 @@ import { loadPhase2Progress } from "@/lib/phase2/steps";
 import { PACK_SPECS, type Country, type Pack } from "@/lib/constants/program";
 import { providerFor } from "@/lib/payments/registry";
 import { convertUsd, usdOnly } from "@/lib/payments/fx";
-import { createPaymentRecord } from "@/lib/payments/record";
+import { createPaymentRecord, markPaymentFailed } from "@/lib/payments/record";
 import { PaymentConfigError } from "@/lib/payments/types";
+import {
+  listOperators,
+  predictProvider,
+  formatAmountForOperator,
+  PawapayIndeterminate,
+  PawapayRejection,
+} from "@/lib/payments/pawapay";
 
 const checkoutSchema = z.object({
   method: z.enum(["mobile_money", "card"]),
@@ -106,12 +113,101 @@ export async function POST(request: Request) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const returnUrl = `${siteUrl}/${progress.candidature.locale}/documents/paiement`;
 
+  // -------------------------------------------------------------------------
+  // Mobile money: everything that can be validated before the money moves
+  // -------------------------------------------------------------------------
+  // pawaPay documents each of these as an avoidable rejection. Catching them
+  // here costs one or two API calls; catching them after initiation costs the
+  // candidate a failed payment on a page they had already committed to.
+  let msisdn = parsed.data.phone;
+  let amountOverride: string | undefined;
+
+  if (parsed.data.method === "mobile_money") {
+    let operators;
+    try {
+      operators = (await listOperators(country)).operators;
+    } catch (error) {
+      console.error("Operator lookup failed at checkout:", (error as Error).message);
+      return NextResponse.json({ error: "errors.checkoutFailed" }, { status: 502 });
+    }
+
+    // The operator must still be one this account can actually collect
+    // through — a list fetched minutes ago may name one that has since closed.
+    const operator = operators.find((o) => o.provider === parsed.data.operator);
+    if (!operator) {
+      return NextResponse.json(
+        { error: "errors.operatorUnavailableNow" },
+        { status: 409 },
+      );
+    }
+
+    // Sanitise the number into the MSISDN pawaPay expects, and reject a
+    // malformed one before it becomes an INVALID_PHONE_NUMBER rejection.
+    try {
+      const predicted = await predictProvider(parsed.data.phone!, country);
+      if (!predicted) {
+        return NextResponse.json({ error: "errors.phoneInvalid" }, { status: 400 });
+      }
+      msisdn = predicted.phoneNumber;
+    } catch (error) {
+      // Validation being unavailable must not block the payment — send the
+      // digits as typed and let pawaPay have the final say.
+      console.error("predict-provider unavailable:", (error as Error).message);
+    }
+
+    // Decimal support and wallet limits vary per operator, and both are known
+    // up front.
+    const shaped = formatAmountForOperator(money.amountLocal, operator);
+    if ("error" in shaped) {
+      console.error(
+        `Fee ${money.amountLocal} ${money.currency} is ${shaped.error} for ${operator.provider} (limit ${shaped.limit}).`,
+      );
+      return NextResponse.json(
+        {
+          error:
+            shaped.error === "too_small"
+              ? "errors.amountTooSmall"
+              : "errors.amountTooLarge",
+        },
+        { status: 409 },
+      );
+    }
+    amountOverride = shaped.amount;
+  }
+
+  // -------------------------------------------------------------------------
+  // Persist the reference BEFORE initiating
+  // -------------------------------------------------------------------------
+  // pawaPay's central consistency rule. If the initiation call times out, this
+  // row is what lets /api/cron/payments find out what actually happened
+  // instead of the deposit becoming an untracked charge.
+  const reference = provider.newReference?.();
+
+  let payment = reference
+    ? await createPaymentRecord(supabase, {
+        candidatureId: session.cid,
+        provider: provider.id,
+        providerRef: reference,
+        method: parsed.data.method,
+        money,
+        // Recorded for reconciliation: "pawapay" alone doesn't say whether the
+        // money moved over MTN or Orange, which is the first thing support asks.
+        operator: parsed.data.operator,
+      })
+    : null;
+
+  if (reference && !payment) {
+    return NextResponse.json({ error: "errors.server" }, { status: 500 });
+  }
+
   try {
     const checkout = await provider.createCheckout({
       candidatureId: session.cid,
       country,
       money,
-      phone: parsed.data.phone,
+      reference,
+      amountOverride,
+      phone: msisdn,
       operator: parsed.data.operator,
       email: progress.candidature.email,
       locale: progress.candidature.locale,
@@ -119,24 +215,26 @@ export async function POST(request: Request) {
       description: `SVAP 2026 verification`,
     });
 
-    const payment = await createPaymentRecord(supabase, {
-      candidatureId: session.cid,
-      provider: provider.id,
-      providerRef: checkout.providerRef,
-      method: parsed.data.method,
-      money,
-      // Recorded for reconciliation: "pawapay" alone doesn't say whether the
-      // money moved over MTN or Orange, which is the first thing support asks.
-      operator: parsed.data.operator,
-    });
-
+    // Providers that mint their own reference (Stripe) are recorded now, since
+    // it did not exist beforehand.
     if (!payment) {
-      // The provider has an open intent we can't track. Loud, because it
-      // needs manual reconciliation rather than a silent retry.
-      console.error(
-        `Payment record failed AFTER provider checkout ${provider.id}/${checkout.providerRef} — reconcile manually.`,
-      );
-      return NextResponse.json({ error: "errors.server" }, { status: 500 });
+      payment = await createPaymentRecord(supabase, {
+        candidatureId: session.cid,
+        provider: provider.id,
+        providerRef: checkout.providerRef,
+        method: parsed.data.method,
+        money,
+        operator: parsed.data.operator,
+      });
+
+      if (!payment) {
+        // The provider has an open intent we can't track. Loud, because it
+        // needs manual reconciliation rather than a silent retry.
+        console.error(
+          `Payment record failed AFTER provider checkout ${provider.id}/${checkout.providerRef} — reconcile manually.`,
+        );
+        return NextResponse.json({ error: "errors.server" }, { status: 500 });
+      }
     }
 
     return NextResponse.json({
@@ -147,7 +245,74 @@ export async function POST(request: Request) {
       currency: money.currency,
     });
   } catch (error) {
+    // An outcome we cannot determine is NOT a failure. The deposit may be
+    // live, so the row stays pending, the candidate is sent to the waiting
+    // screen, and the poll plus the reconciliation cycle resolve it. Telling
+    // them it failed here is how a double charge happens.
+    if (error instanceof PawapayIndeterminate && payment) {
+      console.error("pawaPay initiation indeterminate:", error.message);
+      return NextResponse.json({
+        paymentId: payment.id,
+        asynchronous: true,
+        indeterminate: true,
+        amountLocal: money.amountLocal,
+        currency: money.currency,
+      });
+    }
+
+    // An explicit rejection is safe to record and safe to retry.
+    if (error instanceof PawapayRejection) {
+      console.error(
+        `pawaPay rejected the deposit (${error.failureCode}):`,
+        error.message,
+      );
+      if (payment) {
+        await markPaymentFailed(
+          supabase,
+          payment.id,
+          `${error.failureCode}: ${error.message}`,
+        );
+      }
+      return NextResponse.json(
+        { error: rejectionMessageKey(error.failureCode) },
+        { status: 502 },
+      );
+    }
+
     console.error("Checkout creation failed:", (error as Error).message);
+    if (payment) {
+      await markPaymentFailed(supabase, payment.id, (error as Error).message);
+    }
     return NextResponse.json({ error: "errors.checkoutFailed" }, { status: 502 });
+  }
+}
+
+/**
+ * pawaPay failure codes → a message the candidate can act on.
+ *
+ * pawaPay is explicit that `failureMessage` is written for our support team,
+ * not for the payer, so it is logged rather than shown. Anything unmapped falls
+ * back to the generic retry copy.
+ */
+function rejectionMessageKey(failureCode: string): string {
+  switch (failureCode) {
+    case "PROVIDER_TEMPORARILY_UNAVAILABLE":
+      return "errors.operatorUnavailableNow";
+    case "INVALID_PHONE_NUMBER":
+      return "errors.phoneInvalid";
+    case "AMOUNT_OUT_OF_BOUNDS":
+      return "errors.amountOutOfBounds";
+    case "INVALID_PROVIDER":
+      return "errors.operatorUnavailableNow";
+    case "DEPOSITS_NOT_ALLOWED":
+    case "AUTHENTICATION_ERROR":
+    case "AUTHORISATION_ERROR":
+    case "NO_AUTHENTICATION":
+    case "HTTP_SIGNATURE_ERROR":
+      // Our configuration is wrong, not the candidate's input. Generic copy,
+      // loud log — already emitted by the caller.
+      return "errors.checkoutFailed";
+    default:
+      return "errors.paymentFailed";
   }
 }

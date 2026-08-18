@@ -13,6 +13,25 @@
       "age": "Âge"
     }
   },
+  "countdown": {
+    "eyebrow": "Édition 2026",
+    "title": "Clôture des candidatures",
+    "remainingLabel": "Temps restant pour candidater",
+    "units": {
+      "days": "Jours",
+      "hours": "Heures",
+      "minutes": "Min",
+      "seconds": "Sec"
+    },
+    "deadlineLabel": "Clôture des inscriptions",
+    "eventLabel": "Dates de l'événement",
+    "cta": "Déposer ma candidature",
+    "close": "Réduire",
+    "collapsed": "J-{days} avant clôture",
+    "collapsedClosed": "Inscriptions closes",
+    "closedTitle": "Les inscriptions sont closes",
+    "closedBody": "Les candidatures pour cette édition ne sont plus acceptées. Les dossiers déjà déposés suivent leur cours normalement, et vous pouvez toujours consulter votre dossier avec votre code d'accès."
+  },
   "nav": {
     "brand": "Silicon Valley Africa",
     "programme": "Le programme",
@@ -819,8 +838,11 @@
       "waiting": {
         "title": "Vérifiez votre téléphone",
         "instruction": "Une demande de confirmation vient d'être envoyée sur votre téléphone. Saisissez votre code PIN Mobile Money pour valider le paiement.",
+        "merchantName": "La demande affichera le nom <strong>{name}</strong>. Si un autre nom apparaît, n'entrez pas votre code PIN.",
         "amount": "Montant à confirmer :",
         "polling": "En attente de la confirmation...",
+        "noPrompt": "Vous n'avez pas reçu la demande de code PIN ?",
+        "dialNow": "Composer le code maintenant",
         "dontClose": "Ne fermez pas cette page. La validation peut prendre jusqu'à deux minutes."
       },
       "timeout": {
@@ -839,7 +861,12 @@
         "checkoutFailed": "Le paiement n'a pas pu être initialisé. Réessayez dans quelques instants.",
         "paymentFailed": "Le paiement n'a pas abouti. Vérifiez votre solde et réessayez.",
         "notFound": "Paiement introuvable.",
-        "operatorRequired": "Sélectionnez votre opérateur Mobile Money."
+        "operatorRequired": "Sélectionnez votre opérateur Mobile Money.",
+        "phoneInvalid": "Ce numéro n'est pas reconnu par votre opérateur. Vérifiez-le et réessayez.",
+        "operatorUnavailableNow": "Cet opérateur n'accepte pas de paiement pour le moment. Choisissez-en un autre ou réessayez dans quelques minutes.",
+        "amountTooSmall": "Le montant est inférieur au minimum autorisé par cet opérateur. Contactez le support.",
+        "amountTooLarge": "Le montant dépasse le plafond de votre portefeuille Mobile Money. Contactez votre opérateur pour relever votre plafond, ou payez par carte.",
+        "amountOutOfBounds": "Le montant dépasse les limites de votre portefeuille Mobile Money. Contactez votre opérateur, ou payez par carte."
       },
       "amountToPay": "Montant à régler",
       "amountEquivalent": "Équivalent de {usd} USD au taux du jour.",

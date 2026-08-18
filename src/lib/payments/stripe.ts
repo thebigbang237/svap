@@ -99,7 +99,8 @@ export const stripeProvider: PaymentProvider = {
     };
   },
 
-  async verifyWebhook(rawBody, headers) {
+  async verifyWebhook(rawBody, request) {
+    const { headers } = request;
     const secret = process.env.STRIPE_WEBHOOK_SECRET;
     if (!secret) {
       console.error(

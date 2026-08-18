@@ -8,6 +8,7 @@ import { routing, getDirection } from "@/i18n/routing";
 import "@/lib/fonts";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
+import { DeadlineWidget } from "@/components/marketing/DeadlineWidget";
 import "../globals.css";
 
 export function generateStaticParams() {
@@ -71,6 +72,9 @@ export default async function RootLayout({
           <Topbar />
           <main className="flex flex-1 flex-col pt-24">{children}</main>
           <Footer />
+          {/* Mounted once for the whole tree; it hides itself on the
+              application and Phase-2 routes rather than each page opting in. */}
+          <DeadlineWidget />
         </NextIntlClientProvider>
       </body>
     </html>

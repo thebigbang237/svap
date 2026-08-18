@@ -4,10 +4,17 @@
     {
       "path": "/api/cron/access-codes",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/payments",
+      "schedule": "*/15 * * * *"
     }
   ],
   "functions": {
     "src/app/api/cron/access-codes/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/cron/payments/route.ts": {
       "maxDuration": 60
     }
   }

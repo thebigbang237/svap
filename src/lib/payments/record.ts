@@ -22,6 +22,14 @@ export interface PaymentRow {
   receipt_sent_at: string | null;
 }
 
+/**
+ * Writes the payment row, in `en_cours`, before anything is initiated.
+ *
+ * The ordering is the point, not an implementation detail. pawaPay requires the
+ * `depositId` to exist on our side first, precisely so that a timeout or a
+ * crash mid-initiation still leaves a reference to reconcile against: without
+ * it, a deposit can be collected from a candidate with no record of it here.
+ */
 export async function createPaymentRecord(
   supabase: AdminClient,
   input: {
@@ -60,6 +68,31 @@ export async function createPaymentRecord(
     return null;
   }
   return data;
+}
+
+/**
+ * Marks a payment failed, with the provider's reason.
+ *
+ * Only ever called where the failure is unambiguous — a REJECTED initiation, or
+ * a status check that came back NOT_FOUND. Anything indeterminate is left
+ * pending for the reconciliation cycle instead.
+ */
+export async function markPaymentFailed(
+  supabase: AdminClient,
+  paymentId: string,
+  reason: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("payments")
+    .update({ status: "echoue", failure_reason: reason.slice(0, 500) })
+    .eq("id", paymentId)
+    // Never overwrite a terminal state: a rejection racing a settled callback
+    // must not un-pay someone.
+    .in("status", ["en_attente", "en_cours"]);
+
+  if (error) {
+    console.error("Failed to mark payment failed:", error.message);
+  }
 }
 
 export type ApplyResult =

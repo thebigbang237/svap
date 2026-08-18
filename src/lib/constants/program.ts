@@ -238,6 +238,28 @@ export const TOTAL_COUNTRIES = COUNTRIES.length;
 export const PROGRAMME_DAYS = 6;
 
 // ---------------------------------------------------------------------------
+// Calendar
+// ---------------------------------------------------------------------------
+/**
+ * The two dates the whole funnel is paced by (client, 2026-08-17):
+ * applications close 18 January, the immersion runs 18–23 March.
+ *
+ * ⚠️ THE YEAR WAS NOT STATED and is inferred as 2027. It cannot be 2026: both
+ * dates are already past, and the delegates recruited for this edition serve
+ * October–December 2026 — which only makes sense if the event follows them.
+ * Confirm with the client; if it is wrong, this constant is the only edit.
+ *
+ * Stored as UTC instants rather than plain dates because a countdown has to
+ * subtract them from `Date.now()`. The deadline is the END of 18 January, so a
+ * candidate applying that evening is inside it. The six participating markets
+ * span UTC+0 to UTC+3, so UTC midnight closes applications between 00:00 and
+ * 03:00 local — deliberately generous rather than cutting anyone off early.
+ */
+export const APPLICATION_DEADLINE = new Date("2027-01-18T23:59:59Z");
+export const EVENT_START = new Date("2027-03-18T00:00:00Z");
+export const EVENT_END = new Date("2027-03-23T23:59:59Z");
+
+// ---------------------------------------------------------------------------
 // Eligibility
 // ---------------------------------------------------------------------------
 

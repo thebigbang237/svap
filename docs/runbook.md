@@ -126,7 +126,7 @@ with `openssl rand -hex 32`.
 | **`PHASE2_SESSION_SECRET`** | Signs the Phase-2 session cookie | Nobody can enter Phase 2 |
 | **`CRON_SECRET`** | Authenticates the cron endpoint | **Codes are silently never sent** (route returns 404) |
 | **`FIELD_ENCRYPTION_KEY`** | Encrypts passport numbers (32 bytes hex) | Phase-2 personal info can't be saved |
-| `PAWAPAY_API_TOKEN`, `PAWAPAY_WEBHOOK_SECRET`, `PAWAPAY_ENV` | Mobile money (CM/KE/GH) | Mobile money unavailable; callbacks rejected |
+| `PAWAPAY_API_TOKEN`, `PAWAPAY_ENV` | Mobile money (CM/KE/GH). No callback secret: pawaPay signs with RFC-9421 and the public key is fetched with the token. **Enable “Signed callbacks” in the pawaPay dashboard** — unsigned callbacks are refused. | Mobile money unavailable; callbacks rejected (payments still settle via the poll and `/api/cron/payments`) |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Cards (all 6 countries) | Card payment unavailable |
 | `FX_RATES_USD` | USD → local conversion | Mobile-money checkout throws |
 
@@ -247,6 +247,30 @@ to **44**, and rely on the daily Vercel cron alone. With a once-daily run, a
 always inside the promised 72h. It's less precise and less obvious to a future
 reader, which is why it isn't the default, but it costs nothing and needs no
 second service.
+
+---
+
+### Payment reconciliation — `/api/cron/payments`
+
+Runs every 15 minutes (`vercel.json`). Re-checks every payment still pending
+after 15 minutes against the provider, settles the ones that completed, fails
+the ones that definitively didn't, and gives up after 48 hours.
+
+This is not belt-and-braces, it is a primary settlement path. The other one is
+a poll that only runs while the candidate keeps the payment page open — and in
+these markets, on mobile data, closing the tab after approving a PIN prompt is
+ordinary behaviour. Without this job those candidates pay and stay stuck.
+
+```bash
+curl -X POST https://siliconvalleyafricaprogram.com/api/cron/payments \
+  -H "Authorization: Bearer $CRON_SECRET"
+# → {"checked":3,"settled":1,"failed":0,"unresolved":2}
+```
+
+Both cron routes answer GET (what Vercel Cron sends) and POST (for manual
+triggering). `/api/cron/access-codes` previously exported POST only, which
+meant Vercel's GET got a 405 and the access-code clock never ran in
+production — worth re-checking in the logs after the next deploy.
 
 ---
 
@@ -437,6 +461,33 @@ polls. ✅ Leave it past 5 minutes to see the timeout copy, which deliberately d
 (`stripe events resend <event_id>`). ✅ The second delivery must be acknowledged
 without double-crediting — check that `svap.payments` still shows one paid row.
 
+### Flow 5b — pawaPay failure paths
+
+1. Enter a phone number that isn't valid for the country. ✅ On blur the field
+   reports it, before any money is asked for. (`POST /api/payments/operators`
+   → pawaPay `predict-provider`.)
+2. Enter a valid number belonging to a *different* operator than the one
+   selected. ✅ The operator is pre-selected from the number; overriding it is
+   still allowed, because prediction is not perfect.
+3. ✅ The operator list never offers one whose deposit status is `CLOSED`, nor
+   one whose `authType` isn't `PROVIDER_AUTH` — the pre-auth and redirect
+   flows are not built, so offering them would guarantee a dead end.
+4. Start a deposit and wait without approving. ✅ After ~12s, if the operator
+   is `pinPromptRevivable`, the USSD steps to raise the prompt again appear,
+   in the candidate's language, straight from pawaPay's configuration.
+5. ✅ The waiting screen names the merchant that will appear on the PIN prompt
+   (`nameDisplayedToCustomer`). On a site whose FAQ is about not being a scam,
+   the payer needs to know which name is the legitimate one.
+6. Verify signed callbacks are on: settle a sandbox deposit and confirm
+   `/api/payments/webhooks/pawapay` returns 200. A log line reading
+   "pawaPay callback arrived unsigned" means the dashboard setting is off.
+7. Verify the signature verifier itself:
+   ```bash
+   node --experimental-strip-types --conditions=react-server \
+     scripts/check-pawapay-signature.mjs
+   # → 5 passed, 0 failed
+   ```
+
 ### Flow 6 — Documents and consents
 
 1. Upload the ID front. ✅ Try a **`.txt` renamed to `.jpg`** — rejected, because
@@ -571,7 +622,7 @@ Vercel. Preview keeps pointing at staging.
 | `ACCESS_CODE_PEPPER`, `PHASE2_SESSION_SECRET`, `FIELD_ENCRYPTION_KEY`, `CRON_SECRET` | Fresh values — `openssl rand -hex 32` each |
 | `RESEND_FROM_EMAIL` | An address on the verified domain |
 | `PAWAPAY_ENV` | `sandbox` → `live` |
-| `PAWAPAY_API_TOKEN` / `PAWAPAY_WEBHOOK_SECRET` | Live credentials — **different from sandbox** |
+| `PAWAPAY_API_TOKEN` | Live credentials — **different from sandbox**. Re-enable signed callbacks on the live account too; the setting does not carry over. |
 | `STRIPE_SECRET_KEY` | `sk_test_…` → `sk_live_…` |
 | `STRIPE_WEBHOOK_SECRET` | From a **new live-mode endpoint**, see below |
 | `FX_RATES_USD` | Current rates — see the warning in §2 |

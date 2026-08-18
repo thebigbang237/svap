@@ -203,3 +203,14 @@ export async function POST(request: Request) {
   console.info("Cron access-codes run:", report);
   return NextResponse.json({ success: true, ...report });
 }
+
+/**
+ * Vercel Cron invokes scheduled paths with GET, not POST.
+ *
+ * Without this the whole access-code clock — retries, day-7 and day-12
+ * reminders, expiry — answered 405 in production and silently never ran. POST
+ * is kept for manual triggering from the runbook.
+ */
+export async function GET(request: Request) {
+  return POST(request);
+}

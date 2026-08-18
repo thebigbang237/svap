@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import type { PaymentMethod } from "@/lib/payments/types";
 import { CTAButton } from "@/components/marketing/CTAButton";
@@ -24,11 +24,38 @@ const POLL_TIMEOUT_MS = 5 * 60 * 1000;
 
 type Phase = "choose" | "waiting" | "failed" | "timeout";
 
+interface Instruction {
+  text?: string;
+}
+
 interface Operator {
   provider: string;
   displayName: string;
   currency: string;
+  /** Merchant name the payer will see on the PIN prompt. */
+  nameDisplayedToCustomer?: string;
+  logo?: string;
+  /** AUTOMATIC — the prompt arrives on its own; MANUAL — they must dial in. */
+  pinPrompt?: string;
+  pinPromptRevivable?: boolean;
+  pinPromptInstructions?: {
+    channels?: {
+      type?: string;
+      displayName?: Record<string, string>;
+      quickLink?: string;
+      instructions?: Record<string, Instruction[]>;
+    }[];
+  };
 }
+
+/**
+ * How long to wait before offering "didn't get the prompt?" instructions.
+ *
+ * pawaPay suggests 10–15s: long enough that the prompt has genuinely had its
+ * chance, short enough that someone staring at a phone that never buzzed isn't
+ * left guessing.
+ */
+const REVIVE_HINT_AFTER_MS = 12_000;
 
 export function PaymentForm({
   methods,
@@ -45,6 +72,7 @@ export function PaymentForm({
   currency: string | null;
 }) {
   const t = useTranslations("phase2.paiement");
+  const locale = useLocale();
   const router = useRouter();
 
   const [method, setMethod] = useState<PaymentMethod>(methods[0]);
@@ -56,6 +84,9 @@ export function PaymentForm({
   const [operators, setOperators] = useState<Operator[]>([]);
   const [operator, setOperator] = useState<string>("");
   const [operatorsLoading, setOperatorsLoading] = useState(false);
+  const [prefix, setPrefix] = useState<string | null>(null);
+  const [phoneInvalid, setPhoneInvalid] = useState(false);
+  const [showReviveHint, setShowReviveHint] = useState(false);
 
   // pawaPay v2 carries the operator in the deposit payload, so it has to be
   // chosen. The list comes from their active configuration rather than a
@@ -67,10 +98,11 @@ export function PaymentForm({
     setOperatorsLoading(true);
     fetch("/api/payments/operators")
       .then((res) => res.json())
-      .then((body: { operators?: Operator[] }) => {
+      .then((body: { operators?: Operator[]; prefix?: string }) => {
         if (cancelled) return;
         const list = body.operators ?? [];
         setOperators(list);
+        setPrefix(body.prefix ?? null);
         // A single operator is the common case in several markets — preselect
         // it rather than making it a pointless decision.
         if (list.length === 1) setOperator(list[0].provider);
@@ -87,6 +119,40 @@ export function PaymentForm({
     };
   }, [methods]);
 
+  /**
+   * Validate the number and pre-select the operator it belongs to.
+   *
+   * pawaPay predicts the operator from the number with high accuracy in most
+   * markets, which removes the step payers most often get wrong — sending an
+   * MTN number to Orange fails after they have already committed. It stays a
+   * suggestion: prediction is not perfect, so the choice remains theirs.
+   */
+  const checkPhone = useCallback(async () => {
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length < 6) return;
+
+    try {
+      const res = await fetch("/api/payments/operators", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      });
+      const body: { valid?: boolean; provider?: string } | null = await res
+        .json()
+        .catch(() => null);
+
+      setPhoneInvalid(body?.valid === false);
+
+      // Only ever fills an empty choice — never overrides a deliberate one.
+      if (body?.provider && !operator) {
+        const known = operators.some((o) => o.provider === body.provider);
+        if (known) setOperator(body.provider);
+      }
+    } catch {
+      // Prediction is an optimisation. Its absence must not block a payment.
+    }
+  }, [phone, operator, operators]);
+
   const timers = useRef<{ poll?: number; timeout?: number }>({});
 
   const clearTimers = useCallback(() => {
@@ -100,6 +166,7 @@ export function PaymentForm({
   const startPolling = useCallback(
     (paymentId: string) => {
       setPhase("waiting");
+      window.setTimeout(() => setShowReviveHint(true), REVIVE_HINT_AFTER_MS);
 
       timers.current.poll = window.setInterval(async () => {
         try {
@@ -188,6 +255,12 @@ export function PaymentForm({
   }
 
   if (phase === "waiting") {
+    const chosen = operators.find((o) => o.provider === operator);
+    // Localised by pawaPay, in the payer's own language where they provide it.
+    const channel = chosen?.pinPromptInstructions?.channels?.[0];
+    const steps =
+      channel?.instructions?.[locale] ?? channel?.instructions?.en ?? [];
+
     return (
       <div className="space-y-8">
         <div className="border-s-2 border-terracotta bg-sky-mid/60 p-8">
@@ -195,6 +268,21 @@ export function PaymentForm({
             {t("waiting.title")}
           </h2>
           <p className="mb-4 text-ink">{t("waiting.instruction")}</p>
+
+          {/* The merchant name that will appear on the prompt. Stating it up
+              front is what lets a payer tell a genuine request from the
+              phishing this programme's audience is routinely targeted by. */}
+          {chosen?.nameDisplayedToCustomer && (
+            <p className="mb-4 text-ink">
+              {t.rich("waiting.merchantName", {
+                name: chosen.nameDisplayedToCustomer,
+                strong: (chunks) => (
+                  <strong className="font-semibold">{chunks}</strong>
+                ),
+              })}
+            </p>
+          )}
+
           {charged && (
             <p className="text-ink-mid">
               {t("waiting.amount")}{" "}
@@ -213,6 +301,44 @@ export function PaymentForm({
           <span className="h-2 w-2 animate-pulse bg-terracotta" />
           <span className="text-sm">{t("waiting.polling")}</span>
         </div>
+
+        {/* Shown either immediately (the prompt needs dialling in) or after a
+            grace period (it should have arrived and didn't). pawaPay reports
+            both cases and supplies the exact USSD steps per operator. */}
+        {steps.length > 0 &&
+          (chosen?.pinPrompt === "MANUAL" ||
+            (showReviveHint && chosen?.pinPromptRevivable)) && (
+            <div className="border border-ink-dim/20 bg-white p-6">
+              <p className="mb-3 text-sm font-semibold text-ink">
+                {channel?.displayName?.[locale] ??
+                  channel?.displayName?.en ??
+                  t("waiting.noPrompt")}
+              </p>
+              <ol className="space-y-2">
+                {steps.map((step, i) => (
+                  <li
+                    key={`${step.text}-${i}`}
+                    className="flex gap-3 text-sm text-ink-mid"
+                  >
+                    <span className="font-semibold text-terracotta">
+                      {i + 1}.
+                    </span>
+                    <Ltr>{step.text}</Ltr>
+                  </li>
+                ))}
+              </ol>
+              {/* Pre-dials the USSD code when they're paying from the same
+                  handset they're browsing on. */}
+              {channel?.quickLink && (
+                <a
+                  href={channel.quickLink}
+                  className="mt-4 inline-block text-xs font-semibold uppercase tracking-[0.2em] text-blue hover:text-terracotta"
+                >
+                  {t("waiting.dialNow")}
+                </a>
+              )}
+            </div>
+          )}
 
         <p className="text-sm text-ink-dim">{t("waiting.dontClose")}</p>
       </div>
@@ -321,6 +447,21 @@ export function PaymentForm({
                       onChange={() => setOperator(op.provider)}
                       className="h-4 w-4 accent-terracotta"
                     />
+                    {/* Served by pawaPay, so an operator enabled on the
+                        account tomorrow arrives with its own logo and needs
+                        no asset work here. Decorative: the name beside it
+                        already carries the meaning. */}
+                    {op.logo && (
+                      /* eslint-disable-next-line @next/next/no-img-element --
+                         pawaPay's CDN; allowlisting it in next.config would
+                         couple the build to their hostname for a 6KB mark. */
+                      <img
+                        src={op.logo}
+                        alt=""
+                        loading="lazy"
+                        className="h-6 w-6 shrink-0 object-contain"
+                      />
+                    )}
                     <span className="text-sm font-medium text-ink">
                       {op.displayName}
                     </span>
@@ -330,19 +471,37 @@ export function PaymentForm({
             )}
           </fieldset>
 
-          <TextField
-            id="paymentPhone"
-            type="tel"
-            inputMode="tel"
-            label={t("phoneLabel")}
-            placeholder={t("phonePlaceholder")}
-            hint={<p className="text-xs text-ink-dim">{t("phoneHint")}</p>}
-            registration={{
-              value: phone,
-              onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-                setPhone(e.target.value),
-            }}
-          />
+          {/* The country code is shown rather than typed: pawaPay wants an
+              MSISDN, and asking for one is how you get numbers entered a
+              dozen different ways. */}
+          <div className="flex items-end gap-3">
+            {prefix && (
+              <Ltr className="border border-ink-dim/30 px-4 py-3 text-sm text-ink-mid">
+                +{prefix}
+              </Ltr>
+            )}
+            <div className="flex-1">
+              <TextField
+                id="paymentPhone"
+                type="tel"
+                inputMode="tel"
+                label={t("phoneLabel")}
+                placeholder={t("phonePlaceholder")}
+                error={phoneInvalid ? t("errors.phoneInvalid") : undefined}
+                hint={<p className="text-xs text-ink-dim">{t("phoneHint")}</p>}
+                registration={{
+                  value: phone,
+                  onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                    setPhone(e.target.value);
+                    setPhoneInvalid(false);
+                  },
+                  // Validated on blur, not per keystroke: a number is only
+                  // wrong once they've finished typing it.
+                  onBlur: checkPhone,
+                }}
+              />
+            </div>
+          </div>
         </div>
       )}
 

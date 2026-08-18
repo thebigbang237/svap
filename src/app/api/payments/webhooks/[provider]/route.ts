@@ -43,7 +43,9 @@ export async function POST(
   // response for "crashed" than for "rejected".
   let event;
   try {
-    event = await provider.verifyWebhook(rawBody, request.headers);
+    // The whole request, not just its headers: pawaPay's RFC-9421 signature
+    // covers the method and path as well as the body digest.
+    event = await provider.verifyWebhook(rawBody, request);
   } catch (error) {
     console.error(
       `Error verifying ${providerParam} webhook:`,
