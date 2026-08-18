@@ -207,9 +207,10 @@ export async function POST(request: Request) {
 /**
  * Vercel Cron invokes scheduled paths with GET, not POST.
  *
- * Without this the whole access-code clock — retries, day-7 and day-12
- * reminders, expiry — answered 405 in production and silently never ran. POST
- * is kept for manual triggering from the runbook.
+ * The hourly driver is the GitHub Actions workflow, which POSTs — so the clock
+ * did run. What didn't was the daily Vercel cron kept as its backstop: it
+ * answered 405, meaning a disabled or unconfigured workflow would have left
+ * nothing running at all, silently. Both methods are accepted now.
  */
 export async function GET(request: Request) {
   return POST(request);

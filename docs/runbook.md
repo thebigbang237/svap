@@ -252,14 +252,22 @@ second service.
 
 ### Payment reconciliation — `/api/cron/payments`
 
-Runs every 15 minutes (`vercel.json`). Re-checks every payment still pending
-after 15 minutes against the provider, settles the ones that completed, fails
-the ones that definitively didn't, and gives up after 48 hours.
+Re-checks every payment still pending after 15 minutes against the provider,
+settles the ones that completed, fails the ones that definitively didn't, and
+gives up after 48 hours.
 
 This is not belt-and-braces, it is a primary settlement path. The other one is
 a poll that only runs while the candidate keeps the payment page open — and in
 these markets, on mobile data, closing the tab after approving a PIN prompt is
 ordinary behaviour. Without this job those candidates pay and stay stuck.
+
+Driven **every 15 minutes by GitHub Actions**
+(`.github/workflows/payments-cron.yml`), with a **daily** Vercel cron as the
+backstop — the same split as the access-code job, and for the same reason:
+Vercel's Hobby plan caps cron at once per day and *rejects the deployment
+outright* if `vercel.json` asks for anything more frequent. Both need the
+`SITE_URL` and `CRON_SECRET` repository secrets; without them the workflow
+skips with a warning rather than failing.
 
 ```bash
 curl -X POST https://siliconvalleyafricaprogram.com/api/cron/payments \
@@ -267,10 +275,11 @@ curl -X POST https://siliconvalleyafricaprogram.com/api/cron/payments \
 # → {"checked":3,"settled":1,"failed":0,"unresolved":2}
 ```
 
-Both cron routes answer GET (what Vercel Cron sends) and POST (for manual
-triggering). `/api/cron/access-codes` previously exported POST only, which
-meant Vercel's GET got a 405 and the access-code clock never ran in
-production — worth re-checking in the logs after the next deploy.
+Both cron routes answer POST (what the workflows send) and GET (what Vercel
+Cron sends). `/api/cron/access-codes` exported POST only until 2026-08-18, so
+the GitHub Actions driver worked while **the Vercel daily backstop silently
+answered 405** — if the workflow had ever been disabled, nothing would have
+caught it. Now both methods work on both routes.
 
 ---
 
