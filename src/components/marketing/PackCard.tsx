@@ -27,10 +27,13 @@ export interface PackCardProps {
    * teaser's non-featured pack) has no CTA at all. */
   ctaLabel?: string;
   /** Small caption above the CTA button in "full" size (e.g. "Frais de
-   * candidature : $50", "Réservation garantie"). Omit when a pack has
-   * nothing to note there — the line simply won't render. Not shown in
-   * "compact" size. */
+   * vérification $30"). Omit when a pack has nothing to note there — the line
+   * simply won't render. Not shown in "compact" size. */
   applicationFee?: string;
+  /** Qualifier appended to `applicationFee`, set in terracotta so the
+   * condition on the fee reads as loudly as the fee itself. Ignored without
+   * `applicationFee`. */
+  applicationFeeNote?: string;
   variant?: "default" | "featured";
   size?: "compact" | "full";
   href?: string;
@@ -46,6 +49,7 @@ export function PackCard({
   features,
   ctaLabel,
   applicationFee,
+  applicationFeeNote,
   variant = "default",
   size = "full",
   href,
@@ -186,6 +190,19 @@ export function PackCard({
             className={`mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.2em] ${mutedText}`}
           >
             {applicationFee}
+            {applicationFeeNote && (
+              <>
+                {" — "}
+                {/* Light terracotta on the dark featured card, full terracotta
+                    on white: the same accent at the contrast each surface
+                    needs. */}
+                <span
+                  className={featured ? "text-terracotta-light" : "text-terracotta"}
+                >
+                  {applicationFeeNote}
+                </span>
+              </>
+            )}
           </div>
         )}
         <CTAButton href={href} variant="primary" className="w-full">

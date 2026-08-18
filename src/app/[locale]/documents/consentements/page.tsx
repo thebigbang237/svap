@@ -8,10 +8,10 @@ export default async function Phase2ConsentementsPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  await guardPhase2Step("consentements", locale);
+  const progress = await guardPhase2Step("consentements", locale);
 
   return (
-    <Phase2StepShell step="consentements">
+    <Phase2StepShell step="consentements" steps={progress.steps}>
       <ConsentsForm />
     </Phase2StepShell>
   );

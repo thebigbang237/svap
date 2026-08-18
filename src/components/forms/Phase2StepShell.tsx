@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/marketing/PageHeader";
 import { StepProgress } from "@/components/forms/fields";
-import { PHASE2_STEPS, type Phase2Step } from "@/lib/phase2/steps";
+import type { Phase2Step } from "@/lib/phase2/steps";
 
 /**
  * Chrome shared by every Phase-2 step: breadcrumb, progress bar and the
@@ -9,18 +9,24 @@ import { PHASE2_STEPS, type Phase2Step } from "@/lib/phase2/steps";
  *
  * Server component — the access guard runs in each page before this renders,
  * so nothing here needs to re-check it.
+ *
+ * `steps` comes from the guard's progress rather than the canonical constant:
+ * the capacity step exists only for some packs, and a Délégué counting "5 sur
+ * 6" would be looking for a step they will never be shown.
  */
 export async function Phase2StepShell({
   step,
+  steps,
   children,
 }: {
   step: Phase2Step;
+  steps: Phase2Step[];
   children: React.ReactNode;
 }) {
   const tCommon = await getTranslations("common");
   const t = await getTranslations("phase2");
 
-  const index = PHASE2_STEPS.indexOf(step);
+  const index = steps.indexOf(step);
 
   return (
     <>
@@ -36,10 +42,10 @@ export async function Phase2StepShell({
         <div className="mx-auto max-w-3xl space-y-12">
           <StepProgress
             current={index + 1}
-            total={PHASE2_STEPS.length}
+            total={steps.length}
             label={t("stepLabel", {
               current: index + 1,
-              total: PHASE2_STEPS.length,
+              total: steps.length,
             })}
             stepTitle={t(`steps.${step}.title`)}
           />

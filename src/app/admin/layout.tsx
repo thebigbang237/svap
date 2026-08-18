@@ -19,6 +19,7 @@ const navLinks = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/candidatures", label: "Candidatures" },
   { href: "/admin/revue", label: "File de revue" },
+  { href: "/admin/articles", label: "Actualités" },
   { href: "/admin/journal", label: "Journal d'audit" },
 ];
 

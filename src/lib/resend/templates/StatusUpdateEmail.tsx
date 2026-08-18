@@ -37,7 +37,7 @@ const copy = {
     complet: {
       preview: "Votre dossier est éligible, mais ce pack est complet",
       heading: (prenom: string) => `Cher/Chère ${prenom},`,
-      body: "Votre candidature remplit tous les critères d'éligibilité. Le nombre de pré-sélections pour le pack choisi a simplement atteint sa limite pour l'édition 2026.",
+      body: "Votre candidature remplit tous les critères d'éligibilité. Les places du pack choisi ont simplement toutes été attribuées pour l'édition 2026.",
       next: "Aucun frais ne vous a été demandé. Vous pouvez candidater sur un autre pack encore ouvert, et nous vous recontacterons en priorité pour l'édition suivante.",
     },
     valide: {
@@ -50,7 +50,7 @@ const copy = {
       preview: "Concernant votre dossier — Silicon Valley Africa Program",
       heading: (prenom: string) => `Cher/Chère ${prenom},`,
       body: "Après examen approfondi de votre dossier par notre comité, nous ne sommes malheureusement pas en mesure de le retenir pour l'édition 2026.",
-      next: "Si le rejet est intervenu pour un motif administratif ou d'éligibilité, vos frais de vérification vous sont intégralement remboursés sur votre moyen de paiement d'origine. Nous vous encourageons à candidater de nouveau lors d'une prochaine édition.",
+      next: "Votre dossier est conservé et sera examiné en priorité lors de l'édition suivante. Nous vous encourageons à candidater de nouveau à cette occasion.",
     },
   },
   en: {
@@ -72,7 +72,7 @@ const copy = {
     complet: {
       preview: "Your application is eligible, but this pack is full",
       heading: (prenom: string) => `Dear ${prenom},`,
-      body: "Your application meets every eligibility criterion. The number of pre-selections for your chosen pack has simply reached its limit for the 2026 edition.",
+      body: "Your application meets every eligibility criterion. The places on your chosen pack have simply all been awarded for the 2026 edition.",
       next: "You were not charged anything. You can apply for another pack that's still open, and we'll contact you as a priority for the next edition.",
     },
     valide: {
@@ -85,7 +85,7 @@ const copy = {
       preview: "About your file — Silicon Valley Africa Program",
       heading: (prenom: string) => `Dear ${prenom},`,
       body: "After in-depth review by our committee, we're unfortunately unable to retain your file for the 2026 edition.",
-      next: "If the rejection was on administrative or eligibility grounds, your verification fee is refunded in full to your original payment method. We encourage you to apply again for a future edition.",
+      next: "Your file is kept on record and will be reviewed as a priority for the next edition. We encourage you to apply again then.",
     },
   },
   ar: {
@@ -106,7 +106,7 @@ const copy = {
     complet: {
       preview: "ملفكم مؤهّل، لكن هذه الباقة مكتملة",
       heading: (prenom: string) => `عزيزي/عزيزتي ${prenom}،`,
-      body: "يستوفي ترشيحكم جميع معايير الأهلية. غير أن عدد الاختيارات الأولية للباقة التي اخترتموها بلغ حدّه لنسخة 2026.",
+      body: "يستوفي ترشيحكم جميع معايير الأهلية. غير أن مقاعد الباقة التي اخترتموها قد مُنحت بالكامل لنسخة 2026.",
       next: "لم تُطلب منكم أي رسوم. يمكنكم الترشّح لباقة أخرى ما زالت مفتوحة، وسنتواصل معكم بالأولوية في النسخة القادمة.",
     },
     valide: {
@@ -119,7 +119,7 @@ const copy = {
       preview: "بخصوص ملفكم — Silicon Valley Africa Program",
       heading: (prenom: string) => `عزيزي/عزيزتي ${prenom}،`,
       body: "بعد دراسة معمّقة لملفكم من طرف لجنتنا، يؤسفنا أنه لم يكن بإمكاننا قبوله لنسخة 2026.",
-      next: "إذا كان الرفض لأسباب إدارية أو لعدم الأهلية، تُرَدّ إليكم رسوم التحقّق كاملة على وسيلة الأداء الأصلية. ونشجعكم على الترشّح مجددًا في نسخة قادمة.",
+      next: "يُحتفظ بملفكم وسيُدرس بالأولوية في النسخة القادمة. ونشجعكم على الترشّح مجددًا حينها.",
     },
   },
 } as const;

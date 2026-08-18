@@ -59,6 +59,30 @@ export function ArrowRightIcon({ className = "" }: IconProps) {
   );
 }
 
+/**
+ * Arrow leaving a frame — "this opens on another site".
+ *
+ * Not mirrored in RTL: the convention is the glyph itself, and Arabic readers
+ * meet the same up-and-out arrow everywhere else on the web.
+ */
+export function ExternalLinkIcon({ className = "" }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M15 11v4.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 3 15.5v-9A1.5 1.5 0 0 1 4.5 5H9" />
+      <path d="M12.5 3H17v4.5M17 3l-7.5 7.5" />
+    </svg>
+  );
+}
+
 export function ChevronDownIcon({ className = "" }: IconProps) {
   return (
     <svg

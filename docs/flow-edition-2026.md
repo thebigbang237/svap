@@ -4,6 +4,12 @@ The end-to-end candidate flow, resolved to the level a state machine can be buil
 Companion to [plan-edition-2026.md](plan-edition-2026.md); source is §2, §5, §13 and §14 of
 the client's specification.
 
+> **Superseded in part — client session of 2026-08-17.** Three decisions in this document
+> were reversed or resolved by the client and are now implemented differently: verification
+> fees are **not refundable**; pre-selection caps are **removed** (a pack's `places` is the
+> number admitted at the end, not a quota at the door); and Phase 2 gained a **pack-specific
+> capacity step**. Each affected section below carries a note. See §10.
+
 ---
 
 ## 1. The flow, end to end
@@ -29,7 +35,8 @@ the client's specification.
   │  Étape 1  personal information + risk questionnaire                │
   │  Étape 2  payment (pack fee)          ← see §4, order changed      │
   │  Étape 3  identity documents + criminal record                     │
-  │  Étape 4  consents                                                 │
+  │  Étape 4  capacity dossier (pack-specific — Délégué skips it)      │
+  │  Étape 5  consents                                                 │
   └────────────────────┼───────────────────────────────────────────────┘
                        ▼
              verifications launch automatically
@@ -39,9 +46,9 @@ the client's specification.
        verification fails   verification passes
               │                   │
               ▼                   ▼
-      fraud → no refund      DECISION — differs per pack, see §3
-      admin/eligibility           │
-      rejection → full refund     ▼
+      fraud → rejected,      DECISION — differs per pack, see §3
+      no prime due                │
+      (fees never refunded)       ▼
                           validated → invitation letter,
                           embassy confirmation letter, visa support
 ```
@@ -87,8 +94,8 @@ Two design consequences:
   types. Live disqualification teaches the applicant exactly which answer to change, and
   the three gating questions are all self-declared. Server-side evaluation at submit,
   cross-checked against the Phase-2 answers later, is both better UX and harder to game.
-- **A rejection is not a dead end.** Copy per §9: no fee was charged, nothing to refund,
-  and the dossier stays eligible for future editions.
+- **A rejection is not a dead end.** Copy per §9: no fee was charged at Phase 1, and the
+  dossier stays eligible for future editions.
 
 ---
 
@@ -104,7 +111,7 @@ Pre-selection is automatic for everyone. What happens *after* verification is no
 | Boursier | 63 | **Human review, competitive** | §2 "Sélection sur dossier — attribution non automatique" |
 | Délégué | 60 | Unspecified — presumed human review | — |
 
-### ⚠️ Open issue: paying for a seat that may not exist
+### ⚠️ Open issue: paying for a seat that may not exist — RESOLVED 2026-08-17
 
 Pre-selection is automatic and unlimited. Seats are not. Nothing in the specification stops
 2,000 people from being pre-selected for **12** Lauréat places, each paying the $20
@@ -117,20 +124,18 @@ administratively rejected nor ineligible. As written, they pay and get nothing b
 The same shape applies to Business Visitor: 104 seats, automatic selection, $330 each. If
 500 people pay, 396 have paid $330 for a seat that does not exist.
 
-This needs a decision before W5/W6 are built, because it determines both the refund logic
-and whether the payment step needs a capacity gate. Three workable options:
+Three options were put to the client — a capacity gate, a non-selection refund, or explicit
+disclosure. **Resolved 2026-08-17: the client chose disclosure and rejected the other two.**
 
-1. **Capacity gate.** Stop issuing access codes (or stop accepting payment) once
-   pre-selections for a pack reach a multiple of its seat count. Cleanest, and it makes the
-   scarcity claim true rather than decorative.
-2. **Explicit non-selection refund.** Extend the refund policy: verification passed but not
-   selected ⇒ fee refunded. Costs payment-processing fees on every refund.
-3. **Explicit disclosure.** State plainly before payment that the fee covers verification
-   only and is not refundable on non-selection. Legal, but on a site whose FAQ is about
-   proving it isn't a scam, this is the option most likely to generate complaints.
-
-My recommendation is **(1) + (3)**: cap pre-selections per pack at a defined multiple of
-seats, and disclose clearly at the payment step what the fee does and does not buy.
+1. ~~**Capacity gate.**~~ Rejected. A pack's `places` is the number of participants admitted
+   once the verified dossiers are ranked, not a quota applied at submission. Nobody is turned
+   away for applying late, and `preselectionCapMultiplier` is gone from `PACK_SPECS`.
+2. ~~**Explicit non-selection refund.**~~ Rejected. Verification fees are non-refundable in
+   every case: they pay for work performed as soon as payment clears. What the programme
+   commits to paying out instead is the visa-refusal prime — see §9.
+3. **Explicit disclosure.** Adopted, and now carrying the entire weight. That is why the
+   payment step states both facts (fee ≠ seat, fee not refundable) in the page body rather
+   than in the terms, and why /confiance leads its fee table with the same sentence.
 
 ---
 
@@ -255,31 +260,30 @@ subject to the additional identity verification §12 calls for.
 | Topic | Decision |
 |---|---|
 | **Single-use code** (§5) | Code is single-use *as a credential*. Name + code exchanges it for a signed short-lived session and marks the code consumed; the candidate resumes from any step. |
-| **Capacity** (§3) | Cap pre-selections per pack, **and** state at the payment step exactly what the fee buys. Both, not either. |
-| **Auto-pre-selection scope** (§2) | Four mechanical gates only. The three qualitative *critères de sélection* move to post-verification dossier review. Evaluated server-side at submit — never live as the candidate types. |
+| **Capacity** (§3) | ~~Cap pre-selections per pack~~ — **superseded 2026-08-17**. No cap at all: `places` is the number admitted after verification. Disclosure at the payment step is now the only mechanism, so it is stated in the page body, not the terms. |
+| **Refunds** (§9) | **Superseded 2026-08-17.** Verification fees are non-refundable in every case. The admin reversal survives for billing errors only. What the programme commits to instead is the visa-refusal prime (Lauréat $1,000 / Boursier $500 / VIP $4,500; Business Visitor and Délégué none). |
+| **Capacity dossier** (new) | Phase 2 gained Étape 5, pack-specific: project summary for Lauréat; + $5,000 attestation, flight funding and insurance for Boursier; full trip cost (≈ $13,940 / ≈ $20,940), bank attestation, 2 months of statements, source of funds and insurance for Business/VIP. Délégué skips it. The programme never receives these amounts. |
+| **Auto-pre-selection scope** (§2) | Three mechanical gates only (capacity was the fourth, now removed). The three qualitative *critères de sélection* move to post-verification dossier review. Evaluated server-side at submit — never live as the candidate types. |
 | **Phase 2 order** (§4) | Reordered: portal → personal info + risk questionnaire → **payment** → documents → consents. Verifications still launch only after payment. |
 | **Name matching** (§6) | Normalised comparison — trim, collapse whitespace, case-fold, strip diacritics, accept either name order. |
 | **pawaPay** (§6) | Asynchronous by design: real waiting state, resolved by webhook, never by the browser. |
 
-### Capacity multipliers — implementation default
+### ~~Capacity multipliers~~ — removed 2026-08-17
 
-The decision approves capping; the numbers are a business lever, so they live in
-`PACK_SPECS[pack].preselectionCapMultiplier` and are one edit to change.
+This section described `PACK_SPECS[pack].preselectionCapMultiplier` (1.25× seats for the
+automatic packs, 2× for the competitive ones) and the eligible-but-full outcome at the cap.
+The client rejected capping outright: applications stay open on every pack, and the seat
+count is applied only when the verified dossiers are ranked.
 
-| Pack kind | Default | Reasoning |
-|---|---|---|
-| Automatic (Business Visitor, VIP Visitor) | **1.25 ×** seats | Selection is automatic, so every candidate who pays and passes verification takes a seat. The 25% headroom absorbs verification failures rather than creating losers. |
-| Competitive (Lauréat, Boursier, Délégué) | **2 ×** seats | A review needs a pool larger than the seat count, but every multiple above 1 is a candidate who pays and loses. 2× is the smallest ratio that still permits genuine selection. |
-
-At the cap a pack stops issuing pre-selections; the dossier is recorded as eligible-but-full
-and carried to the next edition rather than charged. Worth confirming these two numbers with
-the client — the mechanism is settled, the ratios are not.
+The field and `preselectionCap()` are gone. The `complet` status and the `pack_full` reason
+are retained — rows written before the change still hold them, and an administrator may
+still close a pack by hand once its seats are awarded.
 
 ### Still open
 
 1. **Délégué decision stage** — human review like the scholarships, or automatic? Currently
    modelled as competitive (`kind: "role"` → 2× cap).
-2. **Business Visitor visa-refusal prime** — omitted from §9 while the other three packs have
-   one. Intentional?
+2. ~~**Business Visitor visa-refusal prime**~~ — **resolved 2026-08-17**: the omission is
+   intentional. The three packs carrying a prime are Lauréat, Boursier and VIP Visitor.
 3. **Code timing** — fixed T+72h send, or "within 72h" as an SLA? Being built configurable,
    so this does not block W4.

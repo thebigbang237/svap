@@ -89,7 +89,8 @@ export default function PacksPage() {
                   costLabel={t(`items.${pack}.costLabel`)}
                   costValue={t(`items.${pack}.costValue`)}
                   features={t.raw(`items.${pack}.features`)}
-                  applicationFee={`${t("feePrefix")} $${spec.verificationFeeUsd} — ${t("feeSuffix")}`}
+                  applicationFee={`${t("feePrefix")} $${spec.verificationFeeUsd}`}
+                  applicationFeeNote={t("feeSuffix")}
                   ctaLabel={t(`items.${pack}.ctaLabel`)}
                   href={`/candidature?pack=${pack}`}
                 />
@@ -97,10 +98,17 @@ export default function PacksPage() {
             })}
           </div>
 
+          {/* What the "places" figure on each card actually means. Stated
+              here because the number reads as a quota on applications, and it
+              is not one: nothing closes at the door. */}
+          <p className="mt-8 border-s-2 border-blue bg-sky-mid/60 p-6 text-sm text-ink">
+            {t("placesNotice")}
+          </p>
+
           {/* The VIP sponsorship contribution is disclosed, and it is stated
               plainly that it is never collected here — otherwise the amount
               contradicts the anti-fraud guidance on /confiance. */}
-          <p className="mt-8 border border-ink-dim/20 bg-white p-6 text-sm text-ink-mid">
+          <p className="mt-6 border border-ink-dim/20 bg-white p-6 text-sm text-ink-mid">
             <span className="font-semibold text-ink">VIP Visitor — </span>
             {t("items.vip_visitor.note")}
           </p>

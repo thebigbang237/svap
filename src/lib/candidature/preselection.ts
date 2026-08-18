@@ -1,7 +1,6 @@
 import {
   MIN_AGE,
   DELEGUE_MAX_AGE,
-  preselectionCap,
   type CandidatureStatus,
   type IneligibilityReason,
   type Pack,
@@ -10,7 +9,7 @@ import {
 /**
  * Automatic Phase-1 pre-selection.
  *
- * Of the eligibility criteria in §2 of the specification, only four can be
+ * Of the eligibility criteria in §2 of the specification, only three can be
  * decided mechanically from the form. The other three — "motivation sincère",
  * "volonté confirmée de retour", "cherchant uniquement un visa … sans
  * engagement réel" — are qualitative, and belong to the post-verification
@@ -18,13 +17,18 @@ import {
  * which says scholarship allocation is "non automatique … après étude
  * approfondie". See docs/flow-edition-2026.md §2.
  *
+ * Capacity is deliberately NOT a gate. A pack's `places` is the number of
+ * seats awarded at the end, not a quota on who may apply: client decision of
+ * 2026-08-17, replacing the pre-selection caps this function used to enforce.
+ * Everyone who clears the gates below is pre-selected, and the ranking against
+ * `places` happens once the verified dossiers are in.
+ *
  * Country is not checked: the form only offers the six participating
  * countries, so it is satisfied by construction and re-checking it here would
  * imply a failure mode that cannot occur.
  *
  * Deliberately pure — no DB, no I/O — so the rules can be unit-tested and read
- * in one place. The caller supplies the current pre-selected count for the
- * pack; this function does not go looking for it.
+ * in one place.
  */
 
 export interface PreselectionInput {
@@ -37,23 +41,18 @@ export interface PreselectionInput {
 export type PreselectionResult =
   | { status: Extract<CandidatureStatus, "preselectionne">; reason: null }
   | {
-      status: Extract<CandidatureStatus, "non_eligible" | "complet">;
+      status: Extract<CandidatureStatus, "non_eligible">;
       reason: IneligibilityReason;
     };
 
 /**
- * The four mechanical gates, evaluated in the order the specification lists
+ * The three mechanical gates, evaluated in the order the specification lists
  * them. Returns the first failure so the candidate gets one specific reason
  * rather than a list — telling someone every way they failed at once is worse
  * copy and leaks more of the rule set than it needs to.
- *
- * Capacity is checked LAST, and only for otherwise-eligible candidates: being
- * told a pack is full is meaningfully different from being told you don't
- * qualify, and conflating the two would be both inaccurate and unkind.
  */
 export function evaluatePreselection(
   input: PreselectionInput,
-  preselectedCountForPack: number,
 ): PreselectionResult {
   if (input.age < MIN_AGE) {
     return { status: "non_eligible", reason: "age" };
@@ -72,10 +71,6 @@ export function evaluatePreselection(
 
   if (input.visaHistorique === "refus_4_plus") {
     return { status: "non_eligible", reason: "visa_refusals" };
-  }
-
-  if (preselectedCountForPack >= preselectionCap(input.pack)) {
-    return { status: "complet", reason: "pack_full" };
   }
 
   return { status: "preselectionne", reason: null };

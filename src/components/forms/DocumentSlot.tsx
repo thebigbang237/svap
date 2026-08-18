@@ -65,6 +65,9 @@ export interface DocumentSlotProps {
   /** Already uploaded on a previous visit. */
   initiallyUploaded?: boolean;
   optional?: boolean;
+  /** Overrides the default optional marker, which reads "(si carte
+   * d'identité)" — right for the ID verso, wrong for anything else. */
+  optionalLabel?: string;
   /** "environment" for documents, "user" for the selfie. */
   capture?: "environment" | "user";
   acceptPdf?: boolean;
@@ -75,6 +78,7 @@ export function DocumentSlot({
   kind,
   initiallyUploaded = false,
   optional = false,
+  optionalLabel,
   capture = "environment",
   acceptPdf = false,
   onUploaded,
@@ -132,7 +136,7 @@ export function DocumentSlot({
             {t(`kinds.${kind}.label`)}
             {optional && (
               <span className="ms-2 normal-case tracking-normal text-ink-dim">
-                {t("optional")}
+                {optionalLabel ?? t("optional")}
               </span>
             )}
           </span>

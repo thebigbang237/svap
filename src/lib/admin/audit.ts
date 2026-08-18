@@ -10,7 +10,11 @@ export type AuditAction =
   | "candidature.export"
   | "payment.refund"
   | "access_code.resend"
-  | "claim.decision";
+  | "claim.decision"
+  // Changes to what the public site says, so a name is attached to each.
+  | "article.create"
+  | "article.update"
+  | "article.delete";
 
 /**
  * Writes an entry to the append-only audit log (§8).

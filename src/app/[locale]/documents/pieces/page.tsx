@@ -14,7 +14,7 @@ export default async function Phase2PiecesPage({
   // who uploaded their ID on a laptop and returns on a phone for the selfie
   // sees the first slot already ticked.
   return (
-    <Phase2StepShell step="pieces">
+    <Phase2StepShell step="pieces" steps={progress.steps}>
       <DocumentsForm uploaded={progress.documentKinds} />
     </Phase2StepShell>
   );

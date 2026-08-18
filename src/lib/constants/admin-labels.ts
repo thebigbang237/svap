@@ -3,10 +3,19 @@
 // next-intl.
 
 export const DOCUMENT_KIND_LABELS_FR: Record<string, string> = {
+  // Étape 4 — identity
   id_recto: "Pièce d'identité — recto",
   id_verso: "Pièce d'identité — verso",
   selfie_liveness: "Selfie de vivacité",
   casier_judiciaire: "Extrait de casier judiciaire",
+  // Étape 5 — capacity, pack-specific
+  attestation_bancaire: "Caution / attestation bancaire",
+  releve_bancaire: "Relevé bancaire (2 derniers mois)",
+  origine_fonds: "Justificatif d'origine des fonds",
+  assurance_voyage: "Assurance voyage",
+  preuve_billet: "Preuve de financement du billet",
+  resume_projet: "Résumé du projet",
+  preuves_avancement: "Preuves d'avancement du projet",
 };
 
 export const CONSENT_KIND_LABELS_FR: Record<string, string> = {
@@ -113,6 +122,9 @@ export const AUDIT_ACTION_LABELS_FR: Record<string, string> = {
   "payment.refund": "Remboursement",
   "access_code.resend": "Renvoi de code d'accès",
   "claim.decision": "Décision prime visa",
+  "article.create": "Publication d'un article",
+  "article.update": "Modification d'un article",
+  "article.delete": "Suppression d'un article",
 };
 
 export const label = (table: Record<string, string>, key: string | null) =>

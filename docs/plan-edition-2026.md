@@ -17,6 +17,19 @@ the i18n plumbing, and the admin auth layer survive intact.
 These are contradictions or gaps **inside the client's own document**. Each one changes
 code, so they need answers before the relevant workstream starts.
 
+### Resolved — 2026-08-17
+
+A client session that reversed two decisions taken on 2026-08-11 and added one feature.
+These supersede anything below that contradicts them.
+
+| # | Issue | Decision |
+|---|---|---|
+| 6b | **Refunds** (reverses #6 below) | **Verification fees are NOT refundable**, in any case. They pay for work performed as soon as payment clears. The refund promise is removed from every public surface — payment step, receipt email, FAQ, /confiance, CGV, status emails. The super-admin reversal survives for billing errors only (double charge, wrong amount, provider incident, chargeback), relabelled "exceptionnel". |
+| 4b | **Primes** (resolves #4 below) | What replaces the refund. Paid when a **validated** dossier is subsequently refused a US visa: Lauréat $1,000, Boursier $500, VIP Visitor $4,500. Business Visitor and Délégué carry none — the omission is intentional. Subject to documentary proof of the consular refusal and an internal audit, paid within 60 days. `svap.visa_refusal_claims` already models this. |
+| 14 | **Pack places are an admission ceiling, not an application quota** | Nothing closes at the door. Every eligible candidate is pre-selected and may complete Phase 2; `places` is applied when the verified dossiers are ranked. `preselectionCapMultiplier` and `preselectionCap()` are removed, and the Phase-1 capacity COUNT query with them. The `complet` status and `pack_full` reason are retained for legacy rows and for a manual close. |
+| 15 | **Pack-specific capacity dossier** (new Phase-2 step) | Per the client's "Cadre de vérification financière". Lauréat: project summary (+ optional evidence of progress). Boursier: $5,000 bank attestation, proof the flight can be funded, travel insurance, project summary. Business Visitor: ≈ $13,940 (flight $4,940 + $1,500 × 6 days) with bank attestation, source of funds, 2 months of statements, insurance. VIP Visitor: same pieces on ≈ $20,940 (+ $7,000 sponsoring). Délégué: nothing, step skipped. **The programme never receives these amounts** — the candidate books and pays their own travel. |
+| 16 | **Press page** (new feature) | `/actualites` — cards (thumbnail, outlet, date, title, caption) that link out to the publisher. Not a blog: no body, no slug, no reading view, nothing reproduced on this domain. Admin CRUD with thumbnail upload to a public bucket; writes are audited. |
+
 ### Resolved — 2026-08-11
 
 | # | Issue | Decision |
@@ -24,7 +37,7 @@ code, so they need answers before the relevant workstream starts.
 | 2 | Délégué age "17 à 65" vs. global 18+ | **18+ everywhere, no exceptions.** Délégué range becomes 18–65. Removes the guardian-consent problem entirely; auto-preselection needs no per-pack branch. |
 | 3 | Délégué pay "4 mois (octobre, novembre, décembre)" | **3 months → $600 total.** Copy says "200 USD/mois pendant 3 mois (octobre, novembre, décembre)". |
 | 5 | VIP $7,000 sponsoring | **Out of scope for the site.** Handled offline by the administration. The site collects only the $330 verification fee for VIP, like Business Visitor. The $7,000 stays in the pack description as disclosure, with no on-site payment path and no refund logic. |
-| 6 | Refund policy self-contradiction | **Phase-2 fees ARE refundable** on administrative or eligibility rejection. §9 is correct; **the FAQ is the error** and gets rewritten. Fraud remains non-refundable. Locks in the Stripe/pawaPay refund requirement. |
+| 6 | Refund policy self-contradiction | ~~**Phase-2 fees ARE refundable** on administrative or eligibility rejection.~~ **Superseded 2026-08-17 by #6b — fees are not refundable at all.** The Stripe/pawaPay refund capability is kept regardless, for billing errors and chargebacks. |
 | 9 | Payment rails named in public copy | **pawaPay + Stripe confirmed.** Flutterwave stays as fallback *if* the account is approved; if not, pawaPay + Stripe are sufficient. §7 (trust table), §8, §14 and the FAQ must be rewritten to name the actual providers — the anti-fraud promise ("any payment outside the official site is fraud") only holds if the named rails match reality. |
 
 ### Still open
@@ -32,7 +45,7 @@ code, so they need answers before the relevant workstream starts.
 | # | Issue | Why it blocks |
 |---|---|---|
 | 1 | **Délégué has no pack card in §4** but appears in the fee table, the Phase-1 pack dropdown, and gets its own §6. | **Drafted** — see [copy-delegue-fr.md](copy-delegue-fr.md). Client approves text rather than answering an open question. Four sub-points still need a decision, listed at the end of that file (notably: how the 600 USD is paid, and whether "éligibilité garantie Lauréat 2027" means guaranteed *admission* or guaranteed *review*). |
-| 4 | **Business Visitor has no visa-refusal prime** (Lauréat $1,000 / Boursier $500 / VIP $4,500). | Intentional or omission? Goes in §9 table and FAQ. |
+| 4 | ~~**Business Visitor has no visa-refusal prime**~~ | **Resolved 2026-08-17 (#4b): intentional.** |
 | 7 | **ID document**: Phase-2 intro says "recto/verso", Étape 3 table lists only "verso". | Building both unless told otherwise. |
 | 8 | **Code timing**: "envoyé 72 heures après le dépôt" (fixed delay) vs FAQ "sous 72 heures" (SLA). | Scheduled job at T+72h vs. send-on-approval. Different infrastructure. |
 | 10 | **Hero stats**: site says "250 Leaders / 10 Pays". Spec totals **200 participants** (12+63+104+21) + 60 delegates, across **6 countries**, **75 bourses** (site says 110). | Public numbers. Confirm the headline figures. |
@@ -94,7 +107,8 @@ vérification $X uniquement si pré-sélectionné."
 | `/faq` | **New** — 12 Q&As from §12 |
 | `/confiance` | **New** — §7 + §8 |
 | `/media` | **New** — §11, empty state until real assets |
-| `/legal/{mentions,confidentialite,cgv,remboursement}` | **New** — §8 requires privacy reachable from every page |
+| `/legal/{mentions,confidentialite,cgv,primes}` | **New** — §8 requires privacy reachable from every page. `remboursement` → `primes` on 2026-08-17, with the policy it documents |
+| `/actualites` | **New (2026-08-17)** — press coverage, cards linking out to publishers |
 
 ---
 

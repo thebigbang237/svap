@@ -6,12 +6,14 @@ import { PAYMENT_STATUS_LABELS_FR, label } from "@/lib/constants/admin-labels";
 import type { PaymentView } from "@/lib/admin/dossier";
 
 /**
- * Payments for a dossier, with the refund action.
+ * Payments for a dossier, with the exceptional refund action.
  *
- * §9 commits to refunding Phase-2 fees in full on administrative or
- * eligibility rejection, on the original payment method — so the refund goes
- * back through the provider that took the money rather than being settled
- * off-platform. super_admin only, confirmed before firing, and audited.
+ * Verification fees are non-refundable (client decision, 2026-08-17) and no
+ * public copy promises otherwise. This button exists for the cases that have
+ * nothing to do with policy — a duplicate charge, a wrong amount, a provider
+ * error, a chargeback to settle — where the money simply should not have been
+ * taken. It goes back through the provider that took it, is super_admin only,
+ * is confirmed before firing, and is audited.
  */
 export function PaymentsPanel({
   payments,
@@ -26,7 +28,7 @@ export function PaymentsPanel({
 
   async function refund(payment: PaymentView) {
     const reason = window.prompt(
-      `Rembourser ${payment.amount_usd} USD à ce candidat ?\n\nMotif (visible dans le journal d'audit) :`,
+      `Remboursement exceptionnel de ${payment.amount_usd} USD ?\n\nLes frais de vérification ne sont pas remboursables : réservez cette action aux erreurs de facturation (double débit, montant erroné, incident prestataire).\n\nMotif (visible dans le journal d'audit) :`,
     );
     // Cancelled dialog — not an empty reason.
     if (reason === null) return;
@@ -100,7 +102,9 @@ export function PaymentsPanel({
                     onClick={() => refund(p)}
                     className="text-xs font-semibold uppercase tracking-wide text-blue hover:underline disabled:opacity-40"
                   >
-                    {busy === p.id ? "Remboursement..." : "Rembourser"}
+                    {busy === p.id
+                      ? "Remboursement..."
+                      : "Rembourser (exceptionnel)"}
                   </button>
                 )}
               </div>

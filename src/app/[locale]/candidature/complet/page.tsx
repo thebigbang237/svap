@@ -3,8 +3,14 @@ import { CTAButton } from "@/components/marketing/CTAButton";
 import { Link } from "@/i18n/navigation";
 
 /**
- * Phase-1 outcome: the candidate met every eligibility criterion, but the
- * pack had already reached its pre-selection cap.
+ * Phase-1 outcome: the candidate met every eligibility criterion, but every
+ * place on the pack had already been awarded.
+ *
+ * No longer reached automatically — pre-selection caps were removed on
+ * 2026-08-17 and nothing is turned away at the door any more. The page stays
+ * because the `complet` status does: an administrator can still close a pack
+ * by hand once its seats are filled, and a candidate holding that status
+ * needs somewhere to land.
  *
  * Kept separate from the non-eligible page on purpose. "You don't qualify"
  * and "you qualified but we ran out of places" are different messages, and

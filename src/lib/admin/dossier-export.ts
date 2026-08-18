@@ -123,6 +123,30 @@ function collectRows(input: ExportInput): [string, string][] {
     );
   }
 
+  if (d.financial) {
+    const f = d.financial;
+    const money = (value: number | null) =>
+      value === null ? "—" : `$${Number(value).toLocaleString("fr-FR")}`;
+
+    rows.push(
+      ["— PHASE 2 · CAPACITÉ FINANCIÈRE ET PROJET —", ""],
+      ["Montant requis pour le pack", money(f.montant_requis_usd)],
+      [
+        "Montant attesté (déclaré)",
+        // Flagged inline: on the CSV and the printed HTML there is no colour
+        // to carry the warning, so it has to be in the text.
+        f.montant_atteste_usd !== null &&
+        f.montant_requis_usd !== null &&
+        Number(f.montant_atteste_usd) < Number(f.montant_requis_usd)
+          ? `${money(f.montant_atteste_usd)} — INFÉRIEUR AU MONTANT REQUIS`
+          : money(f.montant_atteste_usd),
+      ],
+      ["Banque émettrice", f.banque_emettrice ?? "—"],
+      ["Origine des fonds (déclaration)", f.origine_fonds ?? "—"],
+      ["Dossier de capacité transmis le", date(f.submitted_at)],
+    );
+  }
+
   for (const p of d.payments) {
     rows.push([
       `Paiement ${p.provider}`,

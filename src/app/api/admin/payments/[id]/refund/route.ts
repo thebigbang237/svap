@@ -7,13 +7,17 @@ import type { PaymentProviderId } from "@/lib/payments/types";
 import type { PaymentRow } from "@/lib/payments/record";
 
 /**
- * Issues a refund against the original payment method.
+ * Issues an exceptional refund against the original payment method.
  *
- * §9 commits to a full refund of Phase-2 fees on administrative or
- * eligibility rejection, "sur le moyen de paiement d'origine" — which is why
- * this goes back through the provider that took the money rather than being
- * handled off-platform. A mobile-money collection refunds to the wallet; a
- * card refunds to the card.
+ * Verification fees are not refundable as a matter of policy (client decision,
+ * 2026-08-17): they pay for work performed on the dossier, and no public copy
+ * promises them back. What this route is for is billing error — a double
+ * charge, a wrong amount, a provider incident, a chargeback — where the money
+ * should never have been taken in the first place.
+ *
+ * It goes back through the provider that took it rather than being settled
+ * off-platform: a mobile-money collection refunds to the wallet, a card
+ * refunds to the card, and the reversal is traceable on both sides.
  *
  * super_admin only, and audited: this moves money out.
  */

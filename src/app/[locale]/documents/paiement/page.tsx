@@ -57,7 +57,7 @@ export default async function Phase2PaiementPage({
   }
 
   return (
-    <Phase2StepShell step="paiement">
+    <Phase2StepShell step="paiement" steps={progress.steps}>
       <div className="space-y-10">
         <div className="border border-ink-dim/20 bg-white p-8">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-blue">
@@ -95,10 +95,13 @@ export default async function Phase2PaiementPage({
           </ul>
         </div>
 
-        {/* The capacity decision, made explicit at the moment of payment: the
-            fee buys verification, not a seat. */}
-        <div className="border-s-2 border-terracotta bg-sky-mid/60 p-6">
+        {/* Said at the moment of payment, where it costs the programme
+            something to say it: the fee buys verification, not a seat, and it
+            does not come back. Burying either fact in the terms would be the
+            kind of thing this page exists to be the opposite of. */}
+        <div className="space-y-4 border-s-2 border-terracotta bg-sky-mid/60 p-6">
           <p className="text-ink">{t("notASeat")}</p>
+          <p className="text-ink">{t("nonRefundable")}</p>
         </div>
 
         <div className="border-t border-ink-dim/20 pt-10">

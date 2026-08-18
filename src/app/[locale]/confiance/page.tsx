@@ -121,12 +121,16 @@ export default function ConfiancePage() {
         </div>
       </section>
 
-      {/* REFUNDS */}
+      {/* FEES AND PRIMES */}
       <section className="bg-sky-mid px-8 py-[120px]">
         <div className="mx-auto max-w-3xl">
-          <h2 className="mb-10 font-serif text-[32px] font-normal text-blue-dark">
+          <h2 className="mb-4 font-serif text-[32px] font-normal text-blue-dark">
             {t("refundTitle")}
           </h2>
+          {/* Stated above the table rather than left to be inferred from it:
+              "non-refundable" is the sentence a candidate most needs to have
+              read before paying, not after. */}
+          <p className="mb-10 leading-relaxed text-ink-mid">{t("refundLead")}</p>
           <div className="overflow-x-auto border border-ink-dim/20 bg-white">
             <table className="w-full text-start text-sm">
               <tbody>

@@ -27,6 +27,9 @@ re-running is not safe unless the file explicitly says so.
 | 0010 | `payments` | `payments`, `payment_events` (idempotency), `visa_refusal_claims` | Checkout and webhooks fail |
 | 0011 | `audit_log` | Append-only admin audit trail | Document views and refunds go unrecorded |
 | 0012 | `service_role_grants` | `USAGE` + table privileges on `svap` for `service_role` | **Everything server-side fails** with `permission denied for schema svap` (42501) |
+| 0013–0014 | payment operator, dossier-download audit | Mobile-money operator on `payments`, `dossier.download` audit action | Operator selection and dossier exports fail |
+| 0015 | `phase2_capacite` | `phase2_financial`, seven new `phase2_documents` kinds | Étape 5 can't save; capacity uploads rejected by the kind check |
+| 0016 | `articles` | `articles` + public `svap-articles` bucket, `article.*` audit actions | `/actualites` renders empty; the admin editor 500s |
 
 ### Running them on an empty database
 
@@ -142,7 +145,7 @@ Seven transactional emails, all wired. Resend is the only provider.
 |---|---|---|---|
 | Candidature reçue | Phase-1 submit, **pre-selected only** | Applicant | fr/en/ar |
 | Décision — non éligible | Phase-1 submit, failed a gate | Applicant | fr/en/ar |
-| Décision — pack complet | Phase-1 submit, cap reached | Applicant | fr/en/ar |
+| Décision — pack complet | Admin sets `complet` by hand (no longer automatic) | Applicant | fr/en/ar |
 | Nouvelle candidature | Every Phase-1 submit | `ADMIN_NOTIFICATION_EMAIL` | fr/en/ar |
 | **Code d'accès** | Cron, 72h after pre-selection | Applicant | fr/en/ar |
 | **Code expire bientôt** | Cron, day 7 and day 12 of 14 | Applicant | fr/en/ar |
@@ -388,7 +391,7 @@ from svap.candidatures order by created_at desc limit 5;
 |---|---|
 | No rows at all | The submission never landed — check the API logs |
 | `status = 'non_eligible'` | Failed a gate; `preselection_reason` says which. No code is ever issued |
-| `status = 'complet'` | Pack cap reached |
+| `status = 'complet'` | Pack closed by hand once its seats were awarded — no longer produced automatically (caps removed 2026-08-17) |
 | `status = 'code_envoye'` | Already sent — check spam, and `svap.access_codes` for `last_sent_at` |
 | `status = 'preselectionne'` but `created_at` recent | Simply not due yet — backdate as above |
 2. ✅ Response reports `{ issued: 1 }`; the applicant receives a code email with
@@ -448,6 +451,31 @@ without double-crediting — check that `svap.payments` still shows one paid row
    submit. ✅ You reach `/documents/termine` and the dossier status becomes
    **Vérification**.
 
+### Flow 6b — Capacity dossier (Étape 5, pack-specific)
+
+Run this on **two** dossiers: one Délégué and one Business Visitor or VIP.
+
+1. As a **Délégué**, finish the identity documents. ✅ You go straight to the
+   consents, and the progress bar reads "5 sur 5" — the capacity step does not
+   exist for this pack. Opening `/documents/capacite` by hand redirects you
+   back to where you actually stand.
+2. As a **Business Visitor**, the same point leads to `/documents/capacite`, on
+   a 6-step bar. ✅ The page opens with "Aucun versement ne vous est demandé à
+   cette étape" — check this survives any copy edit, it is the sentence that
+   separates this step from a payment.
+3. ✅ The table totals **≈ $13,940** (flight $4,940 + $1,500 × 6 days). On a VIP
+   dossier it totals **≈ $20,940**, with the $7,000 sponsoring line noted as
+   settled offline.
+4. ✅ Try to continue with a document missing — blocked, naming which one. The
+   route enforces this too: POST `/api/documents/capacite` without the uploads
+   returns 409 `errors.documentsMissing`.
+5. Enter an attested amount **below** the requirement. ✅ You get a terracotta
+   warning but you are **not** blocked — the reviewer decides, not the form.
+   The admin dossier then shows the shortfall in terracotta, and the exported
+   HTML/CSV spells it out in words.
+6. ✅ Skipping to the consents is refused: the route returns 409
+   `errors.capaciteMissing` for a pack that has this step.
+
 ### Flow 7 — Admin
 
 1. Sign in at `/admin/login`.
@@ -461,8 +489,26 @@ without double-crediting — check that `svap.payments` still shows one paid row
 5. Open a document. ✅ It opens in a new tab via a link that expires in 60s.
 6. ✅ `/admin/journal` now shows `document.view` and `passport.reveal` entries,
    highlighted, with your identity and IP.
-7. As super_admin, refund the payment. ✅ Status becomes **Remboursé** and a
-   `payment.refund` entry appears in the journal.
+7. As super_admin, issue an **exceptional** refund. ✅ Status becomes
+   **Remboursé** and a `payment.refund` entry appears in the journal. Note this
+   is a billing-error tool only — verification fees are not refundable as a
+   matter of policy, and no public copy offers a refund.
+
+### Flow 7b — Press articles
+
+1. In `/admin/articles`, add an article with a thumbnail. ✅ It appears on
+   `/actualites` in all three locales, with the outlet, the date, the title and
+   the caption.
+2. ✅ Click the card — it opens the publisher's site in a new tab. Nothing about
+   the article is readable on this domain; that is the whole design.
+3. ✅ Try a `javascript:` URL — rejected by the form, by the route, and by the
+   `articles_url_http` CHECK. This value becomes an `href` on a public page.
+4. Untick "Visible sur la page Actualités". ✅ The card disappears from
+   `/actualites` but stays in the admin list, marked **Masqué**. The public page
+   reads through the anonymous client, so the RLS policy is what enforces this,
+   not the query.
+5. Replace the thumbnail, then delete the article. ✅ `/admin/journal` shows
+   `article.create`, `article.update` and `article.delete` with your identity.
 
 ### Flow 8 — Languages
 
@@ -563,7 +609,7 @@ Then, on the live domain:
 ### After launch, before announcing
 
 Check `svap.candidatures` contains **no test rows**. If any leaked in, delete
-them — they consume pre-selection capacity that belongs to real applicants.
+them — they distort the pre-selection counts the final ranking is drawn from.
 
 ---
 
@@ -573,8 +619,8 @@ them — they consume pre-selection capacity that belongs to real applicants.
       go stale and either under- or over-charge candidates.
 - [ ] Have counsel complete every block marked ⚠️ on the four `/legal/*` pages
       (jurisdiction, liability, DPO identity, hosting, retention).
-- [ ] Get the Arabic translation professionally reviewed — the legal, refund and
-      consent copy in particular.
+- [ ] Get the Arabic translation professionally reviewed — the legal, fee/prime
+      and consent copy in particular.
 - [ ] Switch `PAWAPAY_ENV` to `live` and swap Stripe test keys for live ones.
 - [ ] Confirm Stripe underwriting has cleared the business — a rejection after
       launch would stop all card revenue.

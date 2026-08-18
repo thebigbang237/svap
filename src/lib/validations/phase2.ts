@@ -9,6 +9,7 @@ import {
   FAMILLE_USA_OPTIONS,
   MIN_AGE,
   CASIER_MAX_AGE_MONTHS,
+  financialRequirement,
 } from "@/lib/constants/program";
 
 // As in the Phase-1 schema, every message is a next-intl key relative to the
@@ -145,7 +146,80 @@ export const casierMetadataSchema = z.object({
 export type CasierMetadataInput = z.infer<typeof casierMetadataSchema>;
 
 // ---------------------------------------------------------------------------
-// Étape 5 — consents
+// Étape 5 — financial / project capacity
+// ---------------------------------------------------------------------------
+
+/**
+ * Built per pack, because the fields themselves differ: a Lauréat is asked
+ * nothing here beyond their project dossier, while a VIP Visitor declares the
+ * issuing bank, the amount attested and the origin of the funds.
+ *
+ * Note what is deliberately *not* enforced: an attested amount below the
+ * requirement does not fail validation. Blocking submission would strand a
+ * candidate who has already paid the verification fee behind a form they
+ * cannot satisfy — over a figure that may be short for a legitimate reason
+ * (a rate applied on the day, an attestation issued in local currency). The
+ * shortfall is surfaced to the candidate as a warning and to the reviewer as a
+ * comparison, which is where the judgement belongs.
+ */
+const optionalText = (max: number) =>
+  z.string().trim().max(max, { error: "validation.tooLong" }).optional();
+
+/**
+ * Accepts the string a number input produces *and* the number that survives a
+ * JSON round-trip, so the browser and the route can share one schema: the form
+ * posts values this has already parsed, and the route parses them again.
+ */
+const attestedAmount = (required: boolean) =>
+  z
+    .union([z.string(), z.number()])
+    .optional()
+    .transform((value) => {
+      if (value === undefined) return null;
+      const trimmed = typeof value === "string" ? value.trim() : value;
+      return trimmed === "" ? null : Number(trimmed);
+    })
+    .refine((value) => !required || value !== null, {
+      error: "validation.required",
+    })
+    .refine(
+      (value) =>
+        value === null ||
+        (Number.isFinite(value) && value > 0 && value <= 100_000_000),
+      { error: "validation.amountInvalid" },
+    );
+
+export function financialDossierSchema(pack: string) {
+  const requirement = financialRequirement(pack);
+
+  return z.object({
+    banqueEmettrice: requirement?.requiresBankName
+      ? requiredText(160)
+      : optionalText(160),
+
+    montantAtteste: attestedAmount(requirement?.requiresBankName === true),
+
+    origineFonds: requirement?.requiresFundsOrigin
+      ? z
+          .string()
+          .trim()
+          .min(60, { error: "validation.tooShort" })
+          .max(3000, { error: "validation.tooLong" })
+      : optionalText(3000),
+  });
+}
+
+/** What the form fields hold — the amount is still text at this point. */
+export type FinancialDossierValues = z.input<
+  ReturnType<typeof financialDossierSchema>
+>;
+/** What validation produces, and what the route stores. */
+export type FinancialDossierInput = z.output<
+  ReturnType<typeof financialDossierSchema>
+>;
+
+// ---------------------------------------------------------------------------
+// Étape 6 — consents
 // ---------------------------------------------------------------------------
 
 /**

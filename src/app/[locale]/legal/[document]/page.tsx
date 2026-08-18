@@ -11,7 +11,7 @@ import { routing } from "@/i18n/routing";
  * effect — jurisdiction, liability, cancellation terms, the DPO's identity
  * and contact — are NOT invented here. Each page renders the factual content
  * the specification actually establishes (company details, fee amounts, the
- * refund matrix, the data-protection measures the system genuinely
+ * prime commitments, the data-protection measures the system genuinely
  * implements) and marks explicitly where a lawyer's text is required.
  *
  * A generated privacy policy on a site collecting passport scans and criminal
@@ -23,7 +23,10 @@ const DOCUMENTS = [
   "mentions-legales",
   "confidentialite",
   "conditions-generales",
-  "remboursement",
+  // Was "remboursement" until 2026-08-17. Renamed with the policy it
+  // describes: verification fees are not refundable, and what this page now
+  // documents is the prime paid when a verified candidate's visa is refused.
+  "primes",
 ] as const;
 
 type LegalDocument = (typeof DOCUMENTS)[number];

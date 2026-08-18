@@ -20,6 +20,7 @@
     "packs": "Packs",
     "agenda": "Agenda",
     "delegues": "Délégués",
+    "actualites": "Actualités",
     "faq": "FAQ",
     "cta": "Candidater",
     "menuLabel": "Menu",
@@ -85,7 +86,7 @@
     "page": {
       "eyebrow": "Édition 2026",
       "title": "Cinq façons de participer",
-      "lead": "Le même processus s'applique à tous les packs : candidature gratuite, pré-sélection automatique, puis vérification. Choisissez le format qui correspond à votre situation.",
+      "lead": "Le même processus s'applique à tous les packs : candidature gratuite, pré-sélection automatique, puis vérification. Le nombre de places indiqué est le nombre de participants retenus à l'issue des vérifications — il ne limite pas le nombre de candidatures.",
       "breadcrumbCurrent": "Packs"
     },
     "items": {
@@ -127,7 +128,7 @@
         "costValue": "200 USD/mois pendant 3 mois",
         "features": [
           "Rémunération de 200 USD par mois — octobre à décembre",
-          "Éligibilité garantie Lauréat, édition 2027",
+          "Éligibilité garantie Lauréat, édition 2028",
           "Certificat officiel First Of All",
           "Accès communauté alumni 1 an",
           "Ouvert de 18 à 65 ans"
@@ -180,7 +181,7 @@
         },
         "step4": {
           "title": "Vérification",
-          "description": "Informations complètes, frais de vérification, pièces justificatives. Les contrôles démarrent après paiement."
+          "description": "Informations complètes, frais de vérification, pièces justificatives et, selon le pack, justificatifs de capacité financière ou de projet. Les contrôles démarrent après paiement."
         },
         "step5": {
           "title": "Visa et départ",
@@ -194,6 +195,7 @@
       "ctaLabel": "Déposer ma candidature"
     },
     "freeNotice": "Le dépôt de candidature est entièrement gratuit pour tous les packs. Les frais de vérification ne sont dus qu'en Phase 2, après pré-sélection et réception de votre code d'accès.",
+    "placesNotice": "Aucun pack ne ferme ses candidatures. Le nombre de places affiché correspond au nombre de participants retenus à l'issue des vérifications : tous les dossiers éligibles sont examinés, et la sélection finale intervient une fois les vérifications terminées.",
     "feePrefix": "Frais de vérification",
     "feeSuffix": "uniquement si pré-sélectionné"
   },
@@ -577,7 +579,7 @@
         "age": "Le programme est réservé aux personnes âgées de 18 ans et plus.",
         "casier_judiciaire": "Un casier judiciaire vierge, ou son équivalent légal, est exigé pour participer.",
         "visa_refusals": "Les candidats ayant essuyé 4 refus de visa USA ou plus ne sont pas éligibles à cette édition.",
-        "pack_full": "Le quota de ce pack est atteint pour cette édition.",
+        "pack_full": "Toutes les places de ce pack ont été attribuées pour cette édition.",
         "generic": "Votre candidature ne remplit pas l'un des critères d'éligibilité de cette édition."
       },
       "noFee": "Aucun frais ne vous a été demandé, et aucun ne vous sera demandé.",
@@ -588,7 +590,7 @@
     "complet": {
       "eyebrow": "Quota atteint",
       "title": "Votre dossier est éligible, mais ce pack est complet.",
-      "explanation": "Votre candidature remplit tous les critères d'éligibilité. Le nombre de présélections pour ce pack a simplement atteint sa limite pour l'édition 2026.",
+      "explanation": "Votre candidature remplit tous les critères d'éligibilité. Les places de ce pack ont simplement toutes été attribuées pour l'édition 2026.",
       "noFee": "Aucun frais ne vous a été demandé.",
       "nextSteps": "Vous pouvez candidater sur un autre pack encore ouvert, ou nous vous recontacterons en priorité pour l'édition suivante.",
       "ctaLabel": "Voir les autres packs",
@@ -612,7 +614,7 @@
     "bourseDescription": "12 places entièrement financées et 63 places partiellement financées, pour les candidats à fort potentiel confrontés à des contraintes financières réelles.",
     "bourseCta": "Voir les critères d'éligibilité",
     "delegateTitle": "60 postes de délégués rémunérés",
-    "delegateDescription": "Représentez le programme dans votre pays pendant trois mois, gagnez 200 USD par mois et obtenez une éligibilité garantie au pack Lauréat pour l'édition 2027.",
+    "delegateDescription": "Représentez le programme dans votre pays pendant trois mois, gagnez 200 USD par mois et obtenez une éligibilité garantie au pack Lauréat pour l'édition 2028.",
     "delegateCta": "Découvrir le programme délégués",
     "closingCta": {
       "title": "La candidature est gratuite et prend quelques minutes.",
@@ -635,7 +637,7 @@
     "legal": "Mentions légales",
     "privacyLink": "Confidentialité",
     "terms": "Conditions générales",
-    "refund": "Remboursement",
+    "primes": "Primes",
     "fraudNote": "Aucun paiement ne vous sera jamais demandé en dehors de ce site."
   },
   "portal": {
@@ -699,6 +701,10 @@
       "pieces": {
         "title": "Pièces justificatives",
         "lead": "Pièce d'identité, selfie de vivacité et extrait de casier judiciaire."
+      },
+      "capacite": {
+        "title": "Capacité et projet",
+        "lead": "Les justificatifs propres à votre pack, nécessaires à la délivrance de votre lettre d'invitation."
       },
       "consentements": {
         "title": "Consentements",
@@ -791,7 +797,8 @@
         "riskTest": "Le test d'évaluation du risque de non-retour",
         "processing": "Le traitement administratif de votre dossier"
       },
-      "notASeat": "Ces frais couvrent la vérification de votre dossier, et non l'attribution d'une place. Les places sont limitées et attribuées après vérification. En cas de rejet administratif ou d'éligibilité, ces frais vous sont intégralement remboursés sur votre moyen de paiement d'origine.",
+      "notASeat": "Ces frais couvrent la vérification de votre dossier, et non l'attribution d'une place. Les places sont attribuées après vérification, dans la limite du nombre de participants prévu pour votre pack.",
+      "nonRefundable": "Les frais de vérification ne sont pas remboursables : ils rémunèrent un travail effectivement réalisé sur votre dossier — contrôle d'identité, casier judiciaire, évaluation du risque et traitement administratif — que l'issue vous soit favorable ou non. En revanche, si votre dossier est validé et que le visa américain vous est ensuite refusé, une prime est prévue pour les packs Lauréat, Boursier et VIP Visitor.",
       "methodsTitle": "Moyens de paiement",
       "chooseMethod": "Choisissez votre moyen de paiement",
       "methods": {
@@ -912,6 +919,34 @@
         "casier_judiciaire": {
           "label": "Extrait de casier judiciaire",
           "help": "Daté de moins de trois mois. Image ou PDF. Le document doit être lisible dans son intégralité."
+        },
+        "attestation_bancaire": {
+          "label": "Caution ou attestation bancaire",
+          "help": "Délivrée par une banque de premier ordre, à votre nom, mentionnant le montant disponible. Datée de moins de trois mois."
+        },
+        "releve_bancaire": {
+          "label": "Relevé bancaire des 2 derniers mois",
+          "help": "Les deux relevés complets, en-tête de la banque visible. Vous pouvez masquer les opérations sans rapport avec le solde."
+        },
+        "origine_fonds": {
+          "label": "Justificatif d'origine des fonds",
+          "help": "Ce qui explique d'où viennent les fonds : bulletins de salaire, contrat de cession, acte de vente, états financiers de votre entreprise."
+        },
+        "assurance_voyage": {
+          "label": "Assurance voyage",
+          "help": "Attestation couvrant toute la durée du séjour aux États-Unis. Une attestation provisoire est acceptée à ce stade."
+        },
+        "preuve_billet": {
+          "label": "Preuve de financement du billet",
+          "help": "Ce qui montre que vous pouvez financer votre billet d'avion : relevé bancaire, réservation, ou attestation de prise en charge."
+        },
+        "resume_projet": {
+          "label": "Résumé de votre projet (1 page)",
+          "help": "Une page maximum : le problème que vous adressez, votre solution, votre stade d'avancement. PDF de préférence."
+        },
+        "preuves_avancement": {
+          "label": "Preuves d'avancement",
+          "help": "Si vous en disposez : prototype, MVP, premiers utilisateurs, revenus, partenariats. Un seul document regroupant l'ensemble."
         }
       },
       "casierSection": "Références du casier judiciaire",
@@ -944,13 +979,62 @@
         "casierFileFirst": "Transmettez d'abord l'extrait de casier judiciaire."
       }
     },
+    "capacite": {
+      "noTransferTitle": "Aucun versement ne vous est demandé à cette étape.",
+      "noTransfer": "Le programme ne perçoit, ne gère ni ne conserve les fonds destinés à votre voyage. Vous réservez et payez vous-même votre billet, votre hébergement et vos transports auprès des prestataires de votre choix. Cette étape sert uniquement à confirmer que vous en avez les moyens.",
+      "intro": {
+        "laureat": "Votre pack est intégralement financé par le programme : aucune capacité financière ne vous est demandée. La sélection repose sur la qualité et l'impact potentiel de votre projet — c'est ce que nous vous demandons de documenter ici.",
+        "boursier": "Votre pack couvre le séjour, hors billet d'avion. Nous vérifions ici deux choses : la crédibilité de votre projet, et une capacité financière minimale vous permettant de faire face au billet et aux imprévus. Il ne s'agit pas d'évaluer votre patrimoine.",
+        "business_visitor": "Votre voyage est intégralement à votre charge. Pour délivrer une lettre d'invitation, nous devons nous assurer que la capacité financière déclarée est réelle et cohérente avec votre dossier.",
+        "vip_visitor": "Votre voyage est à votre charge, et votre pack inclut une contribution de sponsoring au programme. Le niveau de vérification est renforcé en conséquence."
+      },
+      "amountTitle": "Montant à justifier",
+      "lines": {
+        "surface": "Surface financière à attester",
+        "sponsoring": "Contribution de sponsoring au programme",
+        "sponsoringDetail": "Réglée directement auprès de l'administration après validation de votre dossier — jamais sur ce site.",
+        "billet": "Billet d'avion aller-retour",
+        "billetDetail": "Estimation du programme : {fcfa} FCFA. Vous réservez vous-même auprès de la compagnie de votre choix.",
+        "sejour": "Hôtel, transport et restauration",
+        "sejourDetail": "{daily} par jour × {days} jours sur place.",
+        "total": "Total à justifier"
+      },
+      "documentsTitle": "Pièces à transmettre",
+      "optional": "(facultatif)",
+      "declarationsTitle": "Déclarations",
+      "banqueLabel": "Banque émettrice",
+      "banquePlaceholder": "Nom de la banque",
+      "banqueHint": "La banque qui a délivré votre attestation. Une banque de premier ordre est requise.",
+      "montantLabel": "Montant attesté (USD)",
+      "montantHint": "Le montant figurant sur votre attestation bancaire, converti en dollars américains.",
+      "montantShort": "Ce montant est inférieur au montant requis ({required}). Vous pouvez continuer : notre équipe examinera votre dossier, mais un écart non expliqué peut retarder ou compromettre la délivrance de votre lettre d'invitation.",
+      "origineLabel": "Origine des fonds",
+      "originePlaceholder": "Expliquez précisément d'où proviennent ces fonds : revenus d'activité, épargne constituée, cession, dividendes, soutien familial. Indiquez sur quelle période ils ont été constitués.",
+      "continue": "Continuer",
+      "saving": "Enregistrement...",
+      "validation": {
+        "required": "Ce champ est requis.",
+        "tooLong": "Ce texte est trop long.",
+        "tooShort": "Merci de détailler davantage votre réponse.",
+        "amountInvalid": "Montant invalide."
+      },
+      "errors": {
+        "documentsMissing": "Il manque encore :",
+        "server": "Une erreur est survenue. Veuillez réessayer.",
+        "network": "Connexion interrompue. Vérifiez votre réseau et réessayez.",
+        "session": "Votre session a expiré. Saisissez à nouveau votre nom et votre code.",
+        "locked": "Votre dossier est déjà transmis et ne peut plus être modifié.",
+        "paymentRequired": "Le règlement des frais de vérification est requis avant cette étape.",
+        "notApplicable": "Cette étape ne s'applique pas à votre pack."
+      }
+    },
     "consentements": {
       "intro": "Dernière étape. En validant, vous autorisez le lancement des vérifications de votre dossier.",
       "items": {
         "verificationTiers": "J'autorise First Of All LLC et ses prestataires tiers agréés à vérifier mon identité, mes documents et mon casier judiciaire.",
         "certificationHonneur": "Je certifie sur l'honneur l'exactitude et l'authenticité des informations et des pièces fournies.",
-        "conditionsGenerales": "J'accepte la politique de remboursement, les conditions générales et la politique de confidentialité.",
-        "fraudeSignalement": "Je reconnais qu'en cas de fraude avérée, ma candidature est rejetée sans remboursement et peut faire l'objet d'un signalement.",
+        "conditionsGenerales": "J'accepte les conditions générales et la politique de confidentialité, et je reconnais que les frais de vérification ne sont pas remboursables.",
+        "fraudeSignalement": "Je reconnais qu'en cas de fraude avérée, ma candidature est rejetée définitivement et peut faire l'objet d'un signalement.",
         "traitementDonnees": "J'accepte le traitement de mes données personnelles pour la seule finalité de l'instruction de ma candidature."
       },
       "finalNote": "Après validation, les vérifications démarrent automatiquement. Vous ne pourrez plus modifier votre dossier sans contacter le support.",
@@ -964,7 +1048,8 @@
         "network": "Connexion interrompue. Réessayez.",
         "session": "Votre session a expiré. Saisissez à nouveau votre nom et votre code.",
         "paymentRequired": "Le règlement des frais de vérification est requis.",
-        "documentsMissing": "Certaines pièces justificatives sont manquantes."
+        "documentsMissing": "Certaines pièces justificatives sont manquantes.",
+        "capaciteMissing": "L'étape « Capacité et projet » n'est pas encore complétée."
       }
     },
     "termine": {
@@ -1011,11 +1096,19 @@
       },
       {
         "q": "Ces frais garantissent-ils une place ?",
-        "a": "Non, et c'est important. Ils couvrent la vérification de votre dossier, pas l'attribution d'une place. Les places sont limitées et attribuées après vérification. Le nombre de pré-sélections par pack est plafonné précisément pour que ce déséquilibre reste raisonnable."
+        "a": "Non, et c'est important. Ils couvrent la vérification de votre dossier, pas l'attribution d'une place. Le nombre de places affiché sur chaque pack correspond au nombre de participants retenus à l'issue des vérifications ; il ne limite pas le nombre de candidatures."
       },
       {
-        "q": "Puis-je être remboursé si ma candidature est rejetée après paiement ?",
-        "a": "Oui, intégralement, si le rejet intervient pour un motif administratif ou d'éligibilité. Le remboursement est effectué sur votre moyen de paiement d'origine. Aucun remboursement n'est accordé en cas de fraude avérée."
+        "q": "Les frais de vérification sont-ils remboursables ?",
+        "a": "Non. Ils rémunèrent un travail effectivement réalisé sur votre dossier — vérification d'identité, contrôle du casier judiciaire, évaluation du risque de non-retour et traitement administratif — que l'issue vous soit favorable ou non. C'est aussi pourquoi ils restent volontairement bas pour les packs boursiers (20 et 30 USD). Ce que le programme s'engage à verser, en revanche, c'est une prime en cas de refus de visa après validation de votre dossier."
+      },
+      {
+        "q": "Mon pack me demande-t-il des justificatifs supplémentaires ?",
+        "a": "Cela dépend du pack. Le Lauréat transmet un résumé de projet d'une page. Le Boursier y ajoute une attestation bancaire de 5 000 USD, une preuve de financement du billet et une assurance voyage. Le Business Visitor et le VIP Visitor justifient l'intégralité du coût de leur voyage (environ 13 940 USD et 20 940 USD respectivement), avec attestation bancaire, relevés des deux derniers mois, origine des fonds et assurance voyage. Le Délégué n'a aucun justificatif de ce type à fournir."
+      },
+      {
+        "q": "Dois-je verser ces montants au programme ?",
+        "a": "Non, jamais. Le programme ne perçoit, ne gère ni ne conserve les fonds destinés à votre voyage : vous réservez et payez vous-même votre billet, votre hôtel et vos transports auprès des prestataires de votre choix. Seuls les frais de vérification — et, pour le pack VIP Visitor, la contribution de sponsoring organisée directement avec l'administration après validation — sont versés au programme."
       },
       {
         "q": "Comment puis-je payer ?",
@@ -1031,7 +1124,7 @@
       },
       {
         "q": "Que se passe-t-il si mon visa américain est refusé ?",
-        "a": "Les Lauréats reçoivent une prime de 1 000 USD, les Boursiers 500 USD et les VIP Visitor 4 500 USD. Le versement est soumis à la vérification documentaire du refus officiel délivré par les autorités consulaires américaines et à un audit interne, avec un délai de 60 jours après réception du document."
+        "a": "Si votre dossier a été validé à l'issue de nos vérifications et que le visa vous est ensuite refusé, une prime vous est versée : 1 000 USD pour les Lauréats, 500 USD pour les Boursiers et 4 500 USD pour les VIP Visitor. Le versement est soumis à la vérification documentaire du refus officiel délivré par les autorités consulaires américaines et à un audit interne, avec un délai de 60 jours après réception du document. Le pack Business Visitor ne comporte pas de prime."
       },
       {
         "q": "Quelle est la différence entre les packs ?",
@@ -1043,11 +1136,22 @@
       }
     ]
   },
+  "actualites": {
+    "eyebrow": "Le programme dans la presse",
+    "breadcrumbCurrent": "Actualités",
+    "title": "Ce que les médias en disent",
+    "lead": "Les articles consacrés au Silicon Valley Africa Program et à First Of All. Chaque carte renvoie vers le site du média qui a publié l'article.",
+    "readOn": "Lire sur le site du média",
+    "empty": "Aucun article n'est publié pour le moment. Cette page recensera les parutions consacrées au programme au fur et à mesure.",
+    "disclaimer": "Les articles référencés sur cette page sont publiés par des médias indépendants du programme. Ils sont cités à titre d'information et ne sont pas reproduits sur ce site : chaque lien ouvre la page du média concerné.",
+    "ctaTitle": "La candidature est gratuite et prend quelques minutes.",
+    "ctaLabel": "Déposer ma candidature"
+  },
   "delegues": {
     "eyebrow": "Programme délégués",
     "breadcrumbCurrent": "Délégués",
     "title": "60 postes pour porter le programme dans votre pays",
-    "lead": "Un rôle rémunéré de trois mois, une éligibilité garantie au pack Lauréat pour l'édition 2027, et l'entrée dans un réseau qui ne se referme pas à la fin du programme.",
+    "lead": "Un rôle rémunéré de trois mois, une éligibilité garantie au pack Lauréat pour l'édition 2028, et l'entrée dans un réseau qui ne se referme pas à la fin du programme.",
     "roleTitle": "Le rôle",
     "roleBody": "Le délégué représente et promeut le Silicon Valley Africa Program dans son espace géographique : relayer l'information, identifier et mobiliser des candidats à fort potentiel, et faire rayonner le programme auprès de son réseau local — universités, incubateurs, chambres de commerce, communautés professionnelles.",
     "roleNote": "C'est un rôle de terrain. Nous ne cherchons pas des relais passifs, mais des personnes déjà écoutées dans leur écosystème.",
@@ -1144,19 +1248,24 @@
         "description": "Un délégué à la protection des données est désigné. Vous disposez d'un droit d'accès, de rectification et de suppression de vos données."
       }
     ],
-    "refundTitle": "Politique de remboursement",
+    "refundTitle": "Frais et primes : ce qui est dû, ce qui est versé",
+    "refundLead": "Les frais de vérification ne sont pas remboursables : ils rémunèrent un travail réalisé sur votre dossier. Ce que le programme s'engage à verser, c'est une prime en cas de refus de visa après validation.",
     "refundRows": [
       [
         "Non pré-sélectionné (Phase 1)",
-        "Aucun frais n'a été demandé. Rien à rembourser. Votre dossier reste éligible pour les éditions suivantes."
+        "Aucun frais n'a été demandé et aucun ne le sera. Votre dossier reste éligible pour les éditions suivantes."
       ],
       [
-        "Rejet administratif ou d'éligibilité (Phase 2)",
-        "Remboursement intégral des frais de Phase 2, sur votre moyen de paiement d'origine."
+        "Frais de vérification (Phase 2)",
+        "Non remboursables, quelle que soit l'issue : ils couvrent la vérification d'identité, le contrôle du casier judiciaire, l'évaluation du risque et le traitement du dossier."
+      ],
+      [
+        "Non retenu à l'issue des vérifications",
+        "Les frais restent acquis, le service ayant été rendu. Votre dossier est conservé en priorité pour l'édition suivante."
       ],
       [
         "Fraude avérée",
-        "Aucun remboursement. Dossier rejeté définitivement, signalement possible."
+        "Dossier rejeté définitivement, aucune prime due, signalement possible."
       ],
       [
         "Refus de visa — Lauréat",
@@ -1169,6 +1278,10 @@
       [
         "Refus de visa — VIP Visitor",
         "Prime de 4 500 USD, sous vérification documentaire et audit interne. Versement sous 60 jours."
+      ],
+      [
+        "Refus de visa — Business Visitor et Délégué",
+        "Ces deux packs ne comportent pas de prime."
       ]
     ],
     "ctaTitle": "Des questions avant de commencer ?",
@@ -1184,7 +1297,7 @@
       "mentions-legales": "Mentions légales",
       "confidentialite": "Confidentialité",
       "conditions-generales": "Conditions générales",
-      "remboursement": "Remboursement"
+      "primes": "Primes"
     },
     "mentions-legales": {
       "title": "Mentions légales",
@@ -1310,15 +1423,23 @@
         },
         {
           "title": "Ce que couvrent les frais de vérification",
-          "body": "Ces frais couvrent la vérification d'identité, le contrôle du casier judiciaire, le test d'évaluation du risque de non-retour et le traitement administratif du dossier. Ils ne constituent pas l'achat d'une place : les places sont limitées et attribuées après vérification."
+          "body": "Ces frais couvrent la vérification d'identité, le contrôle du casier judiciaire, le test d'évaluation du risque de non-retour et le traitement administratif du dossier. Ils ne constituent pas l'achat d'une place : les places sont attribuées après vérification. Ces frais ne sont pas remboursables, le service étant rendu dès leur règlement."
+        },
+        {
+          "title": "Justificatifs propres à chaque pack",
+          "body": "Selon le pack choisi, la Phase 2 comporte une étape supplémentaire de justification : résumé de projet pour le Lauréat ; attestation bancaire de 5 000 USD, preuve de financement du billet, assurance voyage et résumé de projet pour le Boursier ; justification de l'intégralité du coût du voyage, relevés bancaires des deux derniers mois, origine des fonds et assurance voyage pour le Business Visitor et le VIP Visitor. Le pack Délégué n'est pas concerné. Ces montants ne sont jamais versés au programme : le candidat réserve et règle lui-même ses prestations de voyage."
         },
         {
           "title": "Code d'accès",
           "body": "Le code d'accès est personnel, lié à votre nom complet et à votre adresse e-mail, à usage unique et valable 14 jours. Il ne peut être ni partagé ni cédé. Un nouveau code annule automatiquement le précédent."
         },
         {
-          "title": "Sélection",
-          "body": "La pré-sélection en Phase 1 est automatique et fondée sur des critères vérifiables. L'attribution finale des places pour les packs Lauréat, Boursier et Délégué relève d'une décision de comité, sur dossier, et n'est jamais automatique. Les packs Business Visitor et VIP Visitor font l'objet d'une sélection automatique si les critères d'éligibilité sont remplis et la vérification concluante."
+          "title": "Sélection et nombre de places",
+          "body": "La pré-sélection en Phase 1 est automatique et fondée sur des critères vérifiables ; aucune candidature n'est refusée au motif qu'un pack serait complet. Le nombre de places annoncé pour chaque pack correspond au nombre maximal de participants retenus à l'issue des vérifications. L'attribution finale des places pour les packs Lauréat, Boursier et Délégué relève d'une décision de comité, sur dossier. Les packs Business Visitor et VIP Visitor font l'objet d'une sélection automatique si les critères d'éligibilité sont remplis et la vérification concluante, dans la limite des places disponibles."
+        },
+        {
+          "title": "Primes en cas de refus de visa",
+          "body": "Les packs Lauréat, Boursier et VIP Visitor ouvrent droit à une prime en cas de refus du visa américain après validation du dossier, dans les conditions détaillées dans la politique de primes."
         },
         {
           "title": "Contribution de sponsoring VIP Visitor",
@@ -1326,7 +1447,7 @@
         },
         {
           "title": "Fraude",
-          "body": "En cas de fraude documentaire avérée, la candidature est rejetée définitivement, aucun remboursement n'est accordé et un signalement aux autorités compétentes est possible."
+          "body": "En cas de fraude documentaire avérée, la candidature est rejetée définitivement, aucune prime n'est due et un signalement aux autorités compétentes est possible."
         },
         {
           "title": "Responsabilité, droit applicable et juridiction compétente",
@@ -1335,42 +1456,53 @@
         }
       ]
     },
-    "remboursement": {
-      "title": "Politique de remboursement et primes",
-      "lead": "Dans quels cas les frais de Phase 2 sont remboursés, et les conditions de versement des primes en cas de refus de visa.",
+    "primes": {
+      "title": "Primes en cas de refus de visa",
+      "lead": "Ce que couvrent les frais de vérification, pourquoi ils ne sont pas remboursables, et dans quelles conditions une prime est versée si le visa américain vous est refusé.",
       "sections": [
         {
           "title": "Non pré-sélectionné en Phase 1",
           "body": "Aucun frais ne vous a été demandé et aucun ne le sera. Il n'y a donc rien à rembourser. Votre dossier reste éligible pour les éditions suivantes du programme."
         },
         {
-          "title": "Rejet administratif ou d'éligibilité en Phase 2",
-          "body": "Les frais de vérification vous sont remboursés intégralement, sur le moyen de paiement d'origine. Un remboursement par Mobile Money est crédité sur le portefeuille ayant servi au paiement ; un remboursement par carte est crédité sur la carte utilisée."
+          "title": "Frais de vérification non remboursables",
+          "body": "Les frais de vérification de la Phase 2 ne sont pas remboursables, quelle que soit l'issue de votre dossier. Ils rémunèrent un service effectivement rendu : vérification d'identité, contrôle du casier judiciaire auprès d'un prestataire partenaire local, évaluation du risque de non-retour et traitement administratif du dossier. Ce travail est réalisé dès le règlement, indépendamment de la décision finale."
         },
         {
-          "title": "Non-attribution d'une place après vérification",
-          "body": "Les places sont limitées. Un dossier vérifié avec succès mais non retenu à l'issue de l'étude de dossier ne donne pas lieu au remboursement des frais de vérification, ceux-ci ayant couvert un service effectivement rendu. Le nombre de pré-sélections par pack est plafonné afin de limiter cette situation."
+          "title": "Non retenu à l'issue des vérifications",
+          "body": "Le nombre de places de chaque pack correspond au nombre de participants retenus à l'issue des vérifications. Un dossier vérifié avec succès mais non retenu ne donne pas lieu au remboursement des frais de vérification. Il est conservé et examiné en priorité lors de l'édition suivante."
         },
         {
           "title": "Fraude avérée",
-          "body": "Aucun remboursement n'est accordé. Le dossier est rejeté définitivement et peut faire l'objet d'un signalement."
+          "body": "Le dossier est rejeté définitivement, aucune prime n'est due et un signalement aux autorités compétentes est possible."
         },
         {
           "title": "Primes en cas de refus de visa américain",
+          "body": "Si votre dossier a été validé à l'issue des vérifications et que les autorités consulaires américaines vous refusent ensuite le visa, une prime vous est versée selon votre pack :",
           "items": [
             "Lauréat : 1 000 USD",
             "Boursier : 500 USD",
-            "VIP Visitor : 4 500 USD"
+            "VIP Visitor : 4 500 USD",
+            "Business Visitor et Délégué : aucune prime"
           ]
         },
         {
           "title": "Conditions de versement des primes",
-          "body": "Le versement est soumis à la vérification documentaire du refus officiel délivré par les autorités consulaires américaines, ainsi qu'à un audit interne du dossier. Le délai de versement est de 60 jours à compter de la réception du document de refus."
+          "items": [
+            "Le dossier doit avoir été validé par le programme avant la demande de visa. Un dossier rejeté à l'issue des vérifications n'ouvre aucun droit à prime.",
+            "Le refus doit être établi par un document officiel délivré par les autorités consulaires américaines, transmis au programme.",
+            "Le dossier fait l'objet d'un audit interne avant tout versement.",
+            "Le délai de versement est de 60 jours à compter de la réception du document de refus."
+          ]
         },
         {
-          "title": "Délais de traitement des remboursements",
+          "title": "Sommes que le programme ne perçoit pas",
+          "body": "Les montants que vous justifiez lors de l'étape « Capacité et projet » (billet d'avion, hébergement, transport, restauration) ne sont jamais versés au programme. Vous réservez et payez vous-même ces prestations auprès des prestataires de votre choix. Seuls les frais de vérification et, pour le pack VIP Visitor, la contribution de sponsoring organisée directement avec l'administration après validation du dossier, sont versés au programme."
+        },
+        {
+          "title": "Réclamations et voies de recours",
           "pending": true,
-          "body": "Délai contractuel de traitement d'une demande de remboursement, procédure de réclamation et modalités de recours."
+          "body": "Procédure de réclamation relative au versement d'une prime, délai contractuel de traitement et modalités de recours dans chacune des six juridictions concernées."
         }
       ]
     }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { CTAButton } from "@/components/marketing/CTAButton";
@@ -17,7 +18,15 @@ export function Topbar() {
     { href: "/packs", label: t("packs"), active: pathname === "/packs" },
     { href: "/agenda", label: t("agenda"), active: pathname === "/agenda" },
     { href: "/delegues", label: t("delegues"), active: pathname === "/delegues" },
-    { href: "/faq", label: t("faq"), active: pathname === "/faq" },
+    {
+      href: "/actualites",
+      label: t("actualites"),
+      active: pathname === "/actualites",
+    },
+    // FAQ deliberately absent: it lives in the footer's Ressources column,
+    // alongside Confiance and Obtenir mes documents, which is where someone
+    // goes looking for it. Keeping the top bar to the five pages that carry
+    // the pitch leaves room for the CTA at every breakpoint.
   ];
 
   // Lock background scroll and allow Escape to dismiss while the mobile
@@ -44,9 +53,20 @@ export function Topbar() {
       {/* z-50, so the toolbar itself always stays crisp above the backdrop
           below — nothing here dims when the mobile menu is open. */}
       <header className="fixed top-0 z-50 w-full border-b border-ink-dim/10 bg-sky backdrop-blur-md">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-8 py-4">
-          <Link href="/" className="font-serif text-2xl font-normal text-blue">
-            {t("brand")}
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-4">
+          {/* The mark carries the brand name itself, so `alt` is the link's
+              accessible name — not a description of the artwork. Sized in CSS
+              rather than by the intrinsic dimensions; the width/height props
+              only fix the 3:1 ratio and give next/image its srcset target. */}
+          <Link href="/" className="shrink-0">
+            <Image
+              src="/logo_svap_h.png"
+              alt={t("brand")}
+              width={144}
+              height={48}
+              priority
+              className="h-10 w-auto sm:h-12"
+            />
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex">

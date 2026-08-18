@@ -257,7 +257,8 @@ export default function HomePage() {
                 costLabel={tPacks(`items.${pack}.costLabel`)}
                 costValue={tPacks(`items.${pack}.costValue`)}
                 features={tPacks.raw(`items.${pack}.features`)}
-                applicationFee={`${tPacks("feePrefix")} $${PACK_SPECS[pack].verificationFeeUsd} — ${tPacks("feeSuffix")}`}
+                applicationFee={`${tPacks("feePrefix")} $${PACK_SPECS[pack].verificationFeeUsd}`}
+                applicationFeeNote={tPacks("feeSuffix")}
                 ctaLabel={tPacks(`items.${pack}.ctaLabel`)}
                 href={`/candidature?pack=${pack}`}
               />

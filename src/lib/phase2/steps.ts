@@ -1,6 +1,7 @@
 import "server-only";
 import type { AdminClient } from "@/lib/supabase/admin";
 import type { CandidatureRow } from "@/lib/supabase/types";
+import { financialRequirement } from "@/lib/constants/program";
 
 /**
  * Phase-2 step order and resume logic.
@@ -15,6 +16,11 @@ import type { CandidatureRow } from "@/lib/supabase/types";
  * maximises abandonment, and collecting passport scans before payment means
  * storing the most sensitive data in the dossier for people who never paid.
  * See docs/flow-edition-2026.md §4.
+ *
+ * `capacite` (2026-08-17) is the one pack-dependent step: what a candidate
+ * must evidence there is a function of the engagement their pack carries, and
+ * Délégué — a role served at home — carries none. Hence the step list is
+ * derived per dossier rather than being a constant.
  */
 
 export const PHASE2_STEPS = [
@@ -22,6 +28,7 @@ export const PHASE2_STEPS = [
   "evaluation",
   "paiement",
   "pieces",
+  "capacite",
   "consentements",
 ] as const;
 
@@ -32,8 +39,23 @@ export const PHASE2_PATHS: Record<Phase2Step, string> = {
   evaluation: "/documents/evaluation",
   paiement: "/documents/paiement",
   pieces: "/documents/pieces",
+  capacite: "/documents/capacite",
   consentements: "/documents/consentements",
 };
+
+/**
+ * The steps this pack actually walks through, in order.
+ *
+ * Everything downstream — the progress bar's denominator, the "can I open
+ * this step" check, the resume point — reads this rather than PHASE2_STEPS,
+ * so a Délégué is never told they're on "step 5 of 6" and never redirected to
+ * a page asking them for a bank attestation.
+ */
+export function phase2StepsForPack(pack: string): Phase2Step[] {
+  return PHASE2_STEPS.filter(
+    (step) => step !== "capacite" || financialRequirement(pack) !== null,
+  );
+}
 
 /**
  * Statuses at which Phase 2 is finished and closed for editing.
@@ -68,6 +90,10 @@ export interface Phase2Progress {
   hasRiskAssessment: boolean;
   hasPaid: boolean;
   documentKinds: string[];
+  /** The pack-specific dossier at Étape 5 has been submitted. */
+  hasFinancialDossier: boolean;
+  /** The steps this candidate's pack goes through, in order. */
+  steps: Phase2Step[];
   /** Dossier submitted — every step is now read-only. */
   locked: boolean;
   /** First step the candidate still has work to do on. */
@@ -96,7 +122,7 @@ export async function loadPhase2Progress(
 
   if (!candidature) return null;
 
-  const [personalInfo, risk, documents] = await Promise.all([
+  const [personalInfo, risk, documents, financial] = await Promise.all([
     supabase
       .from("phase2_applications")
       .select("candidature_id")
@@ -111,10 +137,29 @@ export async function loadPhase2Progress(
       .from("phase2_documents")
       .select("kind")
       .eq("candidature_id", candidatureId),
+    supabase
+      .from("phase2_financial")
+      .select("candidature_id")
+      .eq("candidature_id", candidatureId)
+      .maybeSingle(),
   ]);
 
   const hasPersonalInfo = !!personalInfo.data;
   const hasRiskAssessment = !!risk.data;
+  const hasFinancialDossier = !!financial.data;
+
+  // A read error here is indistinguishable from "not submitted yet", which
+  // would silently park every Business/VIP candidate on the capacity step
+  // forever. The overwhelmingly likely cause is migration 0015 not having been
+  // applied, so say so rather than leaving a support ticket to diagnose it.
+  if (financial.error) {
+    console.error("Failed to read phase2_financial (is migration 0015 applied?):", {
+      message: financial.error.message,
+      code: financial.error.code,
+      details: financial.error.details,
+      hint: financial.error.hint,
+    });
+  }
 
   // Payment is read off the candidature's own lifecycle rather than a
   // payments table, so this stays correct once W6 lands: those statuses are
@@ -124,6 +169,7 @@ export async function loadPhase2Progress(
   );
 
   const documentKinds = (documents.data ?? []).map((d) => d.kind as string);
+  const steps = phase2StepsForPack(candidature.pack);
 
   return {
     candidature,
@@ -131,29 +177,46 @@ export async function loadPhase2Progress(
     hasRiskAssessment,
     hasPaid,
     documentKinds,
+    hasFinancialDossier,
+    steps,
     locked: isPhase2Locked(candidature.status),
-    nextStep: resolveNextStep({
+    nextStep: resolveNextStep(steps, {
       hasPersonalInfo,
       hasRiskAssessment,
       hasPaid,
       documentKinds,
+      hasFinancialDossier,
     }),
   };
 }
 
-function resolveNextStep(state: {
-  hasPersonalInfo: boolean;
-  hasRiskAssessment: boolean;
-  hasPaid: boolean;
-  documentKinds: string[];
-}): Phase2Step {
+/** Identity pieces that gate the step. The ID verso is only mandatory for
+ *  national identity cards, so it is deliberately not among them. */
+const REQUIRED_IDENTITY_KINDS = [
+  "id_recto",
+  "selfie_liveness",
+  "casier_judiciaire",
+];
+
+function resolveNextStep(
+  steps: Phase2Step[],
+  state: {
+    hasPersonalInfo: boolean;
+    hasRiskAssessment: boolean;
+    hasPaid: boolean;
+    documentKinds: string[];
+    hasFinancialDossier: boolean;
+  },
+): Phase2Step {
   if (!state.hasPersonalInfo) return "informations";
   if (!state.hasRiskAssessment) return "evaluation";
   if (!state.hasPaid) return "paiement";
-  // Three of the four documents are always required; the ID verso is only
-  // mandatory for national identity cards, so it isn't gating here.
-  const required = ["id_recto", "selfie_liveness", "casier_judiciaire"];
-  if (!required.every((k) => state.documentKinds.includes(k))) return "pieces";
+  if (!REQUIRED_IDENTITY_KINDS.every((k) => state.documentKinds.includes(k))) {
+    return "pieces";
+  }
+  if (steps.includes("capacite") && !state.hasFinancialDossier) {
+    return "capacite";
+  }
   return "consentements";
 }
 
@@ -164,12 +227,15 @@ function resolveNextStep(state: {
  * and should not require support. What's blocked is jumping *ahead* of the
  * work: it would leave half-populated rows and, at the documents step, would
  * let someone upload before paying.
+ *
+ * A step this pack doesn't have is not "ahead", it's absent: `indexOf` returns
+ * -1 for it, which would read as reachable, so it's rejected outright.
  */
 export function canAccessStep(
   step: Phase2Step,
   progress: Phase2Progress,
 ): boolean {
-  const requested = PHASE2_STEPS.indexOf(step);
-  const furthest = PHASE2_STEPS.indexOf(progress.nextStep);
-  return requested <= furthest;
+  const requested = progress.steps.indexOf(step);
+  if (requested === -1) return false;
+  return requested <= progress.steps.indexOf(progress.nextStep);
 }

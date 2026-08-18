@@ -20,6 +20,7 @@
     "packs": "Packs",
     "agenda": "Agenda",
     "delegues": "Delegates",
+    "actualites": "News",
     "faq": "FAQ",
     "cta": "Apply",
     "menuLabel": "Menu",
@@ -85,7 +86,7 @@
     "page": {
       "eyebrow": "2026 Edition",
       "title": "Five ways to take part",
-      "lead": "The same process applies to every pack: free application, automatic pre-selection, then verification. Choose the format that matches your situation.",
+      "lead": "The same process applies to every pack: free application, automatic pre-selection, then verification. The number of places shown is how many participants are selected once verification is complete — it does not limit how many people may apply.",
       "breadcrumbCurrent": "Packs"
     },
     "items": {
@@ -127,7 +128,7 @@
         "costValue": "200 USD/month for 3 months",
         "features": [
           "200 USD per month — October to December",
-          "Guaranteed Laureate eligibility, 2027 edition",
+          "Guaranteed Laureate eligibility, 2028 edition",
           "Official First Of All certificate",
           "1 year of alumni community access",
           "Open from 18 to 65"
@@ -180,7 +181,7 @@
         },
         "step4": {
           "title": "Verification",
-          "description": "Full details, verification fee, supporting documents. Checks start after payment."
+          "description": "Full details, verification fee, supporting documents and — depending on your pack — proof of financial capacity or of your project. Checks start after payment."
         },
         "step5": {
           "title": "Visa and departure",
@@ -194,6 +195,7 @@
       "ctaLabel": "Submit "
     },
     "freeNotice": "Applying is entirely free for every pack. Verification fees are only due in Phase 2, after pre-selection and once you've received your access code.",
+    "placesNotice": "No pack closes its applications. The number of places shown is the number of participants selected once verification is complete: every eligible file is reviewed, and the final selection is made after the checks are done.",
     "feePrefix": "Verification fee",
     "feeSuffix": "only if pre-selected"
   },
@@ -577,7 +579,7 @@
         "age": "The program is open to applicants aged 18 and over.",
         "casier_judiciaire": "A clean criminal record, or its legal equivalent, is required to take part.",
         "visa_refusals": "Applicants with 4 or more US visa refusals are not eligible for this edition.",
-        "pack_full": "This pack has reached its quota for this edition.",
+        "pack_full": "Every place on this pack has been awarded for this edition.",
         "generic": "Your application does not meet one of this edition's eligibility criteria."
       },
       "noFee": "You were not charged anything, and you will not be.",
@@ -588,7 +590,7 @@
     "complet": {
       "eyebrow": "Quota reached",
       "title": "Your application is eligible, but this pack is full.",
-      "explanation": "Your application meets every eligibility criterion. The number of pre-selections for this pack has simply reached its limit for the 2026 edition.",
+      "explanation": "Your application meets every eligibility criterion. The places on this pack have simply all been awarded for the 2026 edition.",
       "noFee": "You were not charged anything.",
       "nextSteps": "You can apply for another pack that is still open, or we will contact you as a priority for the next edition.",
       "ctaLabel": "See the other packs",
@@ -612,7 +614,7 @@
     "bourseDescription": "12 fully funded places and 63 partially funded places, for high-potential applicants facing real financial constraints.",
     "bourseCta": "See the eligibility criteria",
     "delegateTitle": "60 paid delegate positions",
-    "delegateDescription": "Represent the program in your country for three months, earn 200 USD a month and secure guaranteed Laureate eligibility for the 2027 edition.",
+    "delegateDescription": "Represent the program in your country for three months, earn 200 USD a month and secure guaranteed Laureate eligibility for the 2028 edition.",
     "delegateCta": "Discover the delegate program",
     "closingCta": {
       "title": "Applying is free and takes a few minutes.",
@@ -635,7 +637,7 @@
     "legal": "Legal notice",
     "privacyLink": "Privacy",
     "terms": "Terms",
-    "refund": "Refunds",
+    "primes": "Premiums",
     "fraudNote": "You will never be asked to pay outside this site."
   },
   "portal": {
@@ -699,6 +701,10 @@
       "pieces": {
         "title": "Supporting documents",
         "lead": "ID document, liveness selfie and criminal record extract."
+      },
+      "capacite": {
+        "title": "Capacity and project",
+        "lead": "The documents specific to your pack, required before your invitation letter can be issued."
       },
       "consentements": {
         "title": "Consents",
@@ -791,7 +797,8 @@
         "riskTest": "The non-return risk assessment",
         "processing": "Administrative processing of your file"
       },
-      "notASeat": "This fee covers the verification of your file, not the award of a place. Places are limited and allocated after verification. If your file is rejected on administrative or eligibility grounds, the fee is refunded in full to your original payment method.",
+      "notASeat": "This fee covers the verification of your file, not the award of a place. Places are allocated after verification, up to the number of participants planned for your pack.",
+      "nonRefundable": "Verification fees are not refundable: they pay for work actually carried out on your file — identity check, criminal record, risk assessment and administrative processing — whether or not the outcome is in your favour. What the programme does commit to is a premium if your file is validated and your US visa is subsequently refused, for the Laureate, Scholar and VIP Visitor packs.",
       "methodsTitle": "Payment methods",
       "chooseMethod": "Choose your payment method",
       "methods": {
@@ -912,6 +919,34 @@
         "casier_judiciaire": {
           "label": "Criminal record extract",
           "help": "Issued less than three months ago. Image or PDF. The whole document must be legible."
+        },
+        "attestation_bancaire": {
+          "label": "Bank guarantee or attestation",
+          "help": "Issued by a first-tier bank, in your name, stating the amount available. Less than three months old."
+        },
+        "releve_bancaire": {
+          "label": "Bank statements — last 2 months",
+          "help": "Both statements in full, with the bank's letterhead visible. You may redact transactions unrelated to the balance."
+        },
+        "origine_fonds": {
+          "label": "Proof of source of funds",
+          "help": "What explains where the funds come from: payslips, a sale agreement, a deed of sale, your company's financial statements."
+        },
+        "assurance_voyage": {
+          "label": "Travel insurance",
+          "help": "A certificate covering the full duration of the stay in the United States. A provisional certificate is accepted at this stage."
+        },
+        "preuve_billet": {
+          "label": "Proof you can fund the flight",
+          "help": "Anything showing you can pay for your ticket: a bank statement, a booking, or a letter of financial support."
+        },
+        "resume_projet": {
+          "label": "Project summary (1 page)",
+          "help": "One page maximum: the problem you address, your solution, how far along you are. PDF preferred."
+        },
+        "preuves_avancement": {
+          "label": "Evidence of progress",
+          "help": "If you have it: prototype, MVP, first users, revenue, partnerships. A single document covering all of it."
         }
       },
       "casierSection": "Criminal record references",
@@ -944,13 +979,62 @@
         "casierFileFirst": "Upload the criminal record extract first."
       }
     },
+    "capacite": {
+      "noTransferTitle": "No payment is asked of you at this step.",
+      "noTransfer": "The programme does not receive, hold or manage the funds for your trip. You book and pay for your own flight, accommodation and transport, directly with the providers of your choice. This step exists only to confirm that you have the means to do so.",
+      "intro": {
+        "laureat": "Your pack is fully funded by the programme: no financial capacity is required of you. Selection rests on the quality and potential impact of your project — that is what we're asking you to document here.",
+        "boursier": "Your pack covers the stay, excluding the flight. We check two things here: the credibility of your project, and a minimum financial capacity that lets you cover the ticket and the unexpected. This is not an assessment of your wealth.",
+        "business_visitor": "Your trip is entirely at your own expense. Before issuing an invitation letter, we have to be satisfied that the financial capacity you declare is real and consistent with your file.",
+        "vip_visitor": "Your trip is at your own expense, and your pack includes a sponsoring contribution to the programme. Verification is correspondingly more thorough."
+      },
+      "amountTitle": "Amount to evidence",
+      "lines": {
+        "surface": "Financial standing to attest",
+        "sponsoring": "Sponsoring contribution to the programme",
+        "sponsoringDetail": "Settled directly with the administration once your file is validated — never on this site.",
+        "billet": "Return flight",
+        "billetDetail": "Programme estimate: {fcfa} FCFA. You book it yourself, with the airline of your choice.",
+        "sejour": "Hotel, transport and meals",
+        "sejourDetail": "{daily} per day × {days} days on site.",
+        "total": "Total to evidence"
+      },
+      "documentsTitle": "Documents to provide",
+      "optional": "(optional)",
+      "declarationsTitle": "Declarations",
+      "banqueLabel": "Issuing bank",
+      "banquePlaceholder": "Name of the bank",
+      "banqueHint": "The bank that issued your attestation. A first-tier bank is required.",
+      "montantLabel": "Amount attested (USD)",
+      "montantHint": "The amount shown on your bank attestation, converted to US dollars.",
+      "montantShort": "This is below the amount required ({required}). You can continue: our team will review your file, but an unexplained gap may delay or prevent the issue of your invitation letter.",
+      "origineLabel": "Source of funds",
+      "originePlaceholder": "Explain precisely where these funds come from: business income, savings built up over time, a sale, dividends, family support. Say over what period they were accumulated.",
+      "continue": "Continue",
+      "saving": "Saving...",
+      "validation": {
+        "required": "This field is required.",
+        "tooLong": "This text is too long.",
+        "tooShort": "Please give a fuller answer.",
+        "amountInvalid": "Invalid amount."
+      },
+      "errors": {
+        "documentsMissing": "Still missing:",
+        "server": "Something went wrong. Please try again.",
+        "network": "Connection lost. Check your network and try again.",
+        "session": "Your session has expired. Enter your name and code again.",
+        "locked": "Your file has already been submitted and can no longer be changed.",
+        "paymentRequired": "The verification fee must be settled before this step.",
+        "notApplicable": "This step does not apply to your pack."
+      }
+    },
     "consentements": {
       "intro": "Last step. By confirming, you authorise the checks on your file to begin.",
       "items": {
         "verificationTiers": "I authorise First Of All LLC and its approved third-party providers to verify my identity, my documents and my criminal record.",
         "certificationHonneur": "I certify on my honour the accuracy and authenticity of the information and documents provided.",
-        "conditionsGenerales": "I accept the refund policy, the terms and conditions and the privacy policy.",
-        "fraudeSignalement": "I acknowledge that in the event of proven fraud, my application is rejected without refund and may be reported.",
+        "conditionsGenerales": "I accept the terms and conditions and the privacy policy, and I acknowledge that verification fees are not refundable.",
+        "fraudeSignalement": "I acknowledge that in the event of proven fraud, my application is definitively rejected and may be reported.",
         "traitementDonnees": "I accept the processing of my personal data for the sole purpose of assessing my application."
       },
       "finalNote": "Once confirmed, verifications start automatically. You won't be able to change your file without contacting support.",
@@ -964,7 +1048,8 @@
         "network": "Connection lost. Try again.",
         "session": "Your session has expired. Enter your name and code again.",
         "paymentRequired": "The verification fee must be paid first.",
-        "documentsMissing": "Some supporting documents are missing."
+        "documentsMissing": "Some supporting documents are missing.",
+        "capaciteMissing": "The “Capacity and project” step hasn't been completed yet."
       }
     },
     "termine": {
@@ -1011,11 +1096,19 @@
       },
       {
         "q": "Do these fees guarantee a place?",
-        "a": "No, and this matters. They cover the verification of your file, not the award of a place. Places are limited and allocated after verification. The number of pre-selections per pack is capped precisely to keep that imbalance reasonable."
+        "a": "No, and this matters. They cover the verification of your file, not the award of a place. The number of places shown on each pack is how many participants are selected once verification is complete; it does not limit how many people may apply."
       },
       {
-        "q": "Can I be refunded if my application is rejected after payment?",
-        "a": "Yes, in full, if the rejection is on administrative or eligibility grounds. The refund goes back to your original payment method. No refund is granted in the event of proven fraud."
+        "q": "Are verification fees refundable?",
+        "a": "No. They pay for work actually carried out on your file — identity verification, the criminal record check, the non-return risk assessment and administrative processing — whether or not the outcome is in your favour. It's also why they are deliberately kept low for the scholarship packs (20 and 30 USD). What the programme does commit to paying is a premium if your visa is refused after your file has been validated."
+      },
+      {
+        "q": "Does my pack require additional documents?",
+        "a": "It depends on the pack. Laureate submits a one-page project summary. Scholar adds a 5,000 USD bank attestation, proof they can fund the flight, and travel insurance. Business Visitor and VIP Visitor evidence the full cost of their trip (roughly 13,940 USD and 20,940 USD respectively), with a bank attestation, the last two months of statements, the source of funds and travel insurance. Delegate has no such documents to provide."
+      },
+      {
+        "q": "Do I have to pay these amounts to the programme?",
+        "a": "No, never. The programme does not receive, hold or manage the funds for your trip: you book and pay for your own flight, hotel and transport, with the providers of your choice. Only the verification fee — and, for the VIP Visitor pack, the sponsoring contribution arranged directly with the administration after validation — is paid to the programme."
       },
       {
         "q": "How can I pay?",
@@ -1031,7 +1124,7 @@
       },
       {
         "q": "What happens if my US visa is refused?",
-        "a": "Laureates receive a 1,000 USD premium, Scholars 500 USD and VIP Visitors 4,500 USD. Payment is subject to documentary verification of the official refusal issued by US consular authorities and to an internal audit, within 60 days of receiving the document."
+        "a": "If your file was validated after our checks and the visa is subsequently refused, a premium is paid: 1,000 USD for Laureates, 500 USD for Scholars and 4,500 USD for VIP Visitors. Payment is subject to documentary verification of the official refusal issued by US consular authorities and to an internal audit, within 60 days of receiving the document. The Business Visitor pack carries no premium."
       },
       {
         "q": "What's the difference between the packs?",
@@ -1043,11 +1136,22 @@
       }
     ]
   },
+  "actualites": {
+    "eyebrow": "The programme in the press",
+    "breadcrumbCurrent": "News",
+    "title": "What the media are saying",
+    "lead": "Articles about the Silicon Valley Africa Program and First Of All. Each card opens the site of the outlet that published it.",
+    "readOn": "Read on the publisher's site",
+    "empty": "No articles are published yet. This page will list coverage of the programme as it appears.",
+    "disclaimer": "The articles listed on this page are published by media outlets independent of the programme. They are cited for information and are not reproduced on this site: each link opens the publisher's own page.",
+    "ctaTitle": "Applying is free and takes a few minutes.",
+    "ctaLabel": "Submit my application"
+  },
   "delegues": {
     "eyebrow": "Delegate program",
     "breadcrumbCurrent": "Delegates",
     "title": "60 positions to carry the program in your country",
-    "lead": "A paid three-month role, guaranteed Laureate eligibility for the 2027 edition, and entry into a network that doesn't close when the program ends.",
+    "lead": "A paid three-month role, guaranteed Laureate eligibility for the 2028 edition, and entry into a network that doesn't close when the program ends.",
     "roleTitle": "The role",
     "roleBody": "Delegates represent and promote the Silicon Valley Africa Program in their region: passing on information, identifying and mobilising high-potential applicants, and raising the program's profile within their local network — universities, incubators, chambers of commerce, professional communities.",
     "roleNote": "This is fieldwork. We're not looking for passive relays, but for people already listened to in their ecosystem.",
@@ -1144,19 +1248,24 @@
         "description": "A data protection officer is appointed. You have rights of access, rectification and erasure of your data."
       }
     ],
-    "refundTitle": "Refund policy",
+    "refundTitle": "Fees and premiums: what is owed, what is paid",
+    "refundLead": "Verification fees are not refundable: they pay for work carried out on your file. What the programme commits to paying is a premium if your visa is refused after validation.",
     "refundRows": [
       [
         "Not pre-selected (Phase 1)",
-        "No fee was requested. Nothing to refund. Your file remains eligible for future editions."
+        "No fee was requested and none will be. Your file remains eligible for future editions."
       ],
       [
-        "Administrative or eligibility rejection (Phase 2)",
-        "Full refund of Phase 2 fees, to your original payment method."
+        "Verification fee (Phase 2)",
+        "Not refundable, whatever the outcome: it covers identity verification, the criminal record check, the risk assessment and the processing of your file."
+      ],
+      [
+        "Not selected after verification",
+        "The fee stands, the service having been rendered. Your file is kept and reviewed as a priority for the next edition."
       ],
       [
         "Proven fraud",
-        "No refund. File permanently rejected, reporting possible."
+        "File permanently rejected, no premium due, reporting possible."
       ],
       [
         "Visa refusal — Laureate",
@@ -1169,6 +1278,10 @@
       [
         "Visa refusal — VIP Visitor",
         "4,500 USD premium, subject to documentary verification and internal audit. Paid within 60 days."
+      ],
+      [
+        "Visa refusal — Business Visitor and Delegate",
+        "Neither of these packs carries a premium."
       ]
     ],
     "ctaTitle": "Questions before you start?",
@@ -1184,7 +1297,7 @@
       "mentions-legales": "Legal notice",
       "confidentialite": "Privacy",
       "conditions-generales": "Terms",
-      "remboursement": "Refunds"
+      "primes": "Premiums"
     },
     "mentions-legales": {
       "title": "Legal notice",
@@ -1310,15 +1423,23 @@
         },
         {
           "title": "What the verification fee covers",
-          "body": "The fee covers identity verification, the criminal record check, the non-return risk assessment and administrative processing of the file. It does not constitute the purchase of a place: places are limited and allocated after verification."
+          "body": "The fee covers identity verification, the criminal record check, the non-return risk assessment and administrative processing of the file. It does not constitute the purchase of a place: places are allocated after verification. The fee is not refundable, the service being rendered as soon as it is paid."
+        },
+        {
+          "title": "Documents specific to each pack",
+          "body": "Depending on the pack chosen, Phase 2 includes an additional evidence step: a project summary for Laureate; a 5,000 USD bank attestation, proof the flight can be funded, travel insurance and a project summary for Scholar; evidence of the full cost of the trip, the last two months of bank statements, the source of funds and travel insurance for Business Visitor and VIP Visitor. The Delegate pack is not concerned. These amounts are never paid to the program: candidates book and pay for their own travel services."
         },
         {
           "title": "Access code",
           "body": "The access code is personal, tied to your full name and email address, single-use and valid for 14 days. It cannot be shared or transferred. A new code automatically cancels the previous one."
         },
         {
-          "title": "Selection",
-          "body": "Phase 1 pre-selection is automatic and based on verifiable criteria. Final allocation of places for the Laureate, Scholar and Delegate packs is a committee decision made on file, and is never automatic. Business Visitor and VIP Visitor are selected automatically where eligibility criteria are met and verification is conclusive."
+          "title": "Selection and number of places",
+          "body": "Phase 1 pre-selection is automatic and based on verifiable criteria; no application is refused on the grounds that a pack is full. The number of places announced for each pack is the maximum number of participants selected once verification is complete. Final allocation of places for the Laureate, Scholar and Delegate packs is a committee decision made on file. Business Visitor and VIP Visitor are selected automatically where eligibility criteria are met and verification is conclusive, within the limit of available places."
+        },
+        {
+          "title": "Visa-refusal premiums",
+          "body": "The Laureate, Scholar and VIP Visitor packs carry a premium in the event of a US visa refusal after the file has been validated, on the conditions set out in the premiums policy."
         },
         {
           "title": "VIP Visitor sponsorship contribution",
@@ -1326,7 +1447,7 @@
         },
         {
           "title": "Fraud",
-          "body": "In the event of proven documentary fraud, the application is permanently rejected, no refund is granted and a report to the competent authorities is possible."
+          "body": "In the event of proven documentary fraud, the application is permanently rejected, no premium is due and a report to the competent authorities is possible."
         },
         {
           "title": "Liability, governing law and jurisdiction",
@@ -1335,42 +1456,53 @@
         }
       ]
     },
-    "remboursement": {
-      "title": "Refund policy and premiums",
-      "lead": "When Phase 2 fees are refunded, and the conditions for paying visa-refusal premiums.",
+    "primes": {
+      "title": "Visa-refusal premiums",
+      "lead": "What verification fees cover, why they are not refundable, and on what conditions a premium is paid if your US visa is refused.",
       "sections": [
         {
           "title": "Not pre-selected in Phase 1",
           "body": "No fee was requested and none will be. There is therefore nothing to refund. Your file remains eligible for future editions of the program."
         },
         {
-          "title": "Administrative or eligibility rejection in Phase 2",
-          "body": "Verification fees are refunded in full, to the original payment method. A Mobile Money refund is credited to the wallet used for payment; a card refund is credited to the card used."
+          "title": "Verification fees are not refundable",
+          "body": "Phase 2 verification fees are not refundable, whatever the outcome of your file. They pay for a service actually rendered: identity verification, the criminal record check carried out through a local partner provider, the non-return risk assessment and the administrative processing of the file. That work is performed as soon as payment is made, independently of the final decision."
         },
         {
-          "title": "No place allocated after verification",
-          "body": "Places are limited. A file that passes verification but is not retained after review does not give rise to a refund of the verification fee, which covered a service actually rendered. The number of pre-selections per pack is capped in order to limit this situation."
+          "title": "Not selected after verification",
+          "body": "The number of places on each pack is the number of participants selected once verification is complete. A file that passes verification but is not selected does not give rise to a refund of the verification fee. It is kept and reviewed as a priority for the following edition."
         },
         {
           "title": "Proven fraud",
-          "body": "No refund is granted. The file is permanently rejected and may be reported."
+          "body": "The file is permanently rejected, no premium is due and the matter may be reported to the competent authorities."
         },
         {
           "title": "Premiums in the event of a US visa refusal",
+          "body": "If your file was validated after our checks and US consular authorities subsequently refuse your visa, a premium is paid according to your pack:",
           "items": [
             "Laureate: 1,000 USD",
             "Scholar: 500 USD",
-            "VIP Visitor: 4,500 USD"
+            "VIP Visitor: 4,500 USD",
+            "Business Visitor and Delegate: no premium"
           ]
         },
         {
           "title": "Conditions for paying premiums",
-          "body": "Payment is subject to documentary verification of the official refusal issued by US consular authorities, and to an internal audit of the file. Payment is made within 60 days of receiving the refusal document."
+          "items": [
+            "The file must have been validated by the program before the visa application. A file rejected after verification gives rise to no entitlement.",
+            "The refusal must be established by an official document issued by US consular authorities and sent to the program.",
+            "The file is subject to an internal audit before any payment.",
+            "Payment is made within 60 days of receiving the refusal document."
+          ]
         },
         {
-          "title": "Refund processing times",
+          "title": "Sums the program does not collect",
+          "body": "The amounts you evidence at the “Capacity and project” step (flight, accommodation, transport, meals) are never paid to the program. You book and pay for those services yourself, with the providers of your choice. Only the verification fee and, for the VIP Visitor pack, the sponsoring contribution arranged directly with the administration after validation, are paid to the program."
+        },
+        {
+          "title": "Complaints and appeals",
           "pending": true,
-          "body": "Contractual processing time for a refund request, complaints procedure and appeal arrangements."
+          "body": "Complaints procedure regarding payment of a premium, contractual processing time and appeal arrangements in each of the six jurisdictions concerned."
         }
       ]
     }

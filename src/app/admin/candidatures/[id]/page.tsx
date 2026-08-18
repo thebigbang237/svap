@@ -7,7 +7,7 @@ import { RiskScorePanel } from "@/components/admin/RiskScorePanel";
 import { DocumentViewer } from "@/components/admin/DocumentViewer";
 import { PassportReveal } from "@/components/admin/PassportReveal";
 import { PaymentsPanel } from "@/components/admin/PaymentsPanel";
-import { loadDossier } from "@/lib/admin/dossier";
+import { loadDossier, type FinancialView } from "@/lib/admin/dossier";
 import {
   CONSENT_KIND_LABELS_FR,
   PROFESSION_LABELS_FR,
@@ -45,6 +45,15 @@ function Meta({ label, value }: { label: string; value: string }) {
       <dd className="text-end text-ink">{value}</dd>
     </div>
   );
+}
+
+/** Attested less than the pack requires. Both figures are numeric(12,2), which
+ *  supabase-js hands back as strings often enough to be worth coercing. */
+function shortfall(financial: FinancialView): boolean {
+  const { montant_atteste_usd: attested, montant_requis_usd: required } =
+    financial;
+  if (attested === null || required === null) return false;
+  return Number(attested) < Number(required);
 }
 
 function Field({ label, value }: { label: string; value: string }) {
@@ -218,6 +227,58 @@ export default async function CandidatureDetailPage({
           )}
 
           {dossier.risk && <RiskScorePanel risk={dossier.risk} />}
+
+          {dossier.financial && (
+            <Section title="Phase 2 — Capacité financière et projet">
+              {/* Required vs. attested, side by side. A shortfall is not a
+                  rejection — an attestation issued in local currency or on a
+                  different day's rate lands short legitimately — so it is
+                  flagged for the reviewer rather than blocked at the form. */}
+              <Field
+                label="Montant requis (pack)"
+                value={
+                  dossier.financial.montant_requis_usd !== null
+                    ? `$${Number(dossier.financial.montant_requis_usd).toLocaleString("fr-FR")}`
+                    : "Aucun montant exigé"
+                }
+              />
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-dim">
+                  Montant attesté (déclaré)
+                </p>
+                <p
+                  className={`text-sm ${
+                    shortfall(dossier.financial) ? "font-semibold text-terracotta" : "text-ink"
+                  }`}
+                >
+                  {dossier.financial.montant_atteste_usd !== null
+                    ? `$${Number(dossier.financial.montant_atteste_usd).toLocaleString("fr-FR")}`
+                    : "—"}
+                  {shortfall(dossier.financial) && " — inférieur au montant requis"}
+                </p>
+              </div>
+              <Field
+                label="Banque émettrice"
+                value={dossier.financial.banque_emettrice ?? "—"}
+              />
+              <Field
+                label="Transmis le"
+                value={new Date(
+                  dossier.financial.submitted_at,
+                ).toLocaleString("fr-FR")}
+              />
+              {dossier.financial.origine_fonds && (
+                <div className="sm:col-span-2">
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-dim">
+                    Origine des fonds (déclaration)
+                  </p>
+                  <p className="whitespace-pre-wrap text-sm text-ink">
+                    {dossier.financial.origine_fonds}
+                  </p>
+                </div>
+              )}
+            </Section>
+          )}
 
           {dossier.documents.length > 0 && (
             <div className="border border-ink-dim/20 bg-white p-6">

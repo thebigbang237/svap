@@ -12,20 +12,6 @@ import {
 import { issueAccessCode } from "@/lib/access-code/issue";
 import type { CandidatureEmailData } from "@/lib/resend/types";
 
-/**
- * Statuses that occupy one of a pack's capped pre-selection slots. A dossier
- * that failed a gate or expired never consumed a place, so it must not count
- * against the cap.
- */
-const OCCUPYING_STATUSES = [
-  "preselectionne",
-  "code_envoye",
-  "phase2_en_cours",
-  "phase2_paye",
-  "verification",
-  "valide",
-];
-
 export async function POST(request: Request) {
   const json = await request.json().catch(() => null);
 
@@ -54,57 +40,21 @@ export async function POST(request: Request) {
 
   const data = parsed.data;
 
-  // Service-role client: the capacity check below has to COUNT rows, and the
-  // anonymous "Anyone can submit a candidature" policy grants INSERT only.
-  // Nothing user-supplied reaches a query filter here beyond the pack enum,
-  // which Zod has already constrained to a known value.
+  // Service-role client: the anonymous "Anyone can submit a candidature"
+  // policy grants INSERT only, and the access-code issue below needs more.
   const supabase = createAdminClient();
 
-  // `head: true` would issue a HEAD request, whose empty body leaves
-  // supabase-js unable to surface any error detail at all — the symptom being
-  // a useless `{ message: '' }` in the logs. `.limit(1)` gets the exact count
-  // from the Content-Range header just the same, over a normal GET that can
-  // actually report what went wrong.
-  const { count, error: countError } = await supabase
-    .from("candidatures")
-    .select("id", { count: "exact" })
-    .eq("pack", data.pack)
-    .in("status", OCCUPYING_STATUSES)
-    .limit(1);
-
-  if (countError) {
-    // Log every field Postgres/PostgREST provides. `message` alone is often
-    // empty; `code`, `details` and `hint` are what identify a missing schema
-    // grant versus a missing table versus a bad key.
-    console.error("Failed to count pre-selections:", {
-      message: countError.message,
-      code: countError.code,
-      details: countError.details,
-      hint: countError.hint,
-    });
-  }
-
-  // Fail OPEN, deliberately.
-  //
-  // The capacity cap is a business lever, not a safety control — exceeding it
-  // slightly costs the programme a few extra pre-selections it can absorb.
-  // Refusing every application because a COUNT query failed takes the entire
-  // free Phase-1 funnel offline, which is far worse. The error above is what
-  // gets it noticed.
-  const occupiedForPack = countError ? 0 : (count ?? 0);
-
-  // The four mechanical gates plus capacity. Everything qualitative — the
-  // three critères de sélection — is deliberately not decided here; it belongs
-  // to the post-verification dossier review. See lib/candidature/preselection.
-  const verdict = evaluatePreselection(
-    {
-      age: data.age,
-      pack: data.pack,
-      casierJudiciaire: data.casierJudiciaire,
-      visaHistorique: data.visaHistorique,
-    },
-    occupiedForPack,
-  );
+  // The mechanical gates. Capacity is not among them — a pack's places are
+  // awarded after verification, not rationed at the door. Everything
+  // qualitative (the three critères de sélection) is likewise not decided
+  // here; it belongs to the post-verification dossier review. See
+  // lib/candidature/preselection.
+  const verdict = evaluatePreselection({
+    age: data.age,
+    pack: data.pack,
+    casierJudiciaire: data.casierJudiciaire,
+    visaHistorique: data.visaHistorique,
+  });
 
   const id = crypto.randomUUID();
   const now = new Date().toISOString();

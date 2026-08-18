@@ -65,7 +65,7 @@ export function CandidatureReviewForm({
     const wording =
       nextStatus === "valide"
         ? `Valider le dossier de ${candidateName} ?\n\nUn email de validation lui sera envoyé immédiatement.`
-        : `Rejeter le dossier de ${candidateName} ?\n\nUn email de rejet lui sera envoyé immédiatement. S'il s'agit d'un motif administratif ou d'éligibilité, pensez à procéder au remboursement.`;
+        : `Rejeter le dossier de ${candidateName} ?\n\nUn email de rejet lui sera envoyé immédiatement. Les frais de vérification ne sont pas remboursables ; un remboursement exceptionnel reste possible depuis le panneau Paiements.`;
 
     // A browser confirm rather than a custom modal: this is the one place in
     // the admin where a mis-click sends an irreversible email to a real

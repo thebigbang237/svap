@@ -7,7 +7,7 @@ import { consentsSchema } from "@/lib/validations/phase2";
 import { CONSENT_KINDS } from "@/lib/constants/program";
 
 /**
- * Étape 5 — consents, and the end of the candidate's part in Phase 2.
+ * The final step — consents, and the end of the candidate's part in Phase 2.
  *
  * Recording consent means recording *when* and *from where*, not just
  * whether — §8's audit obligations are about being able to demonstrate later
@@ -55,6 +55,17 @@ export async function POST(request: Request) {
   if (missing.length > 0) {
     return NextResponse.json(
       { error: "errors.documentsMissing", missing },
+      { status: 409 },
+    );
+  }
+
+  // Packs carrying a capacity requirement cannot finish without it: an
+  // invitation letter rests on that evidence, so a dossier that reached the
+  // consents without it would look complete while missing the part the
+  // consulate cares about.
+  if (progress.steps.includes("capacite") && !progress.hasFinancialDossier) {
+    return NextResponse.json(
+      { error: "errors.capaciteMissing" },
       { status: 409 },
     );
   }

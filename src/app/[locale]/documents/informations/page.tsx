@@ -11,7 +11,7 @@ export default async function Phase2InformationsPage({
   const progress = await guardPhase2Step("informations", locale);
 
   return (
-    <Phase2StepShell step="informations">
+    <Phase2StepShell step="informations" steps={progress.steps}>
       {/* Pre-fills the two names from Phase 1 as a starting point. They are
           asked again because §14 wants them exactly as printed on the
           identity document, which is not always what was typed weeks

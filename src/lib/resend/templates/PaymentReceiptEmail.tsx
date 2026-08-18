@@ -37,8 +37,8 @@ const copy = {
     },
     covers:
       "Ces frais couvrent la vérification d'identité, le contrôle du casier judiciaire, le test d'évaluation du risque de non-retour et le traitement de votre dossier.",
-    refund:
-      "En cas de rejet pour motif administratif ou d'éligibilité, ces frais vous sont intégralement remboursés sur votre moyen de paiement d'origine.",
+    terms:
+      "Ces frais ne sont pas remboursables : ils rémunèrent un travail effectivement réalisé sur votre dossier. Si votre dossier est validé et que le visa américain vous est ensuite refusé, une prime est prévue pour les packs Lauréat, Boursier et VIP Visitor.",
     footer:
       "Silicon Valley Africa Program 2026 — conservez ce reçu. Toute demande de paiement en dehors du site officiel est une tentative de fraude.",
   },
@@ -55,8 +55,8 @@ const copy = {
     },
     covers:
       "This fee covers identity verification, the criminal record check, the non-return risk assessment and the processing of your file.",
-    refund:
-      "If your file is rejected on administrative or eligibility grounds, this fee is refunded in full to your original payment method.",
+    terms:
+      "This fee is not refundable: it pays for work actually carried out on your file. If your file is validated and your US visa is subsequently refused, a premium applies for the Laureate, Scholar and VIP Visitor packs.",
     footer:
       "Silicon Valley Africa Program 2026 — keep this receipt. Any request for payment outside the official site is an attempted fraud.",
   },
@@ -73,8 +73,8 @@ const copy = {
     },
     covers:
       "تغطّي هذه الرسوم التحقّق من الهوية، ومراقبة السجل العدلي، واختبار تقييم خطر عدم العودة، ومعالجة ملفكم.",
-    refund:
-      "في حال رفض ملفكم لأسباب إدارية أو لعدم الأهلية، تُرَدّ إليكم هذه الرسوم كاملة على وسيلة الأداء الأصلية.",
+    terms:
+      "هذه الرسوم غير قابلة للاسترجاع: فهي مقابل عمل يُنجَز فعليًا على ملفكم. وإذا تمت المصادقة على ملفكم ثم رُفضت تأشيرتكم الأمريكية، تُصرف مكافأة لباقات اللاورييه والمتمنّح وVIP Visitor.",
     footer:
       "Silicon Valley Africa Program 2026 — احتفظوا بهذا الإيصال. أي طلب أداء خارج الموقع الرسمي هو محاولة احتيال.",
   },
@@ -155,7 +155,7 @@ export function PaymentReceiptEmail({
 
           <Text style={styles.paragraph}>{t.covers}</Text>
           <Text style={dir === "rtl" ? styles.quoteRtl : styles.quote}>
-            {t.refund}
+            {t.terms}
           </Text>
 
           <Text style={styles.footer}>{t.footer}</Text>

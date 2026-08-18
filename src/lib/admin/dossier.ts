@@ -49,6 +49,14 @@ export interface RiskAssessmentView {
   submitted_at: string;
 }
 
+export interface FinancialView {
+  banque_emettrice: string | null;
+  montant_atteste_usd: number | null;
+  montant_requis_usd: number | null;
+  origine_fonds: string | null;
+  submitted_at: string;
+}
+
 export interface DocumentView {
   id: string;
   kind: string;
@@ -95,6 +103,7 @@ export interface AccessCodeView {
 export interface Dossier {
   application: Phase2ApplicationView | null;
   risk: RiskAssessmentView | null;
+  financial: FinancialView | null;
   documents: DocumentView[];
   payments: PaymentView[];
   consents: ConsentView[];
@@ -105,8 +114,15 @@ export async function loadDossier(
   supabase: AdminClient,
   candidatureId: string,
 ): Promise<Dossier> {
-  const [application, risk, documents, payments, consents, accessCode] =
-    await Promise.all([
+  const [
+    application,
+    risk,
+    financial,
+    documents,
+    payments,
+    consents,
+    accessCode,
+  ] = await Promise.all([
       supabase
         .from("phase2_applications")
         .select(
@@ -119,6 +135,13 @@ export async function loadDossier(
         .select("*")
         .eq("candidature_id", candidatureId)
         .maybeSingle<RiskAssessmentView>(),
+      supabase
+        .from("phase2_financial")
+        .select(
+          "banque_emettrice, montant_atteste_usd, montant_requis_usd, origine_fonds, submitted_at",
+        )
+        .eq("candidature_id", candidatureId)
+        .maybeSingle<FinancialView>(),
       supabase
         .from("phase2_documents")
         .select(
@@ -150,6 +173,7 @@ export async function loadDossier(
   return {
     application: application.data ?? null,
     risk: risk.data ?? null,
+    financial: financial.data ?? null,
     documents: documents.data ?? [],
     payments: payments.data ?? [],
     consents: consents.data ?? [],

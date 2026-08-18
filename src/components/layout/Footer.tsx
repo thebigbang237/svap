@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { GlobeIcon, MailIcon } from "@/components/marketing/icons";
@@ -12,6 +13,7 @@ export function Footer() {
     { href: "/packs", label: tNav("packs") },
     { href: "/agenda", label: tNav("agenda") },
     { href: "/delegues", label: tNav("delegues") },
+    { href: "/actualites", label: tNav("actualites") },
   ];
 
   const resources = [
@@ -26,16 +28,26 @@ export function Footer() {
     { href: "/legal/mentions-legales", label: t("legal") },
     { href: "/legal/confidentialite", label: t("privacyLink") },
     { href: "/legal/conditions-generales", label: t("terms") },
-    { href: "/legal/remboursement", label: t("refund") },
+    { href: "/legal/primes", label: t("primes") },
   ];
 
   return (
     <footer className="w-full bg-ink py-16 text-sky md:py-24">
       <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-12 px-8 md:grid-cols-12">
         <div className="md:col-span-5">
-          <div className="mb-6 font-serif text-2xl font-normal text-white">
-            {t("brand")}
-          </div>
+          {/* Rendered as a white silhouette. The supplied mark is dark navy on
+              transparent, which is all but invisible on `bg-ink` (#1A2A3A) —
+              `brightness-0 invert` flattens it to solid white rather than
+              leaving the wordmark unreadable. Swap this for a light version of
+              the logo, and drop the filter, as soon as one exists: the filter
+              also flattens the terracotta sun and continent. */}
+          <Image
+            src="/logo_svap_h.png"
+            alt={t("brand")}
+            width={144}
+            height={48}
+            className="mb-6 h-11 w-auto brightness-0 invert"
+          />
           <p className="mb-6 max-w-sm text-sm text-sky-deep/70">
             {t("description")}
           </p>

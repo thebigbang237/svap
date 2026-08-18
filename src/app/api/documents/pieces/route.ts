@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { readSession } from "@/lib/access-code/session";
 import { loadPhase2Progress } from "@/lib/phase2/steps";
-import { DOCUMENT_KINDS, type DocumentKind } from "@/lib/constants/program";
+import {
+  IDENTITY_DOCUMENT_KINDS,
+  DOCUMENT_KINDS,
+  financialRequirement,
+  type DocumentKind,
+} from "@/lib/constants/program";
 import {
   MAX_UPLOAD_BYTES,
   STORAGE_BUCKET,
@@ -54,6 +59,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "errors.noFile" }, { status: 400 });
   }
   if (!(DOCUMENT_KINDS as readonly string[]).includes(kind)) {
+    return NextResponse.json({ error: "errors.invalidKind" }, { status: 400 });
+  }
+
+  // Étape 5 pieces are pack-specific, so a kind this candidate's pack never
+  // asks for is refused rather than stored: an unexpected document in a
+  // dossier is one a reviewer has to account for, and it would sit in the
+  // private bucket under the same 12-month retention as everything else.
+  const isIdentityKind = (IDENTITY_DOCUMENT_KINDS as readonly string[]).includes(
+    kind,
+  );
+  const packAsksFor = financialRequirement(
+    progress.candidature.pack,
+  )?.documents.some((doc) => doc.kind === kind);
+
+  if (!isIdentityKind && !packAsksFor) {
     return NextResponse.json({ error: "errors.invalidKind" }, { status: 400 });
   }
   if (file.size === 0 || file.size > MAX_UPLOAD_BYTES) {

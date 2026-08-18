@@ -69,6 +69,20 @@ export interface CandidatureRow {
   payment_reference: string | null;
 }
 
+/** A press item on /actualites. Published elsewhere — see migration 0016. */
+export interface ArticleRow {
+  id: string;
+  media_name: string;
+  title: string;
+  caption: string | null;
+  url: string;
+  thumbnail_path: string | null;
+  published_at: string;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AdminProfileRow {
   id: string;
   full_name: string | null;
