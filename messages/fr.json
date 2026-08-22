@@ -848,7 +848,8 @@
       "timeout": {
         "title": "Confirmation non reçue",
         "description": "Nous n'avons pas encore reçu la confirmation de votre opérateur. Si vous avez validé le paiement sur votre téléphone, il sera pris en compte automatiquement — actualisez cette page dans quelques minutes. Ne recommencez pas le paiement sans avoir vérifié.",
-        "refresh": "Actualiser la page"
+        "refresh": "Actualiser la page",
+        "retry": "Reprendre le paiement"
       },
       "errors": {
         "server": "Une erreur est survenue. Veuillez réessayer.",

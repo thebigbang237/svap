@@ -10,7 +10,11 @@ import type { Country } from "@/lib/constants/program";
  * is a registry entry rather than a refactor.
  */
 
-export type PaymentProviderId = "pawapay" | "stripe" | "flutterwave";
+export type PaymentProviderId =
+  | "pawapay"
+  | "stripe"
+  | "paiementpro"
+  | "flutterwave";
 export type PaymentMethod = "mobile_money" | "card";
 
 export type PaymentStatus =
@@ -53,9 +57,22 @@ export interface CheckoutInput {
    */
   operator?: string;
   email: string;
+  /**
+   * Name and phone as given in Phase 1. Some hosted gateways require the payer's
+   * identity in the initiation payload rather than collecting it themselves —
+   * Paiement Pro rejects an initiation without them.
+   */
+  customer?: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+  };
   locale: string;
   /** Where the provider returns the payer after a hosted flow. */
   returnUrl: string;
+  /** Server-to-server callback URL, for gateways configured per payment
+   *  rather than per account. */
+  notificationUrl?: string;
   description: string;
 }
 
@@ -122,13 +139,30 @@ export interface PaymentProvider {
   verifyWebhook(rawBody: string, request: Request): Promise<WebhookEvent | null>;
 
   /**
+   * Set when the provider's callback carries no verifiable signature.
+   *
+   * The webhook route then treats the callback purely as a trigger and
+   * re-derives the status from `getStatus`, so a forged notification can do no
+   * more than make us re-read the truth.
+   */
+  readonly confirmsViaStatus?: boolean;
+
+  /**
    * Authoritative status straight from the provider.
    *
    * The fallback whenever a webhook is late or lost, and the only way an
    * asynchronous mobile-money collection resolves in the UI. Never trust the
    * browser's return from a hosted page for this.
+   *
+   * `expectedAmount` is the figure we recorded at checkout. Providers that
+   * cannot sign their callbacks compare it against what the gateway reports
+   * and refuse to settle on a mismatch — for them it is the substitute for a
+   * signature. Providers with real signatures ignore it.
    */
-  getStatus(providerRef: string): Promise<{
+  getStatus(
+    providerRef: string,
+    expectedAmount?: number,
+  ): Promise<{
     status: PaymentStatus;
     failureReason?: string;
   }>;

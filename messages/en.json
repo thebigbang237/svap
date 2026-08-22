@@ -848,7 +848,8 @@
       "timeout": {
         "title": "No confirmation yet",
         "description": "We haven't received confirmation from your operator yet. If you approved the payment on your phone, it will be picked up automatically — refresh this page in a few minutes. Don't start a new payment without checking first.",
-        "refresh": "Refresh the page"
+        "refresh": "Refresh the page",
+        "retry": "Start the payment again"
       },
       "errors": {
         "server": "Something went wrong. Please try again.",

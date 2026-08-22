@@ -4,7 +4,12 @@ import { providerById } from "@/lib/payments/registry";
 import { applyWebhookEvent, settlePayment } from "@/lib/payments/record";
 import type { PaymentProviderId } from "@/lib/payments/types";
 
-const KNOWN: PaymentProviderId[] = ["pawapay", "stripe", "flutterwave"];
+const KNOWN: PaymentProviderId[] = [
+  "pawapay",
+  "stripe",
+  "paiementpro",
+  "flutterwave",
+];
 
 /**
  * Payment webhooks — the ONLY thing that may mark a fee as settled.
@@ -60,6 +65,36 @@ export async function POST(
   }
 
   const supabase = createAdminClient();
+
+  // Rule 2b — for providers whose callbacks cannot be authenticated, the
+  // callback is only a nudge. The status is re-derived from the provider's own
+  // API with the amount we recorded cross-checked against what the gateway
+  // reports, so a forged notification achieves nothing but a redundant lookup.
+  if (provider.confirmsViaStatus && event.providerRef) {
+    const { data: payment } = await supabase
+      .from("payments")
+      .select("amount_local")
+      .eq("provider", provider.id)
+      .eq("provider_ref", event.providerRef)
+      .maybeSingle<{ amount_local: number }>();
+
+    if (!payment) {
+      // Nothing to confirm against. Acknowledged so the provider stops
+      // retrying a reference we have never issued.
+      console.warn(
+        `Unverifiable callback for unknown ${provider.id} reference ${event.providerRef}`,
+      );
+      return NextResponse.json({ received: true, applied: false });
+    }
+
+    const live = await provider.getStatus(event.providerRef, payment.amount_local);
+    event = {
+      ...event,
+      status: live.status,
+      failureReason: live.failureReason,
+      eventId: `${event.providerRef}:${live.status}`,
+    };
+  }
 
   // Rule 3 — exactly once.
   const result = await applyWebhookEvent(supabase, provider.id, event);

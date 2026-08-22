@@ -95,6 +95,44 @@ export async function markPaymentFailed(
   }
 }
 
+/** How long a started payment stays resumable. See below. */
+const RESUMABLE_WINDOW_MINUTES = 30;
+
+/**
+ * The payment this candidate has in flight, if any.
+ *
+ * What it protects against: a candidate returning from a hosted card page
+ * lands back on the payment step, but settlement arrives out of band and is
+ * usually a beat behind them. Rendering the form again — with a working Pay
+ * button — moments after they paid is the shortest route to a double charge in
+ * the whole funnel. Finding the pending payment lets the page resume waiting
+ * on it instead.
+ *
+ * Bounded to 30 minutes so an attempt abandoned yesterday doesn't strand
+ * someone in a waiting state, and so a genuinely dead payment eventually
+ * frees the form again.
+ */
+export async function findResumablePayment(
+  supabase: AdminClient,
+  candidatureId: string,
+): Promise<{ id: string } | null> {
+  const since = new Date(
+    Date.now() - RESUMABLE_WINDOW_MINUTES * 60_000,
+  ).toISOString();
+
+  const { data } = await supabase
+    .from("payments")
+    .select("id")
+    .eq("candidature_id", candidatureId)
+    .in("status", ["en_attente", "en_cours"])
+    .gt("created_at", since)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle<{ id: string }>();
+
+  return data ?? null;
+}
+
 export type ApplyResult =
   | { applied: true; payment: PaymentRow; becamePaid: boolean }
   | { applied: false; reason: "duplicate" | "unknown_payment" | "error" };

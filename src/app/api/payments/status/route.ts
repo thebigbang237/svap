@@ -53,7 +53,12 @@ export async function GET(request: Request) {
   }
 
   try {
-    const live = await provider.getStatus(payment.provider_ref);
+    // The recorded amount goes with it: providers that cannot sign their
+    // callbacks use it to confirm the gateway charged what we asked for.
+    const live = await provider.getStatus(
+      payment.provider_ref,
+      payment.amount_local,
+    );
 
     if (live.status !== payment.status) {
       const becamePaid = live.status === "paye";

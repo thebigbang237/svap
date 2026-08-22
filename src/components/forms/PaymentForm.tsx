@@ -63,6 +63,7 @@ export function PaymentForm({
   amountUsd,
   amountLocal,
   currency,
+  resumePaymentId = null,
 }: {
   methods: PaymentMethod[];
   defaultPhone: string;
@@ -70,6 +71,13 @@ export function PaymentForm({
   /** Local-currency equivalent, null where the country is card-only. */
   amountLocal: number | null;
   currency: string | null;
+  /**
+   * A payment already in flight for this dossier, if any. Set when the
+   * candidate arrives back from a hosted card page, or reloads while a mobile
+   * money prompt is still outstanding — the form resumes waiting on it instead
+   * of offering to charge them a second time.
+   */
+  resumePaymentId?: string | null;
 }) {
   const t = useTranslations("phase2.paiement");
   const locale = useLocale();
@@ -77,7 +85,9 @@ export function PaymentForm({
 
   const [method, setMethod] = useState<PaymentMethod>(methods[0]);
   const [phone, setPhone] = useState(defaultPhone);
-  const [phase, setPhase] = useState<Phase>("choose");
+  const [phase, setPhase] = useState<Phase>(
+    resumePaymentId ? "waiting" : "choose",
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [charged, setCharged] = useState<{ amount: number; currency: string } | null>(null);
@@ -154,6 +164,7 @@ export function PaymentForm({
   }, [phone, operator, operators]);
 
   const timers = useRef<{ poll?: number; timeout?: number }>({});
+  const resumed = useRef(false);
 
   const clearTimers = useCallback(() => {
     if (timers.current.poll) window.clearInterval(timers.current.poll);
@@ -196,6 +207,15 @@ export function PaymentForm({
     },
     [clearTimers, router],
   );
+
+  // Pick up an in-flight payment on mount — declared after startPolling so it
+  // can call it. Guarded with a ref rather than an empty dependency list so
+  // React's development double-invoke doesn't start two loops on one payment.
+  useEffect(() => {
+    if (!resumePaymentId || resumed.current) return;
+    resumed.current = true;
+    startPolling(resumePaymentId);
+  }, [resumePaymentId, startPolling]);
 
   async function startCheckout() {
     setBusy(true);
@@ -357,9 +377,25 @@ export function PaymentForm({
               a double charge. */}
           <p className="text-ink">{t("timeout.description")}</p>
         </div>
-        <CTAButton variant="secondary" onClick={() => window.location.reload()}>
-          {t("timeout.refresh")}
-        </CTAButton>
+        <div className="flex flex-wrap items-center gap-4">
+          <CTAButton variant="secondary" onClick={() => window.location.reload()}>
+            {t("timeout.refresh")}
+          </CTAButton>
+          {/* The way out. Without it a resumed wait that never resolves —
+              an abandoned card redirect, a prompt the payer ignored — leaves
+              the candidate on a dead screen with no way back to the form. */}
+          <button
+            type="button"
+            onClick={() => {
+              clearTimers();
+              setError(null);
+              setPhase("choose");
+            }}
+            className="text-xs font-semibold uppercase tracking-[0.2em] text-blue transition-colors hover:text-terracotta"
+          >
+            {t("timeout.retry")}
+          </button>
+        </div>
       </div>
     );
   }

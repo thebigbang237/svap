@@ -592,9 +592,9 @@ You are testing on `https://svap-zeta.vercel.app`. Here is the order to move to
 
 - Your staging database will be full of test candidatures, fake passport
   numbers and sandbox payments. Launching on top of that means real applicants
-  share a table with junk, and the pre-selection **capacity caps count test
-  rows** — 24 test Lauréat applications would close the pack before a single
-  real one arrived.
+  share a table with junk, and every count the final selection is drawn from —
+  how many verified Lauréat dossiers exist, how many seats remain — is
+  computed over that junk.
 - Sandbox payment references would sit alongside live ones in the same
   `payments` table, making reconciliation guesswork.
 - A staging service-role key leaking is then an embarrassment, not a breach of
@@ -644,8 +644,42 @@ Vercel. Preview keeps pointing at staging.
   secret. Test-mode and live-mode endpoints are separate objects with separate
   secrets.
 - **pawaPay:** switch to the live environment, set all four callback URLs to
-  `https://siliconvalleyafricaprogram.com/api/payments/webhooks/pawapay`,
-  generate the live API token and webhook secret.
+  `https://siliconvalleyafricaprogram.com/api/payments/webhooks/pawapay`, and
+  generate the live API token. There is **no webhook secret** — callbacks are
+  signed with RFC-9421 and verified against pawaPay's public key, fetched with
+  the API token. What you must do instead is switch **Signed callbacks** on for
+  the live account (Settings → Signatures); the setting does not carry over
+  from sandbox, and unsigned callbacks are refused. Confirm with:
+
+  ```bash
+  curl -s -H "Authorization: Bearer $PAWAPAY_API_TOKEN" \
+    "https://api.pawapay.io/v2/active-conf?country=CMR&operationType=DEPOSIT" \
+    | grep -o '"signedCallbacks":[a-z]*'
+  # want: "signedCallbacks":true
+  ```
+
+**5b — GitHub Actions secrets** *(easy to forget, and it fails quietly)*
+
+Both cron drivers live in `.github/workflows/` and read repository secrets,
+not Vercel environment variables. Update **both**:
+
+| Secret | New value |
+|---|---|
+| `SITE_URL` | `https://siliconvalleyafricaprogram.com` |
+| `CRON_SECRET` | The **new** production value from step 4 |
+
+Getting `CRON_SECRET` wrong is loud — the endpoint 404s and the workflow turns
+red. Getting `SITE_URL` wrong is the dangerous one: if the old
+`svap-zeta.vercel.app` alias is still attached, the crons keep running happily
+against **staging**, so production access codes stop going out and production
+payments stop reconciling while every run stays green.
+
+**5c — Vercel Deployment Protection**
+
+Settings → Deployment Protection. If it is on for production, Stripe, pawaPay
+and GitHub Actions all hit an authentication wall instead of the app —
+webhooks fail, payments never settle by callback, and cron runs go red. Either
+leave it off for production, or add a protection bypass for `/api/*`.
 
 **6 — Supabase Auth**
 Authentication → URL Configuration → Site URL
@@ -665,6 +699,39 @@ Then, on the live domain:
 - Make one real low-value payment (a $20 Lauréat fee) with a real card, confirm
   the receipt, then **refund it from the admin** to confirm that path works
   before you need it under pressure.
+
+### Content that does NOT migrate with the code
+
+A fresh production Supabase project starts empty, and two things live only in
+the database:
+
+- **Press articles** (`svap.articles`). Any article added on staging has to be
+  re-entered in `/admin/articles` on production. The thumbnails are served
+  from `NEXT_PUBLIC_SUPABASE_URL`, so old rows would point at the staging
+  project's bucket even if you copied them across.
+- **Admin accounts** (`svap.admin_profiles`). Seed at least one super_admin on
+  the new project, or nobody can log in — see §1.
+
+Confirm migrations `0015` (Phase-2 capacity dossier) and `0016` (articles and
+the public `svap-articles` bucket) ran; both are recent, and a project created
+from an older snapshot will be missing them. Symptoms: Business/VIP candidates
+stuck on the capacity step, `/actualites` permanently empty.
+
+### One content decision before you announce
+
+`APPLICATION_DEADLINE` and `EVENT_START` / `EVENT_END` in
+`src/lib/constants/program.ts` are set to **2027** — the client gave the days
+and months (18 January, 18–23 March) without a year, and 2026 is already past.
+The countdown widget is on every public page, so a wrong year is visible
+site-wide. Confirm it before launch; it is a one-line change.
+
+### The old domain
+
+`svap-zeta.vercel.app` stays live and indexable after you attach the real
+domain — it is the project's production alias, not a preview URL, so Vercel
+does not add `noindex` to it. Two sites with identical content compete in
+search and split their ranking. Either remove the alias in Vercel → Domains
+once DNS has settled, or point it at the real domain with a redirect.
 
 ### After launch, before announcing
 

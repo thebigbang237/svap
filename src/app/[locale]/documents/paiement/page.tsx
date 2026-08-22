@@ -1,5 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { guardPhase2Step } from "@/lib/phase2/guard";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { findResumablePayment } from "@/lib/payments/record";
 import { Phase2StepShell } from "@/components/forms/Phase2StepShell";
 import { PaymentForm } from "@/components/forms/PaymentForm";
 import { Ltr } from "@/components/layout/Ltr";
@@ -26,6 +28,13 @@ export default async function Phase2PaiementPage({
   const t = await getTranslations("phase2.paiement");
   const pack = progress.candidature.pack as Pack;
   const spec = PACK_SPECS[pack];
+
+  // A payment already in flight — what a candidate returning from a hosted
+  // card page lands on. See findResumablePayment.
+  const inFlight = await findResumablePayment(
+    createAdminClient(),
+    progress.candidature.id,
+  );
 
   // `pays` is typed as string on the row because 0005's country CHECK was
   // added NOT VALID — a legacy row can hold a dropped country. Fall back to
@@ -114,6 +123,7 @@ export default async function Phase2PaiementPage({
             amountUsd={spec.verificationFeeUsd}
             amountLocal={localAmount?.amountLocal ?? null}
             currency={localAmount?.currency ?? null}
+            resumePaymentId={inFlight?.id ?? null}
           />
         </div>
       </div>

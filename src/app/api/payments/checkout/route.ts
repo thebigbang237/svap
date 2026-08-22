@@ -210,8 +210,17 @@ export async function POST(request: Request) {
       phone: msisdn,
       operator: parsed.data.operator,
       email: progress.candidature.email,
+      // Hosted card gateways that don't collect the payer's identity
+      // themselves take it from here. Phase-1 values, which is what the
+      // dossier is keyed on.
+      customer: {
+        firstName: progress.candidature.prenom,
+        lastName: progress.candidature.nom,
+        phone: progress.candidature.telephone ?? "",
+      },
       locale: progress.candidature.locale,
       returnUrl,
+      notificationUrl: `${siteUrl}/api/payments/webhooks/${provider.id}`,
       description: `SVAP 2026 verification`,
     });
 
