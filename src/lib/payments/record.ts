@@ -64,7 +64,19 @@ export async function createPaymentRecord(
     .single<PaymentRow>();
 
   if (error) {
-    console.error("Failed to create payment record:", error.message);
+    // Every field Postgres gives back, not just `message` — which is often
+    // empty. `code` 23514 is a check-constraint violation, and the one that
+    // bites here is `payments_provider_check`: adding a payment adapter
+    // without extending that list fails at the INSERT, before the candidate
+    // ever reaches the gateway, and reads as an unexplained 500.
+    console.error("Failed to create payment record:", {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      provider: input.provider,
+      method: input.method,
+    });
     return null;
   }
   return data;

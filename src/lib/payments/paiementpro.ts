@@ -43,6 +43,28 @@ const INIT_URL =
   "https://paiementpro.net/webservice/onlinepayment/js/initialize/initialize.php";
 const STATUS_URL = "https://api.paiementpro.net/status";
 
+/**
+ * Observed behaviour of `initialize.php`, probed 2026-08-22 — none of it is
+ * documented, and it cost an afternoon to establish, so it is written down.
+ *
+ *   • A JSON body IS parsed correctly. An incomplete payload returns HTTP 200
+ *     with `{"error":"Veuillez renseigner les champs obligatoire",
+ *     "success":false}`, which proves the request reached their validator.
+ *   • A COMPLETE payload returns HTTP 500 with an EMPTY body. Bisecting the
+ *     fields shows the flip happens on `customerPhoneNumber` — i.e. on the
+ *     first payload that passes validation. Their code validates, then crashes.
+ *   • Reproducible with an unknown merchant id, on both `paiementpro.net` and
+ *     `www.paiementpro.net`, with and without browser Origin/Referer/UA
+ *     headers, and for currency codes 840, 952 and 950. It is therefore their
+ *     endpoint, not our payload, our account, or our currency.
+ *   • `api.paiementpro.net/status/{ref}` was up and correct throughout, so the
+ *     outage is scoped to initiation.
+ *
+ * Until they fix it, card payments through this provider cannot be initiated at
+ * all. `createCheckout` surfaces that as a 502 with their response logged,
+ * rather than anything that looks like the candidate's fault.
+ */
+
 /** Their `channel` for international cards. The rest of their codes are
  *  mobile money in markets pawaPay already covers better. */
 const CARD_CHANNEL = "CARD";

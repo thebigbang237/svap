@@ -197,6 +197,12 @@ export async function POST(request: Request) {
     : null;
 
   if (reference && !payment) {
+    // Nothing has been initiated yet, so no money is at risk — but the
+    // candidate cannot proceed either. createPaymentRecord has already logged
+    // the Postgres error with its code; check there first.
+    console.error(
+      `Could not record a ${provider.id} payment before initiation — checkout aborted.`,
+    );
     return NextResponse.json({ error: "errors.server" }, { status: 500 });
   }
 
