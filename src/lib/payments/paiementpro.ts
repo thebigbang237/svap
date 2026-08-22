@@ -1,5 +1,5 @@
 import "server-only";
-import { randomUUID } from "node:crypto";
+import { randomBytes } from "node:crypto";
 import type { Country } from "@/lib/constants/program";
 import {
   PaymentConfigError,
@@ -59,6 +59,11 @@ const STATUS_URL = "https://api.paiementpro.net/status";
  *     endpoint, not our payload, our account, or our currency.
  *   • `api.paiementpro.net/status/{ref}` was up and correct throughout, so the
  *     outage is scoped to initiation.
+ *   • A WORKING third-party integration's exact payload — currency as an int,
+ *     a 24-hex reference, `customerLastname: " "`, a 9-digit local phone,
+ *     axios' headers, the `www.` host — fails identically. So the difference
+ *     is time, not payload: their endpoint has broken since that integration
+ *     was built.
  *
  * Until they fix it, card payments through this provider cannot be initiated at
  * all. `createCheckout` surfaces that as a 502 with their response logged,
@@ -180,13 +185,18 @@ export const paiementproProvider: PaymentProvider = {
   },
 
   /**
-   * 32 hex characters, no dashes. Their own example reference is a short
-   * numeric string, so the field's real limit is unknown — a UUID stripped of
-   * dashes is the shortest form that is still unguessable, which matters
-   * because the status endpoint needs no authentication.
+   * 24 hex characters.
+   *
+   * Matched to a working third-party integration, which uses a Mongo ObjectId
+   * as the reference — the only format known to have been accepted end to end.
+   * Their own documented example is a short numeric string and the field's real
+   * limit is undocumented, so copying a shape that demonstrably works beats
+   * guessing. 96 bits is still far beyond enumeration, which matters because
+   * their status endpoint requires no authentication and the reference is the
+   * only thing guarding it.
    */
   newReference() {
-    return randomUUID().replace(/-/g, "");
+    return randomBytes(12).toString("hex");
   },
 
   async createCheckout(input: CheckoutInput): Promise<CheckoutResult> {

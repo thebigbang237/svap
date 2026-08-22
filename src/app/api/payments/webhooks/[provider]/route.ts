@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { providerById } from "@/lib/payments/registry";
 import { applyWebhookEvent, settlePayment } from "@/lib/payments/record";
 import type { PaymentProviderId } from "@/lib/payments/types";
+import { routing } from "@/i18n/routing";
 
 const KNOWN: PaymentProviderId[] = [
   "pawapay",
@@ -25,6 +26,46 @@ const KNOWN: PaymentProviderId[] = [
  *     unique index rather than by hoping deliveries don't repeat.
  */
 export async function POST(
+  request: Request,
+  context: { params: Promise<{ provider: string }> },
+) {
+  return handle(request, context);
+}
+
+/**
+ * Some gateways notify over GET.
+ *
+ * Paiement Pro is one: it appends `referenceNumber` and `responsecode` to the
+ * notification URL as query parameters rather than POSTing a body — visible in
+ * a working third-party integration, and in nothing they document. A POST-only
+ * route answers 405 and the notification is lost silently.
+ *
+ * Providers that sign their callbacks are unaffected: a GET carries no
+ * signature, so `verifyWebhook` rejects it exactly as it would any other
+ * unsigned request.
+ */
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ provider: string }> },
+) {
+  const response = await handle(request, context);
+
+  // If a *browser* followed this URL — the gateway redirecting the payer
+  // rather than calling us server-to-server — send them somewhere that makes
+  // sense instead of a page of JSON. The payment step picks up the in-flight
+  // payment and polls it to a conclusion.
+  if (request.headers.get("accept")?.includes("text/html")) {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+    return NextResponse.redirect(
+      `${siteUrl}/${routing.defaultLocale}/documents/paiement`,
+      303,
+    );
+  }
+
+  return response;
+}
+
+async function handle(
   request: Request,
   { params }: { params: Promise<{ provider: string }> },
 ) {
