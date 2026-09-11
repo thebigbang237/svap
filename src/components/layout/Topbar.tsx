@@ -60,7 +60,7 @@ export function Topbar() {
               only fix the 3:1 ratio and give next/image its srcset target. */}
           <Link href="/" className="shrink-0">
             <Image
-              src="/logo_svap_h.png"
+              src="/logo_svap_h_2.png"
               alt={t("brand")}
               width={144}
               height={48}

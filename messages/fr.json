@@ -216,7 +216,11 @@
     "freeNotice": "Le dépôt de candidature est entièrement gratuit pour tous les packs. Les frais de vérification ne sont dus qu'en Phase 2, après pré-sélection et réception de votre code d'accès.",
     "placesNotice": "Aucun pack ne ferme ses candidatures. Le nombre de places affiché correspond au nombre de participants retenus à l'issue des vérifications : tous les dossiers éligibles sont examinés, et la sélection finale intervient une fois les vérifications terminées.",
     "feePrefix": "Frais de vérification",
-    "feeSuffix": "uniquement si pré-sélectionné"
+    "feeSuffix": "uniquement si pré-sélectionné",
+    "carousel": {
+      "previous": "Packs précédents",
+      "next": "Packs suivants"
+    }
   },
   "agenda": {
     "eyebrow": "Programme détaillé",
@@ -589,7 +593,9 @@
     "success": {
       "title": "Candidature reçue.",
       "description": "Merci. Votre candidature a passé la présélection automatique et votre code d'accès unique vient de vous être envoyé par email. Il reste valable 14 jours — vous pouvez enchaîner sur la Phase 2 dès maintenant.",
-      "ctaLabel": "Retour à l'accueil"
+      "ctaLabel": "Retour à l'accueil",
+      "spamNotice": "L'email n'est pas arrivé ? Regardez dans vos courriers indésirables (spam) : c'est là qu'il atterrit le plus souvent. Pensez à marquer le message comme « non indésirable » pour recevoir les suivants normalement.",
+      "spamPending": "L'envoi de votre code n'a pas pu aboutir à l'instant. Il part automatiquement d'ici quelques minutes — surveillez votre boîte, y compris vos courriers indésirables (spam). Vous pouvez aussi en demander un nouveau depuis « Obtenir mes documents »."
     },
     "nonEligible": {
       "eyebrow": "Candidature non retenue",
@@ -1090,7 +1096,8 @@
         "documents": "En cas de validation : lettre d'invitation, lettre de confirmation à l'ambassade et accompagnement visa transmis par email."
       },
       "noAction": "Aucune action n'est requise de votre part. Toute communication concernant votre dossier passera par l'adresse email de votre candidature — jamais par téléphone ni par les réseaux sociaux.",
-      "ctaLabel": "Retour à l'accueil"
+      "ctaLabel": "Retour à l'accueil",
+      "spamNotice": "Toutes nos communications passent par l'adresse email de votre candidature, et nos messages atterrissent parfois dans les courriers indésirables (spam). Vérifiez ce dossier régulièrement et ajoutez notre adresse d'expédition à vos contacts pour ne rien manquer."
     },
     "incompleteHint": "Complétez tous les champs de cette étape pour continuer."
   },
@@ -1152,7 +1159,7 @@
       },
       {
         "q": "Que se passe-t-il si mon visa américain est refusé ?",
-        "a": "Si votre dossier a été validé à l'issue de nos vérifications et que le visa vous est ensuite refusé, une prime vous est versée : 1 000 USD pour les Lauréats, 500 USD pour les Boursiers et 4 500 USD pour les VIP Visitor. Le versement est soumis à la vérification documentaire du refus officiel délivré par les autorités consulaires américaines et à un audit interne, avec un délai de 60 jours après réception du document. Le pack Business Visitor ne comporte pas de prime."
+        "a": "L'ambassade est seule décisionnaire : le programme ne délivre pas de visa, il vous sélectionne, vous accompagne et soutient votre dossier. Si le visa vous est refusé après validation de votre dossier, une prime de garantie et de soutien vous est versée sur le compte bancaire que vous fournissez — 1 000 USD pour les Lauréats, 500 USD pour les Boursiers. Pour les VIP Visitor, 4 500 USD des 7 000 USD de contribution de sponsoring vous sont restitués ; les 2 500 USD conservés financent les Boursiers et les Lauréats, et vous êtes automatiquement sélectionné lors d'une prochaine édition. Le versement est soumis à la vérification documentaire du refus officiel et à un audit interne, sous 60 jours."
       },
       {
         "q": "Quelle est la différence entre les packs ?",
@@ -1277,7 +1284,7 @@
       }
     ],
     "refundTitle": "Frais et primes : ce qui est dû, ce qui est versé",
-    "refundLead": "Les frais de vérification ne sont pas remboursables : ils rémunèrent un travail réalisé sur votre dossier. Ce que le programme s'engage à verser, c'est une prime en cas de refus de visa après validation.",
+    "refundLead": "Les frais de vérification ne sont pas remboursables : ils rémunèrent un travail réalisé sur votre dossier. Ce que le programme s'engage à verser, c'est une prime de garantie et de soutien si l'ambassade refuse le visa après validation de votre dossier.",
     "refundRows": [
       [
         "Non pré-sélectionné (Phase 1)",
@@ -1297,15 +1304,15 @@
       ],
       [
         "Refus de visa — Lauréat",
-        "Prime de 1 000 USD, sous vérification documentaire et audit interne. Versement sous 60 jours."
+        "Prime de garantie de 1 000 USD sur le compte bancaire fourni, sous vérification documentaire et audit interne. Versement sous 60 jours."
       ],
       [
         "Refus de visa — Boursier",
-        "Prime de 500 USD, sous vérification documentaire et audit interne. Versement sous 60 jours."
+        "Prime de garantie de 500 USD sur le compte bancaire fourni, sous vérification documentaire et audit interne. Versement sous 60 jours."
       ],
       [
         "Refus de visa — VIP Visitor",
-        "Prime de 4 500 USD, sous vérification documentaire et audit interne. Versement sous 60 jours."
+        "4 500 USD restitués sur les 7 000 USD de sponsoring ; 2 500 USD conservés pour financer les Boursiers et Lauréats. Sélection automatique lors d'une prochaine édition."
       ],
       [
         "Refus de visa — Business Visitor et Délégué",
@@ -1318,8 +1325,7 @@
   },
   "legal": {
     "eyebrow": "Informations légales",
-    "lastUpdated": "Dernière mise à jour : août 2026",
-    "pendingCounsel": "⚠️ Section à compléter par le conseil juridique de First Of All LLC avant la mise en ligne publique. Le texte définitif doit être validé pour chacune des six juridictions concernées.",
+    "lastUpdated": "Dernière mise à jour : septembre 2026",
     "seeAlso": "Voir aussi",
     "titles": {
       "mentions-legales": "Mentions légales",
@@ -1351,8 +1357,7 @@
         },
         {
           "title": "Hébergement",
-          "pending": true,
-          "body": "Nom, raison sociale, adresse et téléphone de l'hébergeur du site et de la base de données."
+          "body": "Le site et son interface d'administration sont hébergés par Vercel Inc. (États-Unis). La base de données, les pièces justificatives transmises par les candidats et les sauvegardes sont hébergées par Supabase Inc. (États-Unis). Les emails transactionnels sont acheminés par Resend. Les paiements sont traités par pawaPay (Mobile Money) et Paiement Pro (carte bancaire), qui exploitent leurs propres infrastructures."
         },
         {
           "title": "Contact",
@@ -1421,6 +1426,18 @@
           "body": "Vous disposez d'un droit d'accès, de rectification et de suppression de vos données, ainsi que d'un droit d'opposition et de portabilité. Ces demandes sont à adresser au DPO. Une vérification d'identité peut être requise avant tout traitement de la demande."
         },
         {
+          "title": "Sous-traitants et destinataires des données",
+          "body": "Vos données ne sont ni vendues ni cédées. Elles sont traitées par les prestataires suivants, chacun pour une finalité déterminée et dans la limite de ce qui lui est nécessaire :",
+          "items": [
+            "Vercel Inc. — hébergement du site et de l'interface d'administration.",
+            "Supabase Inc. — base de données, stockage des pièces justificatives et sauvegardes.",
+            "Resend — envoi des emails transactionnels (accusé de réception, code d'accès, reçu de paiement, décision).",
+            "pawaPay — traitement des paiements par Mobile Money.",
+            "Paiement Pro — traitement des paiements par carte bancaire.",
+            "Prestataire partenaire local — vérification du casier judiciaire, lorsque cette vérification est réalisée."
+          ]
+        },
+        {
           "title": "Transferts internationaux et base légale",
           "pending": true,
           "body": "Base légale du traitement, encadrement des transferts de données hors du pays de résidence du candidat, et liste des sous-traitants agréés (prestataires de paiement, services de vérification, hébergeur)."
@@ -1471,7 +1488,7 @@
         },
         {
           "title": "Contribution de sponsoring VIP Visitor",
-          "body": "La contribution de sponsoring de 7 000 USD applicable au pack VIP Visitor n'est due qu'après validation du dossier consécutive à la vérification. Elle est organisée directement avec l'administration du programme et ne se règle jamais sur ce site."
+          "body": "La contribution de sponsoring de 7 000 USD applicable au pack VIP Visitor n'est due qu'après validation du dossier consécutive à la vérification. Elle est organisée directement avec l'administration du programme et ne se règle jamais sur ce site. En cas de refus de visa après validation, 4 500 USD sont restitués au candidat et 2 500 USD restent acquis au programme au titre du mécénat, affectés au financement des packs Lauréat et Boursier."
         },
         {
           "title": "Fraude",
@@ -1486,7 +1503,7 @@
     },
     "primes": {
       "title": "Primes en cas de refus de visa",
-      "lead": "Ce que couvrent les frais de vérification, pourquoi ils ne sont pas remboursables, et dans quelles conditions une prime est versée si le visa américain vous est refusé.",
+      "lead": "Ce que couvrent les frais de vérification, pourquoi ils ne sont pas remboursables, et la prime de garantie et de soutien versée si le visa américain vous est refusé après validation de votre dossier.",
       "sections": [
         {
           "title": "Non pré-sélectionné en Phase 1",
@@ -1505,13 +1522,27 @@
           "body": "Le dossier est rejeté définitivement, aucune prime n'est due et un signalement aux autorités compétentes est possible."
         },
         {
-          "title": "Primes en cas de refus de visa américain",
-          "body": "Si votre dossier a été validé à l'issue des vérifications et que les autorités consulaires américaines vous refusent ensuite le visa, une prime vous est versée selon votre pack :",
+          "title": "Le visa relève de l'ambassade, pas du programme",
+          "body": "Les autorités consulaires américaines sont seules décisionnaires de l'attribution du visa. Le programme ne délivre aucun visa : il sélectionne, accompagne et soutient le candidat dans sa procédure — lettre d'invitation, lettre de confirmation à l'ambassade, accompagnement du dossier. Si, malgré un dossier solide et un accompagnement complet, le visa est refusé, le programme maintient son engagement envers le candidat sélectionné sous la forme d'une prime de garantie et de soutien."
+        },
+        {
+          "title": "Prime de garantie et de soutien",
+          "body": "Le Silicon Valley Africa Program est un programme à caractère social : son objectif premier est de soutenir des candidats porteurs de projets à impact, y compris lorsque le résultat final ne dépend pas de lui. Si votre dossier a été validé à l'issue des vérifications et que le visa vous est ensuite refusé, une prime vous est versée selon votre pack :",
           "items": [
-            "Lauréat : 1 000 USD",
-            "Boursier : 500 USD",
-            "VIP Visitor : 4 500 USD",
-            "Business Visitor et Délégué : aucune prime"
+            "Lauréat — 1 000 USD versés sur le compte bancaire que vous fournissez, pour soutenir la poursuite de votre projet même sans le voyage.",
+            "Boursier — 500 USD versés sur le compte bancaire que vous fournissez, avec le même objectif : soutenir votre projet localement.",
+            "VIP Visitor — 4 500 USD restitués sur les 7 000 USD de contribution de sponsoring, selon les modalités détaillées ci-dessous.",
+            "Business Visitor et Délégué — aucune prime n'est prévue pour ces deux packs."
+          ]
+        },
+        {
+          "title": "VIP Visitor : le statut de mécène",
+          "body": "Le statut VIP Visitor correspond à un rôle de mécène du programme. En plus de financer votre propre voyage, vous versez une contribution de soutien de 7 000 USD une fois votre dossier validé — tests de vérification et de profilage réussis, frais de vérification de 330 USD déjà réglés. Si l'ambassade refuse ensuite votre visa :",
+          "items": [
+            "4 500 USD vous sont restitués sur le compte bancaire que vous fournissez.",
+            "2 500 USD restent acquis au programme, conformément à votre statut de mécène : cette part finance les Boursiers et les Lauréats, candidats porteurs de projets sans capacité financière suffisante pour voyager seuls.",
+            "Votre contribution de mécénat reste donc pleinement honorée, même en l'absence de voyage.",
+            "En reconnaissance de cet engagement, vous êtes automatiquement sélectionné lors d'une prochaine édition du programme, sans repasser par la phase de sélection initiale."
           ]
         },
         {

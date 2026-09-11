@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { SectionEyebrow } from "@/components/marketing/SectionEyebrow";
 import { StatBlock } from "@/components/marketing/StatBlock";
 import { PackCard } from "@/components/marketing/PackCard";
+import { PackCarousel } from "@/components/marketing/PackCarousel";
 import { HeroBackdrop } from "@/components/marketing/HeroBackdrop";
 import { CTAButton } from "@/components/marketing/CTAButton";
 import { Ltr } from "@/components/layout/Ltr";
@@ -18,6 +19,7 @@ import {
 } from "@/components/marketing/icons";
 import {
   COUNTRIES,
+  PACKS,
   PACK_SPECS,
   PROGRAMME_DAYS,
   TOTAL_PARTICIPANT_PLACES,
@@ -235,7 +237,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PACKS TEASER — the two scholarship tracks, priced from PACK_SPECS. */}
+      {/* PACKS TEASER — every pack, priced from PACK_SPECS.
+          This showed only the two scholarship tracks before. Showing all five
+          is a client decision, and the right one: someone able to fund their
+          own trip had no way of knowing from the homepage that a pack existed
+          for them. */}
       <section className="px-8 py-[120px]">
         <div className="mx-auto max-w-[1280px]">
           <div className="mb-16 flex flex-wrap items-end justify-between gap-6">
@@ -245,25 +251,29 @@ export default function HomePage() {
             <TextCTA href="/packs">{tPacks("closingCta.ctaLabel")}</TextCTA>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            {(["laureat", "boursier"] as const).map((pack) => (
-              <PackCard
+          <PackCarousel>
+            {PACKS.map((pack) => (
+              <div
                 key={pack}
-                size="full"
-                variant={pack === "boursier" ? "featured" : "default"}
-                name={tPack(pack)}
-                badgeLabel={tPacks(`items.${pack}.badgeLabel`)}
-                placesCount={PACK_SPECS[pack].places}
-                costLabel={tPacks(`items.${pack}.costLabel`)}
-                costValue={tPacks(`items.${pack}.costValue`)}
-                features={tPacks.raw(`items.${pack}.features`)}
-                applicationFee={`${tPacks("feePrefix")} $${PACK_SPECS[pack].verificationFeeUsd}`}
-                applicationFeeNote={tPacks("feeSuffix")}
-                ctaLabel={tPacks(`items.${pack}.ctaLabel`)}
-                href={`/candidature?pack=${pack}`}
-              />
+                className="w-[85vw] shrink-0 snap-start sm:w-[380px]"
+              >
+                <PackCard
+                  size="full"
+                  variant={pack === "boursier" ? "featured" : "default"}
+                  name={tPack(pack)}
+                  badgeLabel={tPacks(`items.${pack}.badgeLabel`)}
+                  placesCount={PACK_SPECS[pack].places}
+                  costLabel={tPacks(`items.${pack}.costLabel`)}
+                  costValue={tPacks(`items.${pack}.costValue`)}
+                  features={tPacks.raw(`items.${pack}.features`)}
+                  applicationFee={`${tPacks("feePrefix")} $${PACK_SPECS[pack].verificationFeeUsd}`}
+                  applicationFeeNote={tPacks("feeSuffix")}
+                  ctaLabel={tPacks(`items.${pack}.ctaLabel`)}
+                  href={`/candidature?pack=${pack}`}
+                />
+              </div>
             ))}
-          </div>
+          </PackCarousel>
         </div>
       </section>
 

@@ -216,7 +216,11 @@
     "freeNotice": "Applying is entirely free for every pack. Verification fees are only due in Phase 2, after pre-selection and once you've received your access code.",
     "placesNotice": "No pack closes its applications. The number of places shown is the number of participants selected once verification is complete: every eligible file is reviewed, and the final selection is made after the checks are done.",
     "feePrefix": "Verification fee",
-    "feeSuffix": "only if pre-selected"
+    "feeSuffix": "only if pre-selected",
+    "carousel": {
+      "previous": "Previous packs",
+      "next": "Next packs"
+    }
   },
   "agenda": {
     "eyebrow": "Detailed program",
@@ -589,7 +593,9 @@
     "success": {
       "title": "Application received.",
       "description": "Thank you. Your application passed automatic pre-selection and your unique access code has just been emailed to you. It stays valid for 14 days — you can continue to Phase 2 right now.",
-      "ctaLabel": "Back to home"
+      "ctaLabel": "Back to home",
+      "spamNotice": "Email not arrived? Check your junk or spam folder — that is where it most often lands. Mark the message as “not junk” so the ones that follow reach your inbox normally.",
+      "spamPending": "Your code could not be sent just now. It goes out automatically within a few minutes — keep an eye on your inbox, including your junk or spam folder. You can also request a new one from “Get my documents”."
     },
     "nonEligible": {
       "eyebrow": "Application not retained",
@@ -1090,7 +1096,8 @@
         "documents": "If validated: invitation letter, embassy confirmation letter and visa support sent by email."
       },
       "noAction": "No action is needed from you. Any communication about your file will come through the email address on your application — never by phone or social media.",
-      "ctaLabel": "Back to home"
+      "ctaLabel": "Back to home",
+      "spamNotice": "Everything we send goes to the email address on your application, and our messages sometimes land in junk or spam. Check that folder regularly, and add our sending address to your contacts so you do not miss anything."
     },
     "incompleteHint": "Complete every field on this step to continue."
   },
@@ -1152,7 +1159,7 @@
       },
       {
         "q": "What happens if my US visa is refused?",
-        "a": "If your file was validated after our checks and the visa is subsequently refused, a premium is paid: 1,000 USD for Laureates, 500 USD for Scholars and 4,500 USD for VIP Visitors. Payment is subject to documentary verification of the official refusal issued by US consular authorities and to an internal audit, within 60 days of receiving the document. The Business Visitor pack carries no premium."
+        "a": "The embassy alone decides: the programme issues no visa, it selects you, supports you and backs your file. If the visa is refused after your file has been validated, a guarantee and support payment is made to the bank account you provide — USD 1,000 for Lauréats, USD 500 for Boursiers. For VIP Visitors, USD 4,500 of the USD 7,000 sponsoring contribution is returned; the USD 2,500 retained funds the Boursier and Lauréat places, and you are automatically selected for a future edition. Payment is subject to documentary verification of the official refusal and an internal audit, within 60 days."
       },
       {
         "q": "What's the difference between the packs?",
@@ -1277,7 +1284,7 @@
       }
     ],
     "refundTitle": "Fees and premiums: what is owed, what is paid",
-    "refundLead": "Verification fees are not refundable: they pay for work carried out on your file. What the programme commits to paying is a premium if your visa is refused after validation.",
+    "refundLead": "The verification fee is not refundable: it pays for work actually carried out on your file. What the programme commits to paying is a guarantee and support payment if the embassy refuses the visa after your file has been validated.",
     "refundRows": [
       [
         "Not pre-selected (Phase 1)",
@@ -1297,15 +1304,15 @@
       ],
       [
         "Visa refusal — Laureate",
-        "1,000 USD premium, subject to documentary verification and internal audit. Paid within 60 days."
+        "Guarantee payment of USD 1,000 to the bank account provided, subject to documentary verification and internal audit. Paid within 60 days."
       ],
       [
         "Visa refusal — Scholar",
-        "500 USD premium, subject to documentary verification and internal audit. Paid within 60 days."
+        "Guarantee payment of USD 500 to the bank account provided, subject to documentary verification and internal audit. Paid within 60 days."
       ],
       [
         "Visa refusal — VIP Visitor",
-        "4,500 USD premium, subject to documentary verification and internal audit. Paid within 60 days."
+        "USD 4,500 returned out of the USD 7,000 sponsoring; USD 2,500 retained to fund Boursiers and Lauréats. Automatic selection for a future edition."
       ],
       [
         "Visa refusal — Business Visitor and Delegate",
@@ -1318,8 +1325,7 @@
   },
   "legal": {
     "eyebrow": "Legal information",
-    "lastUpdated": "Last updated: August 2026",
-    "pendingCounsel": "⚠️ Section to be completed by First Of All LLC's legal counsel before public launch. The final wording must be validated for each of the six jurisdictions concerned.",
+    "lastUpdated": "Last updated: September 2026",
     "seeAlso": "See also",
     "titles": {
       "mentions-legales": "Legal notice",
@@ -1351,8 +1357,7 @@
         },
         {
           "title": "Hosting",
-          "pending": true,
-          "body": "Name, company name, address and telephone number of the site and database host."
+          "body": "The site and its administration interface are hosted by Vercel Inc. (United States). The database, the supporting documents submitted by candidates and the backups are hosted by Supabase Inc. (United States). Transactional email is delivered by Resend. Payments are processed by pawaPay (Mobile Money) and Paiement Pro (card), which run their own infrastructure."
         },
         {
           "title": "Contact",
@@ -1421,6 +1426,18 @@
           "body": "You have rights of access, rectification and erasure of your data, as well as rights of objection and portability. These requests should be addressed to the DPO. An identity check may be required before any request is processed."
         },
         {
+          "title": "Processors and data recipients",
+          "body": "Your data is neither sold nor transferred for value. It is processed by the following providers, each for a defined purpose and limited to what that purpose requires:",
+          "items": [
+            "Vercel Inc. — hosting of the site and the administration interface.",
+            "Supabase Inc. — database, storage of supporting documents and backups.",
+            "Resend — delivery of transactional email (acknowledgement, access code, payment receipt, decision).",
+            "pawaPay — Mobile Money payment processing.",
+            "Paiement Pro — card payment processing.",
+            "Local partner provider — criminal record checks, where such a check is carried out."
+          ]
+        },
+        {
           "title": "International transfers and legal basis",
           "pending": true,
           "body": "Legal basis for processing, framework governing data transfers outside the applicant's country of residence, and the list of approved sub-processors (payment providers, verification services, host)."
@@ -1471,7 +1488,7 @@
         },
         {
           "title": "VIP Visitor sponsorship contribution",
-          "body": "The 7,000 USD sponsorship contribution applicable to the VIP Visitor pack is due only after the file has been validated following verification. It is arranged directly with the program administration and is never paid on this site."
+          "body": "The USD 7,000 sponsoring contribution applying to the VIP Visitor pack is due only after the file has been validated following verification. It is arranged directly with the programme administration and is never paid on this site. If the visa is refused after validation, USD 4,500 is returned to the candidate and USD 2,500 remains with the programme as patronage, allocated to funding the Lauréat and Boursier packs."
         },
         {
           "title": "Fraud",
@@ -1486,7 +1503,7 @@
     },
     "primes": {
       "title": "Visa-refusal premiums",
-      "lead": "What verification fees cover, why they are not refundable, and on what conditions a premium is paid if your US visa is refused.",
+      "lead": "What the verification fee covers, why it is non-refundable, and the guarantee and support payment made if the US visa is refused after your file has been validated.",
       "sections": [
         {
           "title": "Not pre-selected in Phase 1",
@@ -1505,13 +1522,27 @@
           "body": "The file is permanently rejected, no premium is due and the matter may be reported to the competent authorities."
         },
         {
-          "title": "Premiums in the event of a US visa refusal",
-          "body": "If your file was validated after our checks and US consular authorities subsequently refuse your visa, a premium is paid according to your pack:",
+          "title": "The visa is the embassy's decision, not the programme's",
+          "body": "The US consular authorities alone decide whether a visa is granted. The programme issues no visa: it selects, supports and accompanies the candidate through the process — invitation letter, confirmation letter to the embassy, help with the file. If the visa is refused despite a solid file and full support, the programme stands by the selected candidate in the form of a guarantee and support payment."
+        },
+        {
+          "title": "Guarantee and support payment",
+          "body": "The Silicon Valley Africa Program is a social programme: its first purpose is to support candidates carrying projects with real impact, including when the final outcome is outside its control. If your file was validated after verification and the visa is then refused, a payment is made according to your pack:",
           "items": [
-            "Laureate: 1,000 USD",
-            "Scholar: 500 USD",
-            "VIP Visitor: 4,500 USD",
-            "Business Visitor and Delegate: no premium"
+            "Lauréat — USD 1,000 paid to the bank account you provide, to support your project even without the trip.",
+            "Boursier — USD 500 paid to the bank account you provide, with the same aim: supporting your project locally.",
+            "VIP Visitor — USD 4,500 returned out of the USD 7,000 sponsoring contribution, on the terms set out below.",
+            "Business Visitor and Délégué — no payment applies to these two packs."
+          ]
+        },
+        {
+          "title": "VIP Visitor: the patron status",
+          "body": "The VIP Visitor status is a patron role within the programme. On top of funding your own trip, you make a support contribution of USD 7,000 once your file is validated — verification and profiling tests passed, the USD 330 verification fee already settled. If the embassy then refuses your visa:",
+          "items": [
+            "USD 4,500 is returned to the bank account you provide.",
+            "USD 2,500 remains with the programme under your patron status: it funds the Boursier and Lauréat places — candidates with real projects but without the means to travel on their own.",
+            "Your patronage is therefore honoured in full, even without the trip.",
+            "In recognition of that commitment, you are automatically selected for a future edition of the programme, without going through the initial selection again."
           ]
         },
         {

@@ -39,10 +39,10 @@ export function Footer() {
               transparent, which is all but invisible on `bg-ink` (#1A2A3A) —
               `brightness-0 invert` flattens it to solid white rather than
               leaving the wordmark unreadable. Swap this for a light version of
-              the logo, and drop the filter, as soon as one exists: the filter
+              the logo, and d rop the filter, as soon as one exists: the filter
               also flattens the terracotta sun and continent. */}
           <Image
-            src="/logo_svap_h.png"
+            src="/logo_svap_h_2.png"
             alt={t("brand")}
             width={144}
             height={48}
@@ -77,7 +77,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h5 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-terracotta-light">
+            <h5 className="mb-4 text-xs font-semibold  uppercase tracking-[0.2em] text-terracotta-light">
               {t("resourcesTitle")}
             </h5>
             <ul className="space-y-2 text-sm">

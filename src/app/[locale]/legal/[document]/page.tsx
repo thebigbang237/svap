@@ -58,7 +58,20 @@ export default async function LegalPage({
   const t = await getTranslations(`legal.${document as LegalDocument}`);
   const tLegal = await getTranslations("legal");
 
-  const sections = t.raw("sections") as Section[];
+  /**
+   * Unfinished sections are not published.
+   *
+   * They used to render with a visible "to be completed by legal counsel"
+   * banner, which is worse than an omission: on a live site it advertises to
+   * every visitor — and to any regulator — that the operator's own legal pages
+   * are a draft. A section that does not exist yet simply does not appear.
+   *
+   * `pending` stays in the message files as the tracking mechanism. Filling one
+   * in means writing the real `body` and deleting the flag, at which point the
+   * section publishes itself. docs/legal-checklist.md lists what each one is
+   * waiting on.
+   */
+  const sections = (t.raw("sections") as Section[]).filter((s) => !s.pending);
 
   return (
     <>
@@ -98,12 +111,6 @@ export default async function LegalPage({
                       </li>
                     ))}
                   </ul>
-                )}
-
-                {section.pending && (
-                  <p className="mt-4 border-s-2 border-terracotta bg-sky-mid/60 p-4 text-sm text-ink">
-                    {tLegal("pendingCounsel")}
-                  </p>
                 )}
               </div>
             ))}

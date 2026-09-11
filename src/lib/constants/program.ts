@@ -199,6 +199,20 @@ export const PRIME_PAYOUT_DAYS = 60;
  */
 export const VIP_SPONSORING_USD = 7000;
 
+/**
+ * What the programme keeps of a VIP's sponsoring when the visa is refused.
+ *
+ * The VIP figure in `visaRefusalPrimeUsd` is not a bonus like the Lauréat and
+ * Boursier ones — it is a partial restitution of the contribution above. The
+ * balance stays with the programme and funds the Lauréat and Boursier places,
+ * which is the substance of the mécène status.
+ *
+ * Derived rather than written down, so the two halves cannot stop adding up to
+ * the contribution as the copy gets edited.
+ */
+export const VIP_SPONSORING_RETAINED_USD =
+  VIP_SPONSORING_USD - (PACK_SPECS.vip_visitor.visaRefusalPrimeUsd ?? 0);
+
 /** Délégué compensation: 200 USD/month over October–December. */
 export const DELEGUE_STIPEND = {
   monthlyUsd: 200,

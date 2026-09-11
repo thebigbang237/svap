@@ -243,6 +243,9 @@ export function CandidatureForm() {
         success?: boolean;
         status?: string;
         reason?: string;
+        /** False when the access-code email failed to send; the retry cron
+         *  will carry it. Absent for non-advancing outcomes. */
+        codeSent?: boolean;
         errors?: Record<string, string[]>;
       } | null = await res.json().catch(() => null);
 
@@ -279,7 +282,15 @@ export function CandidatureForm() {
       } else if (body?.status === "complet") {
         router.push("/candidature/complet");
       } else {
-        router.push("/candidature/success");
+        // `codeSent` is false when the access-code email failed to go out —
+        // non-fatal by design, the retry cron picks it up within the half
+        // hour. The success page has to know, or it tells the candidate to go
+        // looking in their spam folder for a message that does not exist yet.
+        router.push(
+          body?.codeSent === false
+            ? "/candidature/success?code=pending"
+            : "/candidature/success",
+        );
       }
     } catch {
       setError("root", { message: "form.submitError" });

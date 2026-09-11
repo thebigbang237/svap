@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { readSession } from "@/lib/access-code/session";
 import { loadPhase2Progress } from "@/lib/phase2/steps";
 import { CTAButton } from "@/components/marketing/CTAButton";
-import { CheckIcon } from "@/components/marketing/icons";
+import { CheckIcon, MailIcon } from "@/components/marketing/icons";
 
 /**
  * End of the candidate's part in Phase 2.
@@ -64,8 +64,17 @@ export default async function Phase2TerminePage({
           ))}
         </ol>
 
-        <div className="mb-10 border-s-2 border-blue bg-sky-mid/60 p-6">
+        <div className="mb-6 border-s-2 border-blue bg-sky-mid/60 p-6">
           <p className="text-ink">{t("noAction")}</p>
+        </div>
+
+        {/* Every remaining step in this dossier — the decision, and then the
+            invitation and embassy letters — reaches the candidate by email and
+            nowhere else. If those land in junk unnoticed, the dossier stalls
+            with nobody aware of it, which is worth a block of its own. */}
+        <div className="mb-10 flex items-start gap-4 border border-ink-dim/20 p-6">
+          <MailIcon className="mt-0.5 h-5 w-5 shrink-0 text-blue" />
+          <p className="text-sm text-ink-mid">{t("spamNotice")}</p>
         </div>
 
         <CTAButton href="/" variant="primary">
