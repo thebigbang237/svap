@@ -67,6 +67,7 @@ Counsel's call, not the client's alone:
 - [ ] Legal basis for the processing (consent, contract performance, or both — likely differs between Phase 1 and Phase 2)
 - [ ] Framework covering transfers out of the candidate's country of residence to US-hosted infrastructure
 - [ ] Whether standard contractual clauses are in place with Vercel and Supabase
+- [ ] Whether the Meta Pixel (section *Mesure d'audience publicitaire*) needs prior consent in any of the six countries. It currently loads without a consent banner, on public pages only; the section also sits beside a *Finalité du traitement* that says data serves "the sole purpose" of assessing the application
 
 ### 5. Conditions générales → *Responsabilité, droit applicable et juridiction compétente*
 

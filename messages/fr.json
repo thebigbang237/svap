@@ -1438,6 +1438,10 @@
           ]
         },
         {
+          "title": "Mesure d'audience publicitaire",
+          "body": "Les pages publiques du site utilisent le Meta Pixel, un outil de Meta Platforms, pour mesurer l'efficacité de nos publicités sur Facebook et Instagram. Il enregistre les pages consultées et le fait qu'une candidature a été envoyée, et utilise des cookies à cette fin. Il ne reçoit ni le contenu de votre candidature ni son résultat, et il n'est actif ni dans l'espace « Obtenir mes documents » ni sur la page de non-éligibilité. Meta traite ces données selon sa propre politique de confidentialité. Vous pouvez bloquer ces cookies dans les réglages de votre navigateur et gérer vos préférences publicitaires depuis votre compte Facebook ou Instagram."
+        },
+        {
           "title": "Transferts internationaux et base légale",
           "pending": true,
           "body": "Base légale du traitement, encadrement des transferts de données hors du pays de résidence du candidat, et liste des sous-traitants agréés (prestataires de paiement, services de vérification, hébergeur)."

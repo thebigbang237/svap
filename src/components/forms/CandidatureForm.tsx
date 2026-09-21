@@ -22,6 +22,7 @@ import {
 } from "@/lib/constants/program";
 import { CTAButton } from "@/components/marketing/CTAButton";
 import { ArrowRightIcon, LockIcon } from "@/components/marketing/icons";
+import { trackLead } from "@/lib/analytics/meta-pixel";
 import {
   TextField,
   SelectField,
@@ -273,6 +274,8 @@ export function CandidatureForm() {
       }
 
       clearDraft();
+      // Before the outcome branch, on purpose: the event must not vary with it.
+      trackLead();
 
       // Phase-1 outcome decides the destination. All three are real
       // endpoints, not error states — "not pre-selected" cost nothing and

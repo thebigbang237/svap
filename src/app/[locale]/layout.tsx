@@ -9,6 +9,7 @@ import "@/lib/fonts";
 import { Topbar } from "@/components/layout/Topbar";
 import { Footer } from "@/components/layout/Footer";
 import { DeadlineWidget } from "@/components/marketing/DeadlineWidget";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 import "../globals.css";
 
 export function generateStaticParams() {
@@ -75,6 +76,9 @@ export default async function RootLayout({
           {/* Mounted once for the whole tree; it hides itself on the
               application and Phase-2 routes rather than each page opting in. */}
           <DeadlineWidget />
+          {/* Renders nothing unless NEXT_PUBLIC_META_PIXEL_ID is set, and
+              stays silent on Phase-2 routes — see lib/analytics/meta-pixel. */}
+          <MetaPixel />
         </NextIntlClientProvider>
       </body>
     </html>

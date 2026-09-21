@@ -1438,6 +1438,10 @@
           ]
         },
         {
+          "title": "Advertising measurement",
+          "body": "The public pages of this site use the Meta Pixel, a tool provided by Meta Platforms, to measure how well our advertising on Facebook and Instagram performs. It records the pages visited and the fact that an application was submitted, and uses cookies to do so. It receives neither the content of your application nor its outcome, and it is not active in the “Get my documents” area or on the ineligibility page. Meta processes this data under its own privacy policy. You can block these cookies in your browser settings and manage your ad preferences from your Facebook or Instagram account."
+        },
+        {
           "title": "International transfers and legal basis",
           "pending": true,
           "body": "Legal basis for processing, framework governing data transfers outside the applicant's country of residence, and the list of approved sub-processors (payment providers, verification services, host)."
