@@ -63,6 +63,7 @@ export function PaymentForm({
   amountUsd,
   amountLocal,
   currency,
+  cardAmount = null,
   resumePaymentId = null,
 }: {
   methods: PaymentMethod[];
@@ -71,6 +72,8 @@ export function PaymentForm({
   /** Local-currency equivalent, null where the country is card-only. */
   amountLocal: number | null;
   currency: string | null;
+  /** What a card is charged in when it isn't USD (Paiement Pro: XOF). */
+  cardAmount?: { amount: number; currency: string } | null;
   /**
    * A payment already in flight for this dossier, if any. Set when the
    * candidate arrives back from a hosted card page, or reloads while a mobile
@@ -547,12 +550,18 @@ export function PaymentForm({
             {t("amountToPay")}
           </span>
           <Ltr className="font-serif text-[32px] font-normal leading-none text-terracotta">
-            {`$${amountUsd}`}
+            {cardAmount
+              ? `${cardAmount.amount.toLocaleString("en-US")} ${cardAmount.currency}`
+              : `$${amountUsd}`}
           </Ltr>
-          {/* Cards settle in USD against the US entity and the issuer converts
-              at its own rate, so quoting a local figure here would be a number
-              we cannot honour. */}
-          <p className="mt-2 text-xs text-ink-dim">{t("cardConversionNote")}</p>
+          {/* The figure the processor actually charges, so it matches its
+              hosted page. The issuer then converts to the card's own currency
+              at its own rate — a figure we cannot quote. */}
+          <p className="mt-2 text-xs text-ink-dim">
+            {cardAmount
+              ? t("cardLocalNote", { usd: amountUsd })
+              : t("cardConversionNote")}
+          </p>
         </div>
       )}
 

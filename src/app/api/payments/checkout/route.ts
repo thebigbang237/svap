@@ -4,8 +4,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { readSession } from "@/lib/access-code/session";
 import { loadPhase2Progress } from "@/lib/phase2/steps";
 import { PACK_SPECS, type Country, type Pack } from "@/lib/constants/program";
-import { providerFor } from "@/lib/payments/registry";
-import { convertUsd, usdOnly } from "@/lib/payments/fx";
+import { cardMoney, providerFor } from "@/lib/payments/registry";
+import { convertUsd } from "@/lib/payments/fx";
 import { createPaymentRecord, markPaymentFailed } from "@/lib/payments/record";
 import { PaymentConfigError } from "@/lib/payments/types";
 import {
@@ -94,14 +94,14 @@ export async function POST(request: Request) {
     }
   }
 
-  // Mobile money collects in local currency; cards settle in USD against the
-  // US entity, so only the former has a rate to lock.
+  // Mobile money collects in local currency. Cards take whatever the card
+  // processor charges in — USD for Stripe, XOF for Paiement Pro.
   let money;
   try {
     money =
       parsed.data.method === "mobile_money"
         ? convertUsd(spec.verificationFeeUsd, country)
-        : usdOnly(spec.verificationFeeUsd);
+        : cardMoney(spec.verificationFeeUsd);
   } catch (error) {
     if (error instanceof PaymentConfigError) {
       console.error("Payment configuration error:", error.message);

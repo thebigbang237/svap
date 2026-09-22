@@ -62,7 +62,14 @@ function rateTable(): Record<string, number> {
 const ZERO_DECIMAL = new Set(["XAF", "XOF", "JPY", "KRW"]);
 
 export function convertUsd(amountUsd: number, country: Country): Money {
-  const currency = COUNTRY_PAYMENT[country].currency;
+  return convertUsdTo(amountUsd, COUNTRY_PAYMENT[country].currency);
+}
+
+/**
+ * The same conversion into a currency the rail dictates rather than the
+ * candidate's country — Paiement Pro charges cards in XOF whoever is paying.
+ */
+export function convertUsdTo(amountUsd: number, currency: string): Money {
   const table = rateTable();
   const fxRate = table[currency];
 
@@ -70,7 +77,7 @@ export function convertUsd(amountUsd: number, country: Country): Money {
     // Loud rather than falling back to 1:1, which would charge someone 330
     // Kenyan shillings for a $330 pack.
     throw new PaymentConfigError(
-      `No FX rate configured for ${currency} (country ${country}). Add it to FX_RATES_USD.`,
+      `No FX rate configured for ${currency}. Add it to FX_RATES_USD.`,
     );
   }
 
@@ -89,7 +96,7 @@ export function convertUsd(amountUsd: number, country: Country): Money {
 }
 
 /**
- * Card payments settle in USD against the US entity, so there is no
+ * Stripe card payments settle in USD against the US entity, so there is no
  * conversion to lock — the candidate's issuer does it, at its own rate.
  */
 export function usdOnly(amountUsd: number): Money {

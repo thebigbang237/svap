@@ -5,7 +5,7 @@ import { findResumablePayment } from "@/lib/payments/record";
 import { Phase2StepShell } from "@/components/forms/Phase2StepShell";
 import { PaymentForm } from "@/components/forms/PaymentForm";
 import { Ltr } from "@/components/layout/Ltr";
-import { availableMethods } from "@/lib/payments/registry";
+import { availableMethods, cardMoney } from "@/lib/payments/registry";
 import { convertUsd } from "@/lib/payments/fx";
 import type { PaymentMethod } from "@/lib/payments/types";
 import { COUNTRIES, PACK_SPECS, type Country, type Pack } from "@/lib/constants/program";
@@ -63,6 +63,18 @@ export default async function Phase2PaiementPage({
     } catch (error) {
       console.error("FX rate unavailable for the payment page:", error);
     }
+  }
+
+  // What a card is charged in, when that isn't the USD figure above —
+  // Paiement Pro charges XOF. Same function as the checkout, same reason.
+  let cardAmount: { amount: number; currency: string } | null = null;
+  try {
+    const money = cardMoney(spec.verificationFeeUsd);
+    if (money.currency !== "USD") {
+      cardAmount = { amount: money.amountLocal, currency: money.currency };
+    }
+  } catch (error) {
+    console.error("FX rate unavailable for the card amount:", error);
   }
 
   return (
@@ -123,6 +135,7 @@ export default async function Phase2PaiementPage({
             amountUsd={spec.verificationFeeUsd}
             amountLocal={localAmount?.amountLocal ?? null}
             currency={localAmount?.currency ?? null}
+            cardAmount={cardAmount}
             resumePaymentId={inFlight?.id ?? null}
           />
         </div>

@@ -65,9 +65,11 @@ const STATUS_URL = "https://api.paiementpro.net/status";
  *     is time, not payload: their endpoint has broken since that integration
  *     was built.
  *
- * Until they fix it, card payments through this provider cannot be initiated at
- * all. `createCheckout` surfaces that as a 502 with their response logged,
- * rather than anything that looks like the candidate's fault.
+ * Fixed on their side by 2026-09-22: the same complete payload now comes back
+ * HTTP 200 with a proper refusal ("ID marchand inconnu" for an unknown
+ * merchant). Should it regress, `createCheckout` surfaces it as a 502 with
+ * their response logged, rather than anything that looks like the candidate's
+ * fault.
  */
 
 /** Their `channel` for international cards. The rest of their codes are
@@ -75,23 +77,20 @@ const STATUS_URL = "https://api.paiementpro.net/status";
 const CARD_CHANNEL = "CARD";
 
 /**
- * ISO 4217 numeric codes, which is what `countryCurrencyCode` expects. Their
- * SDK defaults to 952 (XOF) — wrong for us, since the card path quotes USD.
+ * The account charges in CFA francs, and ONLY in CFA francs.
  *
- * ⚠️ Whether USD is enabled on the account is a question for Paiement Pro. If
- * it is not, an initiation fails immediately and visibly with their own error
- * rather than charging the wrong amount, which is the failure mode to want.
+ * `countryCurrencyCode: "840"` (USD) is accepted and then ignored: the amount
+ * is read as francs regardless. Observed in production, 2026-09-21/22 — every
+ * $20 and $30 fee was refused with "Le montant minimum est de 100 fr", and a
+ * $330 fee would have passed that check and charged 330 FCFA (≈ $0.55).
+ *
+ * So the fee is converted to XOF before it gets here (see `cardMoney` in the
+ * registry), and `createCheckout` refuses anything else outright: this gateway
+ * does not fail on a wrong currency, it silently undercharges.
  */
-const CURRENCY_CODES: Record<string, string> = {
-  USD: "840",
-  XOF: "952",
-  XAF: "950",
-  GHS: "936",
-  KES: "404",
-  MAD: "504",
-  EGP: "818",
-  ZAR: "710",
-};
+const CURRENCY = "XOF";
+/** ISO 4217 numeric, which is what `countryCurrencyCode` expects. */
+const CURRENCY_CODE = "952";
 
 function config() {
   const merchantId = process.env.PAIEMENTPRO_MERCHANT_ID;
@@ -177,6 +176,8 @@ export const paiementproProvider: PaymentProvider = {
   // own — see the note at the top of this file.
   confirmsViaStatus: true,
 
+  cardCurrency: CURRENCY,
+
   supports(_country: Country, method: PaymentMethod) {
     // Cards only. Their mobile-money channels cover West Africa plus Cameroun;
     // of our six countries that overlaps only Cameroun, where pawaPay already
@@ -213,10 +214,9 @@ export const paiementproProvider: PaymentProvider = {
       );
     }
 
-    const currencyCode = CURRENCY_CODES[input.money.currency];
-    if (!currencyCode) {
+    if (input.money.currency !== CURRENCY) {
       throw new PaymentConfigError(
-        `No Paiement Pro currency code for ${input.money.currency}.`,
+        `Paiement Pro charges in ${CURRENCY} only; refusing a ${input.money.currency} amount it would read as francs.`,
       );
     }
 
@@ -229,7 +229,7 @@ export const paiementproProvider: PaymentProvider = {
         amount: input.money.amountLocal,
         description: input.description,
         channel: CARD_CHANNEL,
-        countryCurrencyCode: currencyCode,
+        countryCurrencyCode: CURRENCY_CODE,
         referenceNumber: input.reference,
         customerEmail: input.email,
         // Their field names are the wrong way round in their own docs

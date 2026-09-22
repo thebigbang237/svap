@@ -878,6 +878,7 @@
       "amountToPay": "Amount to pay",
       "amountEquivalent": "Equivalent of {usd} USD at today's rate.",
       "cardConversionNote": "Charged in USD. Your bank applies its own conversion.",
+      "cardLocalNote": "Equivalent of {usd} USD. Your bank applies its own conversion.",
       "operatorLabel": "Your Mobile Money operator",
       "operatorLoading": "Loading operators...",
       "operatorUnavailable": "No Mobile Money operator is available right now. Please use a bank card."

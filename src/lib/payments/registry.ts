@@ -3,7 +3,13 @@ import { COUNTRY_PAYMENT, type Country } from "@/lib/constants/program";
 import { pawapayProvider } from "./pawapay";
 import { stripeProvider } from "./stripe";
 import { paiementproProvider } from "./paiementpro";
-import type { PaymentMethod, PaymentProvider, PaymentProviderId } from "./types";
+import { convertUsdTo, usdOnly } from "./fx";
+import type {
+  Money,
+  PaymentMethod,
+  PaymentProvider,
+  PaymentProviderId,
+} from "./types";
 
 /**
  * Which processor takes card payments.
@@ -38,6 +44,19 @@ export function providerFor(
 ): PaymentProvider | null {
   const providers: PaymentProvider[] = [pawapayProvider, cardProvider()];
   return providers.find((p) => p.supports(country, method)) ?? null;
+}
+
+/**
+ * What a card payment is charged in, for whichever card processor is
+ * configured.
+ *
+ * Shared by the checkout and the payment page, so the figure the candidate is
+ * shown is the figure that gets charged. Stripe takes USD; Paiement Pro reads
+ * every amount as CFA francs, so the fee has to be converted first.
+ */
+export function cardMoney(amountUsd: number): Money {
+  const currency = cardProvider().cardCurrency;
+  return currency ? convertUsdTo(amountUsd, currency) : usdOnly(amountUsd);
 }
 
 /** Every adapter, configured or not — see `cardProvider`. */

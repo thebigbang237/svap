@@ -128,7 +128,7 @@ with `openssl rand -hex 32`.
 | **`FIELD_ENCRYPTION_KEY`** | Encrypts passport numbers (32 bytes hex) | Phase-2 personal info can't be saved |
 | `PAWAPAY_API_TOKEN`, `PAWAPAY_ENV` | Mobile money (CM/KE/GH). No callback secret: pawaPay signs with RFC-9421 and the public key is fetched with the token. **Enable “Signed callbacks” in the pawaPay dashboard** — unsigned callbacks are refused. | Mobile money unavailable; callbacks rejected (payments still settle via the poll and `/api/cron/payments`) |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Cards (all 6 countries) | Card payment unavailable |
-| `FX_RATES_USD` | USD → local conversion | Mobile-money checkout throws |
+| `FX_RATES_USD` | USD → local conversion (incl. `XOF` for Paiement Pro cards) | Mobile-money and Paiement Pro card checkout throw |
 
 ⚠️ **`FIELD_ENCRYPTION_KEY` and `ACCESS_CODE_PEPPER` are effectively permanent.**
 Losing the first makes stored passport numbers unrecoverable; rotating the second
