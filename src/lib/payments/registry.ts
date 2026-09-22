@@ -32,30 +32,46 @@ function cardProvider(): PaymentProvider {
 }
 
 /**
+ * PayPal, through Paiement Pro's hosted page.
+ *
+ * Off unless `PAIEMENTPRO_PAYPAL=true`, independently of CARD_PROVIDER: the
+ * PAYPAL channel has to be enabled on the merchant account first, and a
+ * button the gateway then refuses is worse than no button.
+ */
+function paypalProvider(): PaymentProvider | null {
+  return process.env.PAIEMENTPRO_PAYPAL === "true" ? paiementproProvider : null;
+}
+
+/**
  * Which rail handles a given country and method.
  *
  * Order matters: the first provider that claims support wins. pawaPay takes
  * mobile money where it operates; whichever card processor is configured takes
- * everything else.
+ * cards. PayPal is routed on its own, since Paiement Pro would otherwise claim
+ * it whenever it is the card processor, switched on or not.
  */
 export function providerFor(
   country: Country,
   method: PaymentMethod,
 ): PaymentProvider | null {
+  if (method === "paypal") return paypalProvider();
   const providers: PaymentProvider[] = [pawapayProvider, cardProvider()];
   return providers.find((p) => p.supports(country, method)) ?? null;
 }
 
 /**
- * What a card payment is charged in, for whichever card processor is
- * configured.
+ * What a card or PayPal payment is charged in, by the provider that takes it.
  *
  * Shared by the checkout and the payment page, so the figure the candidate is
  * shown is the figure that gets charged. Stripe takes USD; Paiement Pro reads
  * every amount as CFA francs, so the fee has to be converted first.
  */
-export function cardMoney(amountUsd: number): Money {
-  const currency = cardProvider().cardCurrency;
+export function hostedMoney(
+  method: "card" | "paypal",
+  amountUsd: number,
+): Money {
+  const provider = method === "paypal" ? paiementproProvider : cardProvider();
+  const currency = provider.chargeCurrency;
   return currency ? convertUsdTo(amountUsd, currency) : usdOnly(amountUsd);
 }
 
@@ -76,11 +92,14 @@ export function providerById(id: PaymentProviderId): PaymentProvider | null {
  * Card is always available; mobile money only where pawaPay operates, which
  * is three of the six participating countries. Morocco, Egypt and South
  * Africa are card-only — which is precisely why a card processor was
- * non-negotiable rather than a later addition.
+ * non-negotiable rather than a later addition. PayPal, once switched on, is
+ * offered everywhere as the fallback for a card its issuer won't let pay
+ * abroad.
  */
 export function availableMethods(country: Country): PaymentMethod[] {
   const methods: PaymentMethod[] = [];
   if (COUNTRY_PAYMENT[country].mobileMoney) methods.push("mobile_money");
   methods.push("card");
+  if (paypalProvider()) methods.push("paypal");
   return methods;
 }

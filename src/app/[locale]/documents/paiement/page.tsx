@@ -5,7 +5,7 @@ import { findResumablePayment } from "@/lib/payments/record";
 import { Phase2StepShell } from "@/components/forms/Phase2StepShell";
 import { PaymentForm } from "@/components/forms/PaymentForm";
 import { Ltr } from "@/components/layout/Ltr";
-import { availableMethods, cardMoney } from "@/lib/payments/registry";
+import { availableMethods, hostedMoney } from "@/lib/payments/registry";
 import { convertUsd } from "@/lib/payments/fx";
 import type { PaymentMethod } from "@/lib/payments/types";
 import { COUNTRIES, PACK_SPECS, type Country, type Pack } from "@/lib/constants/program";
@@ -65,17 +65,22 @@ export default async function Phase2PaiementPage({
     }
   }
 
-  // What a card is charged in, when that isn't the USD figure above —
-  // Paiement Pro charges XOF. Same function as the checkout, same reason.
-  let cardAmount: { amount: number; currency: string } | null = null;
-  try {
-    const money = cardMoney(spec.verificationFeeUsd);
-    if (money.currency !== "USD") {
-      cardAmount = { amount: money.amountLocal, currency: money.currency };
+  // What a card or PayPal payment is charged in, when that isn't the USD
+  // figure above — Paiement Pro charges XOF. Same function as the checkout,
+  // same reason.
+  function hostedAmount(method: "card" | "paypal") {
+    try {
+      const money = hostedMoney(method, spec.verificationFeeUsd);
+      return money.currency === "USD"
+        ? null
+        : { amount: money.amountLocal, currency: money.currency };
+    } catch (error) {
+      console.error(`FX rate unavailable for the ${method} amount:`, error);
+      return null;
     }
-  } catch (error) {
-    console.error("FX rate unavailable for the card amount:", error);
   }
+  const cardAmount = hostedAmount("card");
+  const paypalAmount = methods.includes("paypal") ? hostedAmount("paypal") : null;
 
   return (
     <Phase2StepShell step="paiement" steps={progress.steps}>
@@ -136,6 +141,7 @@ export default async function Phase2PaiementPage({
             amountLocal={localAmount?.amountLocal ?? null}
             currency={localAmount?.currency ?? null}
             cardAmount={cardAmount}
+            paypalAmount={paypalAmount}
             resumePaymentId={inFlight?.id ?? null}
           />
         </div>

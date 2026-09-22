@@ -834,6 +834,10 @@
         "card": {
           "title": "Bank card",
           "description": "Visa or Mastercard. Secure payment — no card data is stored by the program."
+        },
+        "paypal": {
+          "title": "PayPal",
+          "description": "Pay with your PayPal balance or a card linked to your PayPal account."
         }
       },
       "phoneLabel": "Mobile Money number",
@@ -879,6 +883,7 @@
       "amountEquivalent": "Equivalent of {usd} USD at today's rate.",
       "cardConversionNote": "Charged in USD. Your bank applies its own conversion.",
       "cardLocalNote": "Equivalent of {usd} USD. Your bank applies its own conversion.",
+      "paypalNote": "Equivalent of {usd} USD. PayPal shows the exact amount in your currency before you confirm.",
       "operatorLabel": "Your Mobile Money operator",
       "operatorLoading": "Loading operators...",
       "operatorUnavailable": "No Mobile Money operator is available right now. Please use a bank card."
@@ -1358,7 +1363,7 @@
         },
         {
           "title": "Hosting",
-          "body": "The site and its administration interface are hosted by Vercel Inc. (United States). The database, the supporting documents submitted by candidates and the backups are hosted by Supabase Inc. (United States). Transactional email is delivered by Resend. Payments are processed by pawaPay (Mobile Money) and Paiement Pro (card), which run their own infrastructure."
+          "body": "The site and its administration interface are hosted by Vercel Inc. (United States). The database, the supporting documents submitted by candidates and the backups are hosted by Supabase Inc. (United States). Transactional email is delivered by Resend. Payments are processed by pawaPay (Mobile Money) and Paiement Pro (card and PayPal), which run their own infrastructure."
         },
         {
           "title": "Contact",
@@ -1434,7 +1439,7 @@
             "Supabase Inc. — database, storage of supporting documents and backups.",
             "Resend — delivery of transactional email (acknowledgement, access code, payment receipt, decision).",
             "pawaPay — Mobile Money payment processing.",
-            "Paiement Pro — card payment processing.",
+            "Paiement Pro — card and PayPal payment processing.",
             "Local partner provider — criminal record checks, where such a check is carried out."
           ]
         },

@@ -14,7 +14,7 @@ import {
 
 /**
  * Paiement Pro — Visa/Mastercard acquiring, as a stand-in for Stripe until the
- * Stripe account is approved.
+ * Stripe account is approved, and PayPal through the same hosted flow.
  *
  * Two things about this integration are unusual and drive its whole shape.
  *
@@ -72,9 +72,18 @@ const STATUS_URL = "https://api.paiementpro.net/status";
  * fault.
  */
 
-/** Their `channel` for international cards. The rest of their codes are
- *  mobile money in markets pawaPay already covers better. */
-const CARD_CHANNEL = "CARD";
+/**
+ * Their `channel` codes, from the list in their dashboard. Of the rest, the
+ * mobile-money codes cover West Africa plus Cameroun — of our six countries
+ * that overlaps only Cameroun, where pawaPay already gives us both operators,
+ * live availability and PIN-prompt instructions. CRYPTO and TBANK are left out
+ * deliberately: crypto is restricted or banned in several of our countries,
+ * and a bank transfer settles in days, past the reconciliation window.
+ */
+const CHANNELS: Partial<Record<PaymentMethod, string>> = {
+  card: "CARD",
+  paypal: "PAYPAL",
+};
 
 /**
  * The account charges in CFA francs, and ONLY in CFA francs.
@@ -84,9 +93,15 @@ const CARD_CHANNEL = "CARD";
  * $20 and $30 fee was refused with "Le montant minimum est de 100 fr", and a
  * $330 fee would have passed that check and charged 330 FCFA (≈ $0.55).
  *
- * So the fee is converted to XOF before it gets here (see `cardMoney` in the
+ * So the fee is converted to XOF before it gets here (see `hostedMoney` in the
  * registry), and `createCheckout` refuses anything else outright: this gateway
  * does not fail on a wrong currency, it silently undercharges.
+ *
+ * ⚠️ Assumed to hold for PAYPAL too, where PayPal itself cannot take XOF and
+ * Paiement Pro must convert on the way. If their status API then reports the
+ * converted figure, the amount cross-check holds the payment en_cours with an
+ * `amount_mismatch` reason rather than settling it — confirm with them before
+ * switching PayPal on.
  */
 const CURRENCY = "XOF";
 /** ISO 4217 numeric, which is what `countryCurrencyCode` expects. */
@@ -176,13 +191,10 @@ export const paiementproProvider: PaymentProvider = {
   // own — see the note at the top of this file.
   confirmsViaStatus: true,
 
-  cardCurrency: CURRENCY,
+  chargeCurrency: CURRENCY,
 
   supports(_country: Country, method: PaymentMethod) {
-    // Cards only. Their mobile-money channels cover West Africa plus Cameroun;
-    // of our six countries that overlaps only Cameroun, where pawaPay already
-    // gives us both operators, live availability and PIN-prompt instructions.
-    return method === "card";
+    return CHANNELS[method] !== undefined;
   },
 
   /**
@@ -220,6 +232,13 @@ export const paiementproProvider: PaymentProvider = {
       );
     }
 
+    const channel = CHANNELS[input.method];
+    if (!channel) {
+      throw new PaymentConfigError(
+        `Paiement Pro has no channel for ${input.method}.`,
+      );
+    }
+
     const response = await fetch(INIT_URL, {
       method: "POST",
       headers: { Accept: "application/json", "Content-Type": "application/json" },
@@ -228,7 +247,7 @@ export const paiementproProvider: PaymentProvider = {
         merchantId,
         amount: input.money.amountLocal,
         description: input.description,
-        channel: CARD_CHANNEL,
+        channel,
         countryCurrencyCode: CURRENCY_CODE,
         referenceNumber: input.reference,
         customerEmail: input.email,

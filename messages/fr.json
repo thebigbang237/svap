@@ -834,6 +834,10 @@
         "card": {
           "title": "Carte bancaire",
           "description": "Visa ou Mastercard. Paiement sécurisé, aucune donnée de carte n'est stockée par le programme."
+        },
+        "paypal": {
+          "title": "PayPal",
+          "description": "Payez avec votre solde PayPal ou une carte liée à votre compte PayPal."
         }
       },
       "phoneLabel": "Numéro Mobile Money",
@@ -879,6 +883,7 @@
       "amountEquivalent": "Équivalent de {usd} USD au taux du jour.",
       "cardConversionNote": "Débité en USD. Votre banque applique sa propre conversion.",
       "cardLocalNote": "Équivalent de {usd} USD. Votre banque applique sa propre conversion.",
+      "paypalNote": "Équivalent de {usd} USD. PayPal affiche le montant exact dans votre devise avant que vous confirmiez.",
       "operatorLabel": "Votre opérateur Mobile Money",
       "operatorLoading": "Chargement des opérateurs...",
       "operatorUnavailable": "Aucun opérateur Mobile Money disponible actuellement. Utilisez la carte bancaire."
@@ -1358,7 +1363,7 @@
         },
         {
           "title": "Hébergement",
-          "body": "Le site et son interface d'administration sont hébergés par Vercel Inc. (États-Unis). La base de données, les pièces justificatives transmises par les candidats et les sauvegardes sont hébergées par Supabase Inc. (États-Unis). Les emails transactionnels sont acheminés par Resend. Les paiements sont traités par pawaPay (Mobile Money) et Paiement Pro (carte bancaire), qui exploitent leurs propres infrastructures."
+          "body": "Le site et son interface d'administration sont hébergés par Vercel Inc. (États-Unis). La base de données, les pièces justificatives transmises par les candidats et les sauvegardes sont hébergées par Supabase Inc. (États-Unis). Les emails transactionnels sont acheminés par Resend. Les paiements sont traités par pawaPay (Mobile Money) et Paiement Pro (carte bancaire et PayPal), qui exploitent leurs propres infrastructures."
         },
         {
           "title": "Contact",
@@ -1434,7 +1439,7 @@
             "Supabase Inc. — base de données, stockage des pièces justificatives et sauvegardes.",
             "Resend — envoi des emails transactionnels (accusé de réception, code d'accès, reçu de paiement, décision).",
             "pawaPay — traitement des paiements par Mobile Money.",
-            "Paiement Pro — traitement des paiements par carte bancaire.",
+            "Paiement Pro — traitement des paiements par carte bancaire et PayPal.",
             "Prestataire partenaire local — vérification du casier judiciaire, lorsque cette vérification est réalisée."
           ]
         },

@@ -64,6 +64,7 @@ export function PaymentForm({
   amountLocal,
   currency,
   cardAmount = null,
+  paypalAmount = null,
   resumePaymentId = null,
 }: {
   methods: PaymentMethod[];
@@ -74,6 +75,8 @@ export function PaymentForm({
   currency: string | null;
   /** What a card is charged in when it isn't USD (Paiement Pro: XOF). */
   cardAmount?: { amount: number; currency: string } | null;
+  /** The same for PayPal, which only ever goes through Paiement Pro. */
+  paypalAmount?: { amount: number; currency: string } | null;
   /**
    * A payment already in flight for this dossier, if any. Set when the
    * candidate arrives back from a hosted card page, or reloads while a mobile
@@ -258,8 +261,9 @@ export function PaymentForm({
       }
 
       if (body?.redirectUrl) {
-        // Card: hand off to Stripe's hosted page. Settlement is still
-        // confirmed by webhook, never by the return from this redirect.
+        // Card or PayPal: hand off to the provider's hosted page. Settlement
+        // is still confirmed server-side, never by the return from this
+        // redirect.
         window.location.href = body.redirectUrl;
         return;
       }
@@ -561,6 +565,25 @@ export function PaymentForm({
             {cardAmount
               ? t("cardLocalNote", { usd: amountUsd })
               : t("cardConversionNote")}
+          </p>
+        </div>
+      )}
+
+      {method === "paypal" && (
+        <div className="border border-ink-dim/20 bg-white p-6">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-ink-dim">
+            {t("amountToPay")}
+          </span>
+          <Ltr className="font-serif text-[32px] font-normal leading-none text-terracotta">
+            {paypalAmount
+              ? `${paypalAmount.amount.toLocaleString("en-US")} ${paypalAmount.currency}`
+              : `$${amountUsd}`}
+          </Ltr>
+          {/* PayPal cannot hold CFA francs, so what it debits is a conversion
+              made on the way — shown on its own page before the payer
+              confirms, and not a figure we can quote here. */}
+          <p className="mt-2 text-xs text-ink-dim">
+            {t("paypalNote", { usd: amountUsd })}
           </p>
         </div>
       )}

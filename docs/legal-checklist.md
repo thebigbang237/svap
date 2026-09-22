@@ -27,7 +27,7 @@ determinations, which is why they could be written without counsel.
 
 Named there: **Vercel Inc.** (site + admin), **Supabase Inc.** (database, uploaded
 documents, backups), **Resend** (transactional email), **pawaPay** (Mobile Money),
-**Paiement Pro** (card).
+**Paiement Pro** (card and PayPal).
 
 ⚠️ If any of the six jurisdictions requires the host's **full postal address and
 telephone number** — French law does, for example — those must be added to the

@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { readSession } from "@/lib/access-code/session";
 import { loadPhase2Progress } from "@/lib/phase2/steps";
 import { PACK_SPECS, type Country, type Pack } from "@/lib/constants/program";
-import { cardMoney, providerFor } from "@/lib/payments/registry";
+import { hostedMoney, providerFor } from "@/lib/payments/registry";
 import { convertUsd } from "@/lib/payments/fx";
 import { createPaymentRecord, markPaymentFailed } from "@/lib/payments/record";
 import { PaymentConfigError } from "@/lib/payments/types";
@@ -17,7 +17,7 @@ import {
 } from "@/lib/payments/pawapay";
 
 const checkoutSchema = z.object({
-  method: z.enum(["mobile_money", "card"]),
+  method: z.enum(["mobile_money", "card", "paypal"]),
   /** Required for mobile money; the prompt goes to this handset. */
   phone: z.string().trim().regex(/^[0-9+\s().-]{6,20}$/).optional(),
   /**
@@ -94,14 +94,14 @@ export async function POST(request: Request) {
     }
   }
 
-  // Mobile money collects in local currency. Cards take whatever the card
-  // processor charges in — USD for Stripe, XOF for Paiement Pro.
+  // Mobile money collects in local currency. Card and PayPal take whatever
+  // their processor charges in — USD for Stripe, XOF for Paiement Pro.
   let money;
   try {
     money =
       parsed.data.method === "mobile_money"
         ? convertUsd(spec.verificationFeeUsd, country)
-        : cardMoney(spec.verificationFeeUsd);
+        : hostedMoney(parsed.data.method, spec.verificationFeeUsd);
   } catch (error) {
     if (error instanceof PaymentConfigError) {
       console.error("Payment configuration error:", error.message);
@@ -210,6 +210,7 @@ export async function POST(request: Request) {
     const checkout = await provider.createCheckout({
       candidatureId: session.cid,
       country,
+      method: parsed.data.method,
       money,
       reference,
       amountOverride,

@@ -73,7 +73,12 @@ export function PaymentsPanel({
                     : `${p.amount_local} ${p.currency} ($${p.amount_usd})`}
                 </p>
                 <p className="text-xs text-ink-dim">
-                  {p.provider} · {p.method === "card" ? "Carte" : "Mobile Money"}
+                  {p.provider} ·{" "}
+                  {p.method === "card"
+                    ? "Carte"
+                    : p.method === "paypal"
+                      ? "PayPal"
+                      : "Mobile Money"}
                   {p.completed_at &&
                     ` · réglé le ${new Date(p.completed_at).toLocaleString("fr-FR")}`}
                 </p>
