@@ -71,6 +71,9 @@ export async function GET(request: Request) {
           completed_at: becamePaid
             ? new Date().toISOString()
             : payment.completed_at,
+          // Settled by asking the provider directly, which is evidence in its
+          // own right — no reconciliation needed.
+          ...(becamePaid ? { settlement_source: "gateway_status" } : {}),
         })
         .eq("id", payment.id);
 

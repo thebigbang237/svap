@@ -90,6 +90,17 @@ export interface CheckoutResult {
   asynchronous: boolean;
 }
 
+/**
+ * What a settlement rests on. Written onto the payment, because "paid" from a
+ * signed callback and "paid" because an unverifiable callback said so are not
+ * the same claim, and only the second needs a human to check it.
+ */
+export type SettlementSource =
+  | "provider_signature"
+  | "gateway_status"
+  | "callback_unverified"
+  | "manual";
+
 export interface WebhookEvent {
   /** Provider's event id. The idempotency key — must be stable across retries. */
   eventId: string;
@@ -97,6 +108,8 @@ export interface WebhookEvent {
   providerRef: string;
   status: PaymentStatus;
   failureReason?: string;
+  /** Set when this event settles a payment. Defaults to a signed callback. */
+  settlementSource?: SettlementSource;
   raw: unknown;
 }
 
@@ -148,13 +161,25 @@ export interface PaymentProvider {
   verifyWebhook(rawBody: string, request: Request): Promise<WebhookEvent | null>;
 
   /**
-   * Set when the provider's callback carries no verifiable signature.
+   * Second opinion on a callback that carried no verifiable signature.
    *
-   * The webhook route then treats the callback purely as a trigger and
-   * re-derives the status from `getStatus`, so a forged notification can do no
-   * more than make us re-read the truth.
+   * Set only by providers that cannot sign. The webhook route looks the
+   * payment up first and hands over the figures we recorded, so the decision
+   * can be made against them — a signature's job, done with whatever evidence
+   * the provider actually offers. Returning `callback_unverified` says: act on
+   * it, but it has not been proven, so put it in front of an administrator.
+   *
+   * Without this, such an event is applied as-is, which no unsigned provider
+   * should get.
    */
-  readonly confirmsViaStatus?: boolean;
+  confirmEvent?(
+    event: WebhookEvent,
+    expected: { amountLocal: number; amountUsd: number },
+  ): Promise<{
+    status: PaymentStatus;
+    failureReason?: string;
+    settlementSource: SettlementSource;
+  }>;
 
   /**
    * Authoritative status straight from the provider.

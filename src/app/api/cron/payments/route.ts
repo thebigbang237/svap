@@ -98,6 +98,8 @@ async function reconcile() {
           completed_at: becamePaid
             ? new Date().toISOString()
             : payment.completed_at,
+          // Same as the poll: the provider's own answer, so no human needed.
+          ...(becamePaid ? { settlement_source: "gateway_status" } : {}),
         })
         .eq("id", payment.id)
         // Guards against the poll or a callback resolving the same row

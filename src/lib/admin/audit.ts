@@ -9,6 +9,10 @@ export type AuditAction =
   | "candidature.status"
   | "candidature.export"
   | "payment.refund"
+  // A settlement taken on an unverifiable callback, checked against the
+  // provider's back office and either confirmed or reversed.
+  | "payment.reconcile"
+  | "payment.reject"
   | "access_code.resend"
   | "claim.decision"
   // Changes to what the public site says, so a name is attached to each.

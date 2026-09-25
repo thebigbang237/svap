@@ -107,11 +107,10 @@ async function handle(
 
   const supabase = createAdminClient();
 
-  // Rule 2b — for providers whose callbacks cannot be authenticated, the
-  // callback is only a nudge. The status is re-derived from the provider's own
-  // API with the amount we recorded cross-checked against what the gateway
-  // reports, so a forged notification achieves nothing but a redundant lookup.
-  if (provider.confirmsViaStatus && event.providerRef) {
+  // Rule 2b — a callback that carries no signature decides nothing by itself.
+  // The provider's `confirmEvent` re-judges it against the figures we recorded
+  // at checkout, and says what the resulting settlement rests on.
+  if (provider.confirmEvent && event.providerRef) {
     const { data: payment } = await supabase
       .from("payments")
       .select("amount_local, amount_usd")
@@ -128,15 +127,18 @@ async function handle(
       return NextResponse.json({ received: true, applied: false });
     }
 
-    const live = await provider.getStatus(event.providerRef, {
+    const confirmed = await provider.confirmEvent(event, {
       amountLocal: payment.amount_local,
       amountUsd: payment.amount_usd,
     });
+
     event = {
       ...event,
-      status: live.status,
-      failureReason: live.failureReason,
-      eventId: `${event.providerRef}:${live.status}`,
+      status: confirmed.status,
+      failureReason: confirmed.failureReason,
+      settlementSource: confirmed.settlementSource,
+      eventType: `payment.${confirmed.status}`,
+      eventId: `${event.providerRef}:${confirmed.status}`,
     };
   }
 

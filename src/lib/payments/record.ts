@@ -2,7 +2,13 @@ import "server-only";
 import type { AdminClient } from "@/lib/supabase/admin";
 import type { Locale } from "@/i18n/routing";
 import { sendPaymentReceiptEmail } from "@/lib/resend/client";
-import type { PaymentMethod, PaymentProviderId, WebhookEvent, Money } from "./types";
+import type {
+  Money,
+  PaymentMethod,
+  PaymentProviderId,
+  SettlementSource,
+  WebhookEvent,
+} from "./types";
 
 /**
  * Persistence for payments and the webhook idempotency ledger.
@@ -20,6 +26,10 @@ export interface PaymentRow {
   status: string;
   completed_at: string | null;
   receipt_sent_at: string | null;
+  /** What the settlement rests on — see `SettlementSource`. */
+  settlement_source: SettlementSource | null;
+  /** When an administrator checked it against the provider's back office. */
+  reconciled_at: string | null;
 }
 
 /**
@@ -212,6 +222,12 @@ export async function applyWebhookEvent(
       status: event.status,
       failure_reason: event.failureReason ?? null,
       completed_at: becamePaid ? new Date().toISOString() : payment.completed_at,
+      // Only on settlement, and only ever set once: what this "paid" rests on
+      // is a property of the moment it was decided. A provider that signs its
+      // callbacks needs no qualification.
+      ...(becamePaid
+        ? { settlement_source: event.settlementSource ?? "provider_signature" }
+        : {}),
     })
     .eq("id", payment.id)
     .select("*")

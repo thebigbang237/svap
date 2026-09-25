@@ -519,34 +519,52 @@ Then run `supabase/verify-payment.sql` with the test email: `paye`,
 
 **PayPal (any country).** Same, choosing PayPal. ✅ Same three checks.
 
-**The amount cross-check.** Nothing settles on the callback alone — it is
-unsigned, so the status API is re-read and the amount compared
-(`confirmsViaStatus`). Their API does not say which currency it answers in, so
-`amountIsRight()` accepts either the XOF we sent or a USD figure between the
-fee and 1.5× it, and refuses everything else. Assert the bands with:
+**How a Paiement Pro payment settles — and why it needs you afterwards.**
+
+Nothing they send can be verified. Their status API answers "Aucune
+transaction" for our completed transactions (four paid tests, both initiation
+routes, 2026-09-25), and their support states in writing that the `hashcode`
+"est propre aux opérateurs" — it is not a merchant signature. So the
+notification is taken at its word, under four conditions (`confirmEvent` in
+`lib/payments/paiementpro.ts`):
+
+1. their status API is asked first, and preferred whenever it answers;
+2. `responsecode=0`, their code for *Transaction réussi*;
+3. the amount matches what we charged — `amountIsRight()` accepts the XOF we
+   sent or a USD figure between the fee and 1.5× it, since their page debits in
+   USD at their own rate (~5.9% + $1.00 over the fee);
+4. POST only, and the merchant id must be ours. A pasted URL settles nothing.
+
+Assert the amount bands with:
 
 ```bash
 node --experimental-strip-types scripts/check-paiementpro-amounts.mjs
 # → 12 passed, 0 failed
 ```
 
-**Confirm which figure they report, for 100 FCFA rather than $22.** Their
-conversion can change, and a payment held at `amount_mismatch` is invisible
-until a candidate complains:
+What none of that establishes is **who sent the notification**. The payer sees
+their own reference in the return URL, and the notifications arrive from
+Cloudflare addresses anyone can borrow. So the payment settles as
+`settlement_source = 'callback_unverified'`, the candidate continues
+immediately, and the claim waits in **`/admin/paiements`** until someone finds
+the reference in the Paiement Pro back office.
 
-```bash
-node scripts/paiementpro-probe.mjs init 100 CARD   # prints a reference + URL
-# pay it with a real card (~$0.20), then:
-node scripts/paiementpro-probe.mjs status <reference>
-```
+- **Confirmer** → `settlement_source` becomes `manual`, audited as
+  `payment.reconcile`.
+- **Introuvable** → the payment goes back to `echoue` and the dossier to
+  `phase2_en_cours`, audited as `payment.reject`. This is the case the queue
+  exists for: a replayed callback from someone who never paid.
 
-✅ The `amount` in that response is either `100` (XOF, as sent) or ~`0.19`
-(their USD conversion). Both settle. Anything else — a third currency, a figure
-unrelated to either — means the bands need revisiting before candidates pay.
+✅ Work that queue regularly. It is the only thing standing between a replayed
+callback and a free verification.
 
-**If a payment does hold**, `failure_reason` starts `amount_mismatch` and the
-candidate stays on the waiting screen. §3 of `verify-payment.sql` shows what
-they actually reported.
+pawaPay and Stripe never appear there: their callbacks are signed, so they
+settle as `provider_signature`. A payment settled by the status poll or the
+reconciliation cron lands as `gateway_status` — also proof, also no queue.
+
+**If a payment holds instead of settling**, `failure_reason` starts
+`amount_mismatch` or `merchant_mismatch` and the candidate stays on the waiting
+screen. §3 of `verify-payment.sql` shows exactly what arrived.
 
 **If the callback never arrives**, replay it by hand — this is also the
 idempotency test:

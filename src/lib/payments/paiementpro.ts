@@ -188,10 +188,6 @@ function interpret(
 export const paiementproProvider: PaymentProvider = {
   id: "paiementpro",
 
-  // Their callback has no verifiable signature, so it settles nothing on its
-  // own — see the note at the top of this file.
-  confirmsViaStatus: true,
-
   chargeCurrency: CURRENCY,
 
   supports(_country: Country, method: PaymentMethod) {
@@ -288,38 +284,118 @@ export const paiementproProvider: PaymentProvider = {
   },
 
   /**
-   * Turns a notification into a *verified* event.
+   * Parses a notification. Decides nothing — `confirmEvent` does that, once
+   * the route has loaded what we recorded for this reference.
    *
-   * Note what is ignored: `responsecode`, `amount` and `hashcode` from the
-   * callback body. The only thing taken from it is the reference, because that
-   * is the only field whose forgery gains an attacker nothing. Everything else
-   * comes from their status API.
+   * There is no signature to check: their support's own words are that the
+   * `hashcode` "est propre aux opérateurs" and that verification should be
+   * done by reference instead. So everything here is the sender's word, and
+   * the status it carries is provisional.
    */
   async verifyWebhook(rawBody, request) {
     logNotification(rawBody, request);
 
-    const reference = await extractReference(rawBody, request);
+    const fields = notificationFields(rawBody, request);
+    const reference = fields.referenceNumber;
     if (!reference) return null;
-
-    const body = await fetchStatus(reference);
-
-    // The amount cross-check needs the figures we recorded, which the caller
-    // holds; `applyWebhookEvent` looks the payment up by providerRef. Omitting
-    // them here means `interpret` skips the comparison, so the route re-checks
-    // through getStatus() before anything is settled — see the webhook route.
-    const { status, failureReason } = interpret(body);
 
     return {
       // Their callbacks carry no event id, so the key is the reference plus
       // the state we resolved: a retry of the same transition collides, a
-      // genuine later one does not.
-      eventId: `${reference}:${status}`,
-      eventType: `payment.${status}`,
+      // genuine later one does not. `confirmEvent` rewrites it once the
+      // status is settled.
+      eventId: `${reference}:pending`,
+      eventType: "payment.notification",
       providerRef: reference,
-      status,
-      failureReason,
-      raw: { reference, status: body },
+      status: "en_cours",
+      raw: { method: request.method, fields },
     } satisfies WebhookEvent;
+  },
+
+  /**
+   * Decides what a notification is worth.
+   *
+   * Their status API would be the honest answer, so it is asked first and its
+   * verdict preferred whenever it has one. It reports "Aucune transaction" for
+   * our completed transactions (established over four paid tests, MOMOCM and
+   * both initiation routes, 2026-09-25), so in practice the fallback below is
+   * what settles a payment.
+   *
+   * That fallback accepts the notification's own word, and is deliberate
+   * rather than accidental: `responsecode=0` is "Transaction réussi" (v1.3
+   * §3), the amount must match what we charged, the reference must be one we
+   * issued and still owe, and POST-only keeps a pasted URL from settling a
+   * dossier. What it cannot establish is that the sender was Paiement Pro:
+   * the payer sees their own reference in the return URL, and their
+   * notifications arrive from Cloudflare addresses anyone can borrow. Hence
+   * `callback_unverified` — the dossier proceeds, and /admin/paiements holds
+   * the payment until someone confirms it in the back office.
+   */
+  async confirmEvent(event, expected) {
+    const { method, fields } = event.raw as {
+      method: string;
+      fields: Record<string, string>;
+    };
+
+    // Their API first: a confirmed payment there needs no human.
+    const live = interpret(await fetchStatus(event.providerRef), expected);
+    if (live.status === "paye") {
+      return { ...live, settlementSource: "gateway_status" };
+    }
+
+    if (fields.responsecode === "-1") {
+      return {
+        status: "echoue",
+        failureReason: "responsecode=-1",
+        settlementSource: "callback_unverified",
+      };
+    }
+
+    if (fields.responsecode !== "0") {
+      // Anything else is a state they haven't documented. Left pending for
+      // the reconciliation cycle rather than guessed at.
+      return { ...live, settlementSource: "callback_unverified" };
+    }
+
+    // A GET carrying responsecode=0 is a URL, and a URL can be pasted by the
+    // person who benefits. Their notifications are POSTs.
+    if (method !== "POST") {
+      console.warn(
+        `Paiement Pro ${method} callback claiming success on ${event.providerRef} — ignored, notifications are POSTs.`,
+      );
+      return { ...live, settlementSource: "callback_unverified" };
+    }
+
+    const { merchantId } = config();
+    if (fields.merchantId && fields.merchantId !== merchantId) {
+      console.error(
+        `Paiement Pro callback for ${event.providerRef} names merchant ${fields.merchantId}, not ours.`,
+      );
+      return {
+        status: "en_cours",
+        failureReason: `merchant_mismatch: ${fields.merchantId}`,
+        settlementSource: "callback_unverified",
+      };
+    }
+
+    // The amount is the one field a forger has to get right, and the one that
+    // catches a candidate settling a $330 pack with a 100 FCFA payment.
+    const paid = Number(fields.amount);
+    if (!Number.isFinite(paid) || !amountIsRight(paid, expected)) {
+      console.error(
+        `Paiement Pro callback amount mismatch on ${event.providerRef}: ${fields.amount} against ${expected.amountLocal} XOF (fee $${expected.amountUsd}).`,
+      );
+      return {
+        status: "en_cours",
+        failureReason: `amount_mismatch: callback=${fields.amount} sent=${expected.amountLocal} fee_usd=${expected.amountUsd}`,
+        settlementSource: "callback_unverified",
+      };
+    }
+
+    console.warn(
+      `Paiement Pro ${event.providerRef} settled on an unverifiable callback — confirm it in /admin/paiements.`,
+    );
+    return { status: "paye", settlementSource: "callback_unverified" };
   },
 
   async getStatus(providerRef: string, expected?: ExpectedAmount) {
@@ -369,32 +445,59 @@ function logNotification(rawBody: string, request: Request) {
 }
 
 /**
- * Their notification format is not documented — it may be JSON, form-encoded,
- * or query parameters on the return URL. All three are accepted rather than
- * guessing: the reference is the only field read, and reading it from the
- * wrong place would mean silently dropping real settlements.
+ * Every field of a notification, wherever they put it.
+ *
+ * Observed: the fields appear BOTH as query parameters and again in a
+ * multipart body. The query is read first because it is unambiguous; the body
+ * is parsed only to fill gaps, as multipart, form-encoded or JSON, because
+ * their format is undocumented and reading it from the wrong place would mean
+ * silently dropping real settlements.
  */
-async function extractReference(
+function notificationFields(
   rawBody: string,
   request: Request,
-): Promise<string | null> {
-  const fromQuery = new URL(request.url).searchParams.get("referenceNumber");
-  if (fromQuery) return fromQuery;
+): Record<string, string> {
+  const fields: Record<string, string> = {};
 
-  if (rawBody) {
-    try {
-      const json = JSON.parse(rawBody) as {
-        referenceNumber?: string;
-        reference?: string;
-      };
-      if (json.referenceNumber) return json.referenceNumber;
-      if (json.reference) return json.reference;
-    } catch {
-      const form = new URLSearchParams(rawBody);
-      const value = form.get("referenceNumber") ?? form.get("reference");
-      if (value) return value;
-    }
+  for (const [key, value] of new URL(request.url).searchParams) {
+    if (value !== "") fields[key] = value;
   }
 
-  return null;
+  for (const [key, value] of Object.entries(parseBody(rawBody))) {
+    if (value !== "" && fields[key] === undefined) fields[key] = value;
+  }
+
+  // `reference` is what their status API calls it; accept either spelling.
+  if (!fields.referenceNumber && fields.reference) {
+    fields.referenceNumber = fields.reference;
+  }
+
+  return fields;
+}
+
+function parseBody(rawBody: string): Record<string, string> {
+  if (!rawBody) return {};
+
+  try {
+    const json = JSON.parse(rawBody) as Record<string, unknown>;
+    return Object.fromEntries(
+      Object.entries(json).map(([k, v]) => [k, String(v ?? "")]),
+    );
+  } catch {
+    /* not JSON — try the two form encodings below */
+  }
+
+  // multipart/form-data, which is what their notification actually sends:
+  //   ----boundary\r\nContent-Disposition: ...; name="amount"\r\n\r\n100\r\n
+  if (rawBody.includes("Content-Disposition")) {
+    const fields: Record<string, string> = {};
+    const part = /name="([^"]+)"\r?\n\r?\n([\s\S]*?)\r?\n-{2,}/g;
+    let match;
+    while ((match = part.exec(rawBody)) !== null) {
+      fields[match[1]] = match[2];
+    }
+    return fields;
+  }
+
+  return Object.fromEntries(new URLSearchParams(rawBody));
 }
