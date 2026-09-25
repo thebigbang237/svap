@@ -296,6 +296,8 @@ export const paiementproProvider: PaymentProvider = {
    * comes from their status API.
    */
   async verifyWebhook(rawBody, request) {
+    logNotification(rawBody, request);
+
     const reference = await extractReference(rawBody, request);
     if (!reference) return null;
 
@@ -336,6 +338,35 @@ export const paiementproProvider: PaymentProvider = {
     };
   },
 };
+
+/**
+ * Every notification, in full, on one line.
+ *
+ * Observed 2026-09-25: a POST carrying its fields as QUERY parameters —
+ * merchantId, sessionId, payId, channel, countryCurrencyCode, referenceNumber,
+ * amount, transactiondt, returnContext, responsecode — with an MSIE 6 user
+ * agent. `responsecode=0` is "Transaction réussi" (OnlinePayment v1.3 §3).
+ *
+ * Kept because their notification is the ONLY signal that a payment
+ * succeeded: their status API reports "Aucune transaction" for our completed
+ * transactions, and the WSDL exposes nothing else. Since it has to be trusted
+ * to some degree, what arrives — and the IP it arrives from, which is the only
+ * thing a forger cannot easily supply — has to be on the record.
+ */
+function logNotification(rawBody: string, request: Request) {
+  const url = new URL(request.url);
+  console.log(
+    "Paiement Pro notification:",
+    JSON.stringify({
+      method: request.method,
+      query: Object.fromEntries(url.searchParams),
+      body: rawBody.slice(0, 500),
+      // Vercel puts the caller first in x-forwarded-for.
+      ip: request.headers.get("x-forwarded-for"),
+      userAgent: request.headers.get("user-agent"),
+    }),
+  );
+}
 
 /**
  * Their notification format is not documented — it may be JSON, form-encoded,

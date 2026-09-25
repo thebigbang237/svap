@@ -272,7 +272,7 @@ outright* if `vercel.json` asks for anything more frequent. Both need the
 skips with a warning rather than failing.
 
 ```bash
-curl -X POST https://siliconvalleyafricaprogram.com/api/cron/payments \
+curl -X POST https://www.siliconvalleyafricaprogram.com/api/cron/payments \
   -H "Authorization: Bearer $CRON_SECRET"
 # → {"checked":3,"settled":1,"failed":0,"unresolved":2}
 ```
@@ -290,6 +290,33 @@ caught it. Now both methods work on both routes.
 Production domain: **`siliconvalleyafricaprogram.com`**
 Current Vercel URL: `https://svap-zeta.vercel.app`
 
+### ⚠️ Every URL below must be the **www** host
+
+`www.siliconvalleyafricaprogram.com` is the primary domain in Vercel. The bare
+domain answers **308 Permanent Redirect**, nothing else:
+
+```bash
+curl -sI https://siliconvalleyafricaprogram.com/api/payments/webhooks/paiementpro \
+  | head -1          # → HTTP/1.1 308 Permanent Redirect
+```
+
+A browser follows that and nobody notices. **Machines do not**, and every
+failure it causes is silent:
+
+- **Provider callbacks** (`notificationURL`, the pawaPay dashboard) hit the
+  redirect and stop. The payment settles at the provider and never here.
+- **The cron workflows** POST with `curl --fail-with-body`, which treats 308 as
+  success and exits 0. The job goes **green** having done nothing — no access
+  codes sent, no payments reconciled.
+
+So `NEXT_PUBLIC_SITE_URL`, the `SITE_URL` GitHub secret and every callback URL
+registered with a provider carry the `www.`. Check one after any domain change:
+
+```bash
+curl -sI https://www.siliconvalleyafricaprogram.com/api/payments/webhooks/paiementpro | head -1
+# → HTTP/1.1 200 OK
+```
+
 ### Configure these against the final domain, not the Vercel URL
 
 Attach the domain in **Vercel → Settings → Domains** *before* registering the
@@ -298,11 +325,11 @@ risks leaving one pointing at a dead host.
 
 | Where | Value | Notes |
 |---|---|---|
-| Vercel env | `NEXT_PUBLIC_SITE_URL=https://siliconvalleyafricaprogram.com` | Drives `metadataBase`, hreflang, the access-code deep link and the admin email link |
-| pawaPay dashboard | `https://siliconvalleyafricaprogram.com/api/payments/webhooks/pawapay` | Same URL for Deposits, Refunds, Payouts and Checkouts — the adapter handles all four |
-| Stripe → Webhooks | `https://siliconvalleyafricaprogram.com/api/payments/webhooks/stripe` | Subscribe to `checkout.session.completed`, `.expired`, `.async_payment_succeeded`, `.async_payment_failed`. Copy the signing secret into `STRIPE_WEBHOOK_SECRET` |
+| Vercel env | `NEXT_PUBLIC_SITE_URL=https://www.siliconvalleyafricaprogram.com` | Drives `metadataBase`, hreflang, the access-code deep link and the admin email link |
+| pawaPay dashboard | `https://www.siliconvalleyafricaprogram.com/api/payments/webhooks/pawapay` | Same URL for Deposits, Refunds, Payouts and Checkouts — the adapter handles all four |
+| Stripe → Webhooks | `https://www.siliconvalleyafricaprogram.com/api/payments/webhooks/stripe` | Subscribe to `checkout.session.completed`, `.expired`, `.async_payment_succeeded`, `.async_payment_failed`. Copy the signing secret into `STRIPE_WEBHOOK_SECRET` |
 | Resend → Domains | `siliconvalleyafricaprogram.com` | Add the SPF/DKIM/DMARC records. Then `RESEND_FROM_EMAIL="Silicon Valley Africa <programme@siliconvalleyafricaprogram.com>"` |
-| Supabase → Auth → URL config | Site URL + `https://siliconvalleyafricaprogram.com/**` in redirect allowlist | Otherwise admin login redirects fail in production |
+| Supabase → Auth → URL config | Site URL + `https://www.siliconvalleyafricaprogram.com/**` in redirect allowlist | Otherwise admin login redirects fail in production |
 
 ### If you want to test on the Vercel URL first
 
@@ -525,7 +552,7 @@ they actually reported.
 idempotency test:
 
 ```bash
-curl -i "https://siliconvalleyafricaprogram.com/api/payments/webhooks/paiementpro?referenceNumber=<provider_ref>"
+curl -i "https://www.siliconvalleyafricaprogram.com/api/payments/webhooks/paiementpro?referenceNumber=<provider_ref>"
 # → {"received":true,"applied":true}   first time
 # → {"received":true,"applied":false}  every time after: the unique index on
 #   (provider, provider_event_id) refuses the replay
@@ -700,7 +727,7 @@ Vercel. Preview keeps pointing at staging.
 
 | Variable | Change |
 |---|---|
-| `NEXT_PUBLIC_SITE_URL` | `https://siliconvalleyafricaprogram.com` |
+| `NEXT_PUBLIC_SITE_URL` | `https://www.siliconvalleyafricaprogram.com` |
 | `NEXT_PUBLIC_SUPABASE_URL` / `..._ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Production project |
 | `ACCESS_CODE_PEPPER`, `PHASE2_SESSION_SECRET`, `FIELD_ENCRYPTION_KEY`, `CRON_SECRET` | Fresh values — `openssl rand -hex 32` each |
 | `RESEND_FROM_EMAIL` | An address on the verified domain |
@@ -713,12 +740,12 @@ Vercel. Preview keeps pointing at staging.
 **5 — Payment providers, in live mode**
 
 - **Stripe:** switch the dashboard to live mode, create a webhook endpoint at
-  `https://siliconvalleyafricaprogram.com/api/payments/webhooks/stripe`,
+  `https://www.siliconvalleyafricaprogram.com/api/payments/webhooks/stripe`,
   subscribe to the four `checkout.session.*` events, copy the new signing
   secret. Test-mode and live-mode endpoints are separate objects with separate
   secrets.
 - **pawaPay:** switch to the live environment, set all four callback URLs to
-  `https://siliconvalleyafricaprogram.com/api/payments/webhooks/pawapay`, and
+  `https://www.siliconvalleyafricaprogram.com/api/payments/webhooks/pawapay`, and
   generate the live API token. There is **no webhook secret** — callbacks are
   signed with RFC-9421 and verified against pawaPay's public key, fetched with
   the API token. What you must do instead is switch **Signed callbacks** on for
@@ -739,7 +766,7 @@ not Vercel environment variables. Update **both**:
 
 | Secret | New value |
 |---|---|
-| `SITE_URL` | `https://siliconvalleyafricaprogram.com` |
+| `SITE_URL` | `https://www.siliconvalleyafricaprogram.com` |
 | `CRON_SECRET` | The **new** production value from step 4 |
 
 Getting `CRON_SECRET` wrong is loud — the endpoint 404s and the workflow turns
@@ -757,7 +784,7 @@ leave it off for production, or add a protection bypass for `/api/*`.
 
 **6 — Supabase Auth**
 Authentication → URL Configuration → Site URL
-`https://siliconvalleyafricaprogram.com`, and add `.../**` to the redirect
+`https://www.siliconvalleyafricaprogram.com`, and add `.../**` to the redirect
 allowlist. Otherwise admin login breaks in production.
 
 **7 — Deploy and verify**
