@@ -456,21 +456,93 @@ from svap.candidatures order by created_at desc limit 5;
 5. ✅ Try navigating directly to `/fr/documents/pieces` — you're bounced back to
    the payment step. Uploads cannot happen before payment.
 
-### Flow 5 — Payment (sandbox)
+### Flow 5 — Payment
 
-**Card (any country):** choose "Carte bancaire" → redirected to Stripe Checkout
-→ pay with `4242 4242 4242 4242`, any future expiry, any CVC.
-✅ The webhook marks the payment `paye`, the dossier advances, and a receipt email
-arrives. ✅ Confirm the receipt shows the reference and amount.
+**What each country must be offered.** From `availableMethods()` — mobile money
+only where pawaPay operates, card always, PayPal only while
+`PAIEMENTPRO_PAYPAL=true`:
 
-**Mobile money (Cameroun / Kenya / Ghana):** choose "Mobile Money", enter a
-sandbox MSISDN → ✅ you get the "Vérifiez votre téléphone" waiting state, which
-polls. ✅ Leave it past 5 minutes to see the timeout copy, which deliberately does
+| Country | Mobile Money | Card | PayPal |
+|---|---|---|---|
+| Cameroun, Kenya, Ghana | ✅ pawaPay | ✅ | ✅ |
+| Maroc, Égypte, Afrique du Sud | — | ✅ | ✅ |
+
+✅ Open `/documents/paiement` as a dossier from each group and confirm exactly
+those options appear, and no others. A country-only bug shows up here and
+nowhere else.
+
+**⚠️ Card and PayPal have no sandbox.** Every test is a real charge on a real
+card, and Paiement Pro exposes no refund API — a refund is manual, from their
+back office. Test on the **`laureat`** pack, the cheapest at $20.
+
+**⚠️ What the payer is charged.** We send XOF; Paiement Pro converts to USD at
+its own rate and PayPal takes the payment. $20 → 11 436 XOF → **$22.18** on
+their page, about 11% over the fee. Both figures are correct and neither is a
+bug — decide whether to absorb it (lower the `XOF` rate in `FX_RATES_USD`) or
+leave it, but know which you chose before candidates ask.
+
+**Card (any country).** Choose "Carte bancaire" → their page asks for the
+country, then the method → pick Visa/Mastercard → pay.
+✅ You land back on `/documents/paiement`, which resumes polling rather than
+offering to charge you again.
+✅ Within a minute the dossier advances to `/documents/pieces`.
+✅ A receipt email arrives, showing the reference and the amount.
+Then run `supabase/verify-payment.sql` with the test email: `paye`,
+`completed_at` and `receipt_sent_at` set, dossier `phase2_paye`.
+
+**PayPal (any country).** Same, choosing PayPal. ✅ Same three checks.
+
+**The amount cross-check.** Nothing settles on the callback alone — it is
+unsigned, so the status API is re-read and the amount compared
+(`confirmsViaStatus`). Their API does not say which currency it answers in, so
+`amountIsRight()` accepts either the XOF we sent or a USD figure between the
+fee and 1.5× it, and refuses everything else. Assert the bands with:
+
+```bash
+node --experimental-strip-types scripts/check-paiementpro-amounts.mjs
+# → 12 passed, 0 failed
+```
+
+**Confirm which figure they report, for 100 FCFA rather than $22.** Their
+conversion can change, and a payment held at `amount_mismatch` is invisible
+until a candidate complains:
+
+```bash
+node scripts/paiementpro-probe.mjs init 100 CARD   # prints a reference + URL
+# pay it with a real card (~$0.20), then:
+node scripts/paiementpro-probe.mjs status <reference>
+```
+
+✅ The `amount` in that response is either `100` (XOF, as sent) or ~`0.19`
+(their USD conversion). Both settle. Anything else — a third currency, a figure
+unrelated to either — means the bands need revisiting before candidates pay.
+
+**If a payment does hold**, `failure_reason` starts `amount_mismatch` and the
+candidate stays on the waiting screen. §3 of `verify-payment.sql` shows what
+they actually reported.
+
+**If the callback never arrives**, replay it by hand — this is also the
+idempotency test:
+
+```bash
+curl -i "https://siliconvalleyafricaprogram.com/api/payments/webhooks/paiementpro?referenceNumber=<provider_ref>"
+# → {"received":true,"applied":true}   first time
+# → {"received":true,"applied":false}  every time after: the unique index on
+#   (provider, provider_event_id) refuses the replay
+```
+
+✅ Run it twice and confirm `svap.payments` still shows exactly one paid row.
+
+**Mobile money (Cameroun / Kenya / Ghana).** `PAWAPAY_ENV=sandbox` gives test
+MSISDNs and costs nothing; `production` moves real money. Check which one
+production is set to *before* testing, and see Flow 5b for the failure paths.
+✅ You get the "Vérifiez votre téléphone" waiting state, which polls.
+✅ Leave it past 5 minutes to see the timeout copy, which deliberately does
 **not** say the payment failed.
 
-**Critical negative test:** replay a webhook Stripe has already delivered
-(`stripe events resend <event_id>`). ✅ The second delivery must be acknowledged
-without double-crediting — check that `svap.payments` still shows one paid row.
+**Between runs,** clear the test dossier with `supabase/delete-candidate.sql`
+so the same email can apply again. It refuses to delete a dossier with a paid
+payment — deliberately; refund it at the provider first.
 
 ### Flow 5b — pawaPay failure paths
 

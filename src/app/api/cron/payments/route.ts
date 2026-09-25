@@ -78,10 +78,10 @@ async function reconcile() {
     if (!provider) continue;
 
     try {
-      const live = await provider.getStatus(
-        payment.provider_ref,
-        payment.amount_local,
-      );
+      const live = await provider.getStatus(payment.provider_ref, {
+        amountLocal: payment.amount_local,
+        amountUsd: payment.amount_usd,
+      });
 
       if (live.status === payment.status) {
         unresolved += 1;

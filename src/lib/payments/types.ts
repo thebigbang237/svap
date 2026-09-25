@@ -163,14 +163,16 @@ export interface PaymentProvider {
    * asynchronous mobile-money collection resolves in the UI. Never trust the
    * browser's return from a hosted page for this.
    *
-   * `expectedAmount` is the figure we recorded at checkout. Providers that
-   * cannot sign their callbacks compare it against what the gateway reports
-   * and refuse to settle on a mismatch — for them it is the substitute for a
-   * signature. Providers with real signatures ignore it.
+   * `expected` is what we recorded at checkout, in both currencies. Providers
+   * that cannot sign their callbacks compare it against what the gateway
+   * reports and refuse to settle on a mismatch — for them it is the substitute
+   * for a signature. Both figures are passed because a gateway that converts
+   * (Paiement Pro charges in USD what we quoted in XOF) may answer in either.
+   * Providers with real signatures ignore it.
    */
   getStatus(
     providerRef: string,
-    expectedAmount?: number,
+    expected?: { amountLocal: number; amountUsd: number },
   ): Promise<{
     status: PaymentStatus;
     failureReason?: string;

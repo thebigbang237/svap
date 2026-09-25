@@ -1,6 +1,7 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import type { Country } from "@/lib/constants/program";
+import { amountIsRight, type ExpectedAmount } from "./paiementpro-amount";
 import {
   PaymentConfigError,
   type CheckoutInput,
@@ -155,7 +156,7 @@ async function fetchStatus(reference: string): Promise<StatusResponse | null> {
  */
 function interpret(
   body: StatusResponse | null,
-  expectedAmount: number,
+  expected?: ExpectedAmount,
 ): { status: PaymentStatus; failureReason?: string } {
   if (!body) return { status: "en_cours" };
 
@@ -165,13 +166,13 @@ function interpret(
     // match here means the money genuinely moved — and a mismatch means
     // something is wrong enough to stop rather than settle.
     const paid = Number(body.amount);
-    if (Number.isFinite(paid) && Math.abs(paid - expectedAmount) > 0.01) {
+    if (expected && Number.isFinite(paid) && !amountIsRight(paid, expected)) {
       console.error(
-        `Paiement Pro amount mismatch on ${body.reference}: gateway reports ${paid}, we recorded ${expectedAmount}.`,
+        `Paiement Pro amount mismatch on ${body.reference}: gateway reports ${paid}, we sent ${expected.amountLocal} XOF (fee $${expected.amountUsd}).`,
       );
       return {
         status: "en_cours",
-        failureReason: `amount_mismatch: gateway=${paid} expected=${expectedAmount}`,
+        failureReason: `amount_mismatch: gateway=${paid} sent=${expected.amountLocal} fee_usd=${expected.amountUsd}`,
       };
     }
     return { status: "paye" };
@@ -300,11 +301,11 @@ export const paiementproProvider: PaymentProvider = {
 
     const body = await fetchStatus(reference);
 
-    // The amount cross-check needs the figure we recorded, which the caller
-    // holds; `applyWebhookEvent` looks the payment up by providerRef. Passing
-    // NaN here means `interpret` skips the comparison, so the route re-checks
+    // The amount cross-check needs the figures we recorded, which the caller
+    // holds; `applyWebhookEvent` looks the payment up by providerRef. Omitting
+    // them here means `interpret` skips the comparison, so the route re-checks
     // through getStatus() before anything is settled — see the webhook route.
-    const { status, failureReason } = interpret(body, Number.NaN);
+    const { status, failureReason } = interpret(body);
 
     return {
       // Their callbacks carry no event id, so the key is the reference plus
@@ -319,9 +320,9 @@ export const paiementproProvider: PaymentProvider = {
     } satisfies WebhookEvent;
   },
 
-  async getStatus(providerRef: string, expectedAmount?: number) {
+  async getStatus(providerRef: string, expected?: ExpectedAmount) {
     const body = await fetchStatus(providerRef);
-    return interpret(body, expectedAmount ?? Number.NaN);
+    return interpret(body, expected);
   },
 
   async refund(): Promise<RefundResult> {

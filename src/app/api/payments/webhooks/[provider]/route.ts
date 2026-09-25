@@ -114,10 +114,10 @@ async function handle(
   if (provider.confirmsViaStatus && event.providerRef) {
     const { data: payment } = await supabase
       .from("payments")
-      .select("amount_local")
+      .select("amount_local, amount_usd")
       .eq("provider", provider.id)
       .eq("provider_ref", event.providerRef)
-      .maybeSingle<{ amount_local: number }>();
+      .maybeSingle<{ amount_local: number; amount_usd: number }>();
 
     if (!payment) {
       // Nothing to confirm against. Acknowledged so the provider stops
@@ -128,7 +128,10 @@ async function handle(
       return NextResponse.json({ received: true, applied: false });
     }
 
-    const live = await provider.getStatus(event.providerRef, payment.amount_local);
+    const live = await provider.getStatus(event.providerRef, {
+      amountLocal: payment.amount_local,
+      amountUsd: payment.amount_usd,
+    });
     event = {
       ...event,
       status: live.status,
