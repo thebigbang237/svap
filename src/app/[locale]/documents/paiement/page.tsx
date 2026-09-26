@@ -131,7 +131,7 @@ export default async function Phase2PaiementPage({
             currency={localAmount?.currency ?? null}
             cardAmount={cardAmount}
             paypalAmount={paypalAmount}
-            resumePaymentId={inFlight?.id ?? null}
+            resume={inFlight}
           />
         </div>
       </div>

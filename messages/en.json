@@ -855,6 +855,13 @@
         "dialNow": "Dial the code now",
         "dontClose": "Don't close this page. Approval can take up to two minutes."
       },
+      "waitingHosted": {
+        "title": "Confirming your payment",
+        "instruction": "If you have just paid on the payment provider's page, confirmation usually arrives within a minute. Don't close this page — you'll be taken to the next step automatically.",
+        "notPaid": "Didn't complete the payment, or changed your mind?",
+        "restart": "Start the payment again",
+        "confirmRestart": "Only start again if you did NOT pay. If you have already paid, stay on this page: confirmation can take a minute, and starting again risks being charged twice."
+      },
       "timeout": {
         "title": "No confirmation yet",
         "description": "We haven't received confirmation from your operator yet. If you approved the payment on your phone, it will be picked up automatically — refresh this page in a few minutes. Don't start a new payment without checking first.",

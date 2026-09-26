@@ -80,7 +80,7 @@ export function PaymentForm({
   currency,
   cardAmount = null,
   paypalAmount = null,
-  resumePaymentId = null,
+  resume = null,
 }: {
   methods: PaymentMethod[];
   defaultPhone: string;
@@ -96,9 +96,10 @@ export function PaymentForm({
    * A payment already in flight for this dossier, if any. Set when the
    * candidate arrives back from a hosted card page, or reloads while a mobile
    * money prompt is still outstanding — the form resumes waiting on it instead
-   * of offering to charge them a second time.
+   * of offering to charge them a second time. Its method decides which wait
+   * they are shown.
    */
-  resumePaymentId?: string | null;
+  resume?: { id: string; method: PaymentMethod } | null;
 }) {
   const t = useTranslations("phase2.paiement");
   const locale = useLocale();
@@ -106,9 +107,13 @@ export function PaymentForm({
 
   const [method, setMethod] = useState<PaymentMethod>(methods[0]);
   const [phone, setPhone] = useState(defaultPhone);
-  const [phase, setPhase] = useState<Phase>(
-    resumePaymentId ? "waiting" : "choose",
+  const [phase, setPhase] = useState<Phase>(resume ? "waiting" : "choose");
+  // The rail being waited on — the resumed payment's, not whatever the radio
+  // happens to be set to.
+  const [waitingMethod, setWaitingMethod] = useState<PaymentMethod>(
+    resume?.method ?? methods[0],
   );
+  const [pendingId, setPendingId] = useState<string | null>(resume?.id ?? null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [charged, setCharged] = useState<{ amount: number; currency: string } | null>(null);
@@ -197,6 +202,7 @@ export function PaymentForm({
 
   const startPolling = useCallback(
     (paymentId: string) => {
+      setPendingId(paymentId);
       setPhase("waiting");
       window.setTimeout(() => setShowReviveHint(true), REVIVE_HINT_AFTER_MS);
 
@@ -233,10 +239,48 @@ export function PaymentForm({
   // can call it. Guarded with a ref rather than an empty dependency list so
   // React's development double-invoke doesn't start two loops on one payment.
   useEffect(() => {
-    if (!resumePaymentId || resumed.current) return;
+    if (!resume || resumed.current) return;
     resumed.current = true;
-    startPolling(resumePaymentId);
-  }, [resumePaymentId, startPolling]);
+    setWaitingMethod(resume.method);
+    startPolling(resume.id);
+  }, [resume, startPolling]);
+
+  /**
+   * Gives up on the payment being waited for and returns to the form.
+   *
+   * The server asks the provider before cancelling, so someone who actually
+   * did pay is settled and sent onward rather than dropped back to a Pay
+   * button — which is how a second charge happens.
+   */
+  async function abandon() {
+    clearTimers();
+    setBusy(true);
+
+    try {
+      if (pendingId) {
+        const res = await fetch("/api/payments/cancel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentId: pendingId }),
+        });
+        const body: { status?: string } | null = await res.json().catch(() => null);
+
+        if (body?.status === "paye") {
+          router.push("/documents/pieces");
+          return;
+        }
+      }
+    } catch {
+      // The row lapses on its own after 30 minutes; not worth blocking on.
+    } finally {
+      setBusy(false);
+    }
+
+    setPendingId(null);
+    setError(null);
+    setShowReviveHint(false);
+    setPhase("choose");
+  }
 
   async function startCheckout() {
     setBusy(true);
@@ -287,6 +331,7 @@ export function PaymentForm({
         if (body.amountLocal && body.currency) {
           setCharged({ amount: body.amountLocal, currency: body.currency });
         }
+        setWaitingMethod(method);
         startPolling(body.paymentId);
       }
     } catch {
@@ -294,6 +339,53 @@ export function PaymentForm({
     } finally {
       setBusy(false);
     }
+  }
+
+  // Coming back from a hosted card or PayPal page. Nothing is happening on a
+  // handset, so the mobile-money wait below — "check your phone", PIN prompts,
+  // USSD codes — would be actively misleading. Most arrivals here have not
+  // paid at all: they looked at the gateway and came back, which is why the
+  // way out is on the screen rather than five minutes away.
+  if (phase === "waiting" && waitingMethod !== "mobile_money") {
+    return (
+      <div className="space-y-8">
+        <div className="border-s-2 border-terracotta bg-sky-mid/60 p-8">
+          <h2 className="mb-4 font-serif text-[24px] font-normal text-blue-dark">
+            {t("waitingHosted.title")}
+          </h2>
+          <p className="text-ink">{t("waitingHosted.instruction")}</p>
+        </div>
+
+        <div
+          className="flex items-center gap-3 text-ink-dim"
+          role="status"
+          aria-live="polite"
+        >
+          <span className="h-2 w-2 animate-pulse bg-terracotta" />
+          <span className="text-sm">{t("waiting.polling")}</span>
+        </div>
+
+        {/* Held back for the first seconds. Someone who has genuinely just
+            paid arrives here too, and their confirmation is usually moments
+            away — offering them a "start again" button in that moment is
+            offering them a second charge. */}
+        {showReviveHint && (
+          <div className="border border-ink-dim/20 bg-white p-6">
+            <p className="mb-3 text-sm text-ink">{t("waitingHosted.notPaid")}</p>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                if (window.confirm(t("waitingHosted.confirmRestart"))) abandon();
+              }}
+              className="text-xs font-semibold uppercase tracking-[0.2em] text-blue transition-colors hover:text-terracotta disabled:opacity-50"
+            >
+              {t("waitingHosted.restart")}
+            </button>
+          </div>
+        )}
+      </div>
+    );
   }
 
   if (phase === "waiting") {
@@ -408,12 +500,12 @@ export function PaymentForm({
               the candidate on a dead screen with no way back to the form. */}
           <button
             type="button"
-            onClick={() => {
-              clearTimers();
-              setError(null);
-              setPhase("choose");
-            }}
-            className="text-xs font-semibold uppercase tracking-[0.2em] text-blue transition-colors hover:text-terracotta"
+            disabled={busy}
+            // Releases the payment as well as the screen: a row left in
+            // `en_cours` is resumed on the next page load, which is how
+            // someone ends up back on this spinner having done nothing.
+            onClick={abandon}
+            className="text-xs font-semibold uppercase tracking-[0.2em] text-blue transition-colors hover:text-terracotta disabled:opacity-50"
           >
             {t("timeout.retry")}
           </button>

@@ -540,6 +540,27 @@ hours, falling back to `FX_RATES_USD`). The hand-maintained table it replaced
 is what quoted a Ghanaian candidate 31% over the fee — keep the fallback
 roughly current for the day the feed is down.
 
+**What each outcome does, on both rails:**
+
+| Outcome | Payment row | What the candidate sees |
+|---|---|---|
+| Paid | `paye`, `completed_at` set | Moves to `/documents/pieces`, receipt emailed |
+| Refused by the gateway | `echoue` + reason | Back on the form with the reason, free to retry |
+| Came back without paying | `annule` (via `/api/payments/cancel`) | "Start the payment again", after a short delay |
+| Nothing heard | stays `en_cours` | Waiting screen, then the timeout copy — which does **not** say it failed |
+
+Two rules hold across all of it. **A cancel asks the provider first**: if the
+payment actually succeeded it is settled and the candidate sent onward, never
+dropped back to a Pay button. And **cancelling is not final** — the cron keeps
+re-checking `annule` rows, and only ever moves them to `paye`, so a prompt
+approved late or a card page finished in another tab still lands.
+
+✅ The waiting screen must match the rail. A card payer sees "Vérification de
+votre paiement"; only mobile money gets "Vérifiez votre téléphone", PIN
+prompts and USSD codes. Returning from a card page into the mobile-money wait
+tells someone to check a phone that will never ring — it was doing exactly
+that until 2026-09-26.
+
 **Card (any country).** Choose "Carte bancaire" → their page asks for the
 country, then the method → pick Visa/Mastercard → pay.
 ✅ You land back on `/documents/paiement`, which resumes polling rather than

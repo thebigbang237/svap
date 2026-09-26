@@ -137,20 +137,24 @@ const RESUMABLE_WINDOW_MINUTES = 30;
 export async function findResumablePayment(
   supabase: AdminClient,
   candidatureId: string,
-): Promise<{ id: string } | null> {
+): Promise<{ id: string; method: PaymentMethod } | null> {
   const since = new Date(
     Date.now() - RESUMABLE_WINDOW_MINUTES * 60_000,
   ).toISOString();
 
   const { data } = await supabase
     .from("payments")
-    .select("id")
+    // The method comes back too: waiting for a PIN prompt and waiting for a
+    // card redirect to be confirmed are different screens, and showing the
+    // mobile-money one to someone who just came back from a card page tells
+    // them to check a phone that will never ring.
+    .select("id, method")
     .eq("candidature_id", candidatureId)
     .in("status", ["en_attente", "en_cours"])
     .gt("created_at", since)
     .order("created_at", { ascending: false })
     .limit(1)
-    .maybeSingle<{ id: string }>();
+    .maybeSingle<{ id: string; method: PaymentMethod }>();
 
   return data ?? null;
 }

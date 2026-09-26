@@ -57,7 +57,11 @@ async function reconcile() {
   const { data: pending, error } = await supabase
     .from("payments")
     .select("*")
-    .in("status", ["en_attente", "en_cours"])
+    // `annule` is in here deliberately. A candidate who gives up on the
+    // payment step cancels their row, but a mobile-money prompt they approved
+    // late, or a card page they finished after changing tabs, still completes
+    // at the provider. Those rows are only ever moved on to `paye` below.
+    .in("status", ["en_attente", "en_cours", "annule"])
     .lt("created_at", staleBefore)
     .gt("created_at", giveUpBefore)
     .order("created_at", { ascending: true })
@@ -90,6 +94,14 @@ async function reconcile() {
 
       const becamePaid = live.status === "paye";
 
+      // A cancelled payment is only ever revived by money actually arriving.
+      // Without this, the provider's "still pending" would walk it back to
+      // `en_cours` and resume waiting on a payment the candidate abandoned.
+      if (payment.status === "annule" && !becamePaid) {
+        unresolved += 1;
+        continue;
+      }
+
       await supabase
         .from("payments")
         .update({
@@ -104,7 +116,7 @@ async function reconcile() {
         .eq("id", payment.id)
         // Guards against the poll or a callback resolving the same row
         // concurrently.
-        .in("status", ["en_attente", "en_cours"]);
+        .in("status", ["en_attente", "en_cours", "annule"]);
 
       if (becamePaid) {
         await settlePayment(supabase, { ...payment, status: "paye" });

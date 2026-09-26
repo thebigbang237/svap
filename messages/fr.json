@@ -855,6 +855,13 @@
         "dialNow": "Composer le code maintenant",
         "dontClose": "Ne fermez pas cette page. La validation peut prendre jusqu'à deux minutes."
       },
+      "waitingHosted": {
+        "title": "Vérification de votre paiement",
+        "instruction": "Si vous venez de payer sur la page du prestataire, la confirmation arrive généralement en moins d'une minute. Ne fermez pas cette page : vous passerez automatiquement à l'étape suivante.",
+        "notPaid": "Vous n'avez pas terminé le paiement, ou vous avez changé d'avis ?",
+        "restart": "Recommencer le paiement",
+        "confirmRestart": "Ne recommencez que si vous n'avez PAS payé. Si vous avez déjà payé, restez sur cette page : la confirmation peut prendre une minute, et recommencer risque de vous faire payer deux fois."
+      },
       "timeout": {
         "title": "Confirmation non reçue",
         "description": "Nous n'avons pas encore reçu la confirmation de votre opérateur. Si vous avez validé le paiement sur votre téléphone, il sera pris en compte automatiquement — actualisez cette page dans quelques minutes. Ne recommencez pas le paiement sans avoir vérifié.",
