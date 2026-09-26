@@ -1,10 +1,20 @@
+import { use } from "react";
+import { setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/marketing/PageHeader";
 import { CandidatureForm } from "@/components/forms/CandidatureForm";
 import { CheckIcon, ShieldIcon, CertificateIcon } from "@/components/marketing/icons";
 
-export default function CandidaturePage() {
+export default function CandidaturePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  // Prerendered: without this, next-intl resolves the locale from the
+  // request headers and the page is re-rendered for every visitor.
+  setRequestLocale(use(params).locale);
+
   const tCommon = useTranslations("common");
   const tCandidature = useTranslations("candidature");
 

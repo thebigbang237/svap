@@ -112,16 +112,29 @@ function mapStatus(raw: string | undefined): PaymentStatus {
   }
 }
 
-async function pawapayFetch(path: string, init?: RequestInit) {
+/**
+ * `revalidate` opts a call into Next's data cache, shared across invocations.
+ * Everything to do with money stays uncached — a deposit or its status read
+ * from a cache is a wrong answer — so it is opt-in, and only the operator
+ * listing uses it.
+ */
+async function pawapayFetch(
+  path: string,
+  init?: RequestInit & { revalidate?: number },
+) {
   const { token, baseUrl } = config();
+  const { revalidate, ...rest } = init ?? {};
+
   return fetch(`${baseUrl}${path}`, {
-    ...init,
+    ...rest,
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
       ...(init?.headers ?? {}),
     },
-    cache: "no-store",
+    ...(revalidate === undefined
+      ? { cache: "no-store" as const }
+      : { next: { revalidate } }),
   });
 }
 
@@ -235,6 +248,11 @@ export async function listOperators(
 
   const response = await pawapayFetch(
     `/v2/active-conf?country=${COUNTRY_CODES[country]}&operationType=DEPOSIT`,
+    // Five minutes. Which operators are live changes on the scale of
+    // maintenance windows, not page loads, and this fires on every visit to
+    // the payment step — but short enough that an operator going down is
+    // reflected before most candidates reach the form.
+    { revalidate: 300 },
   );
 
   if (!response.ok) {

@@ -1,3 +1,5 @@
+import { use } from "react";
+import { setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -70,7 +72,15 @@ function WhyCard({
   );
 }
 
-export default function HomePage() {
+export default function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  // Prerendered: without this, next-intl resolves the locale from the
+  // request headers and the page is re-rendered for every visitor.
+  setRequestLocale(use(params).locale);
+
   const tHero = useTranslations("hero");
   const tWhy = useTranslations("why");
   const tPacks = useTranslations("packs");

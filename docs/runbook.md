@@ -360,6 +360,39 @@ will succeed and the feature will fail.
 
 ---
 
+## 3c. Rendering, and why it is a cost question
+
+Vercel bills **Fluid Active CPU**. A page that renders per request burns it on
+every visit; a prerendered one is served from the CDN and burns none. In
+September 2026 the whole public site was rendering per request and reached 75%
+of the free monthly allowance, at which point projects are **paused**.
+
+What holds that down, and is easy to undo by accident:
+
+| Thing | Why |
+|---|---|
+| `setRequestLocale(locale)` in `[locale]/layout.tsx` **and every public page** | next-intl otherwise resolves the locale from request headers, which makes the page dynamic. The call must be in the page too — layouts and pages render concurrently |
+| Pages take `params` and read it with `use(params)` | So a sync page can call `setRequestLocale` without becoming async |
+| `export const revalidate = 900` on `/actualites` | The only public page that reads the database. ISR instead of per-request |
+| The proxy matcher excludes `fr/`, `en/`, `ar/` | A locale-prefixed URL needs no negotiation; running the proxy on it costs an invocation per page view. What is left is unprefixed paths (`/`, `/faq`) and `/admin/*` |
+| `revalidate: 300` on pawaPay's `active-conf` | Fires on every visit to the payment step. Deposits and status reads stay uncached — money is never served from a cache |
+
+✅ Check after any change to i18n, routing or a public page — `next build`
+must show `●` or `○`, never `ƒ`, for everything outside `documents/*`,
+`admin/*` and `api/*`:
+
+```bash
+npm run build | sed -n '/Route (app)/,/Middleware/p'
+```
+
+A single `ƒ` on a marketing page means every visit to it is a function
+invocation again.
+
+**What the proxy change gives up**: next-intl no longer writes its
+`NEXT_LOCALE` cookie on locale-prefixed visits, so a later visit to `/` is
+routed by `Accept-Language` rather than by the last locale chosen. The
+language switcher links to explicit paths, so switching still works.
+
 ## 4. Local development
 
 ```bash

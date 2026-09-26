@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageHeader } from "@/components/marketing/PageHeader";
 import { ArticleCard } from "@/components/marketing/ArticleCard";
 import { CTAButton } from "@/components/marketing/CTAButton";
@@ -12,10 +12,13 @@ import type { ArticleRow } from "@/lib/supabase/types";
  * Every card leaves for the publisher. Nothing is reproduced on this domain —
  * see supabase/migrations/0016.
  *
- * No `revalidate` export: the whole `[locale]` tree renders per request in
- * this app, so declaring one here would promise caching that never happens.
- * The query is a single indexed read of a table with tens of rows.
+ * Revalidated rather than rendered per request: press coverage changes a few
+ * times a season, and this is the only public page that reads the database.
+ * Publishing an article shows up within the window below.
  */
+
+/** Fifteen minutes: news is not time-critical, and this keeps the page free. */
+export const revalidate = 900;
 
 export default async function ActualitesPage({
   params,
@@ -23,6 +26,7 @@ export default async function ActualitesPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const tCommon = await getTranslations("common");
   const t = await getTranslations("actualites");
 

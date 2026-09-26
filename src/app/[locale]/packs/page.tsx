@@ -1,3 +1,5 @@
+import { use } from "react";
+import { setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/marketing/PageHeader";
 import { SectionEyebrow } from "@/components/marketing/SectionEyebrow";
@@ -47,7 +49,15 @@ function ProcessStep({
  * step, in the FAQ and in the database constraint, and the whole point of the
  * single source of truth is that they cannot disagree.
  */
-export default function PacksPage() {
+export default function PacksPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  // Prerendered: without this, next-intl resolves the locale from the
+  // request headers and the page is re-rendered for every visitor.
+  setRequestLocale(use(params).locale);
+
   const tCommon = useTranslations("common");
   const t = useTranslations("packs");
   // Pack display names live in the candidature namespace — the form, the

@@ -1,3 +1,5 @@
+import { use } from "react";
+import { setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/marketing/PageHeader";
 import { SectionEyebrow } from "@/components/marketing/SectionEyebrow";
@@ -85,7 +87,15 @@ function StatusCard({
   );
 }
 
-export default function AdmissionPage() {
+export default function AdmissionPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  // Prerendered: without this, next-intl resolves the locale from the
+  // request headers and the page is re-rendered for every visitor.
+  setRequestLocale(use(params).locale);
+
   const tCommon = useTranslations("common");
   const t = useTranslations("admission");
   const tPays = useTranslations("candidature.options.pays");

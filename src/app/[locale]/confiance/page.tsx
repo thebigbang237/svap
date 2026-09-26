@@ -1,3 +1,5 @@
+import { use } from "react";
+import { setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/marketing/PageHeader";
 import { CTAButton } from "@/components/marketing/CTAButton";
@@ -24,7 +26,15 @@ interface Item {
  * guidance is only useful if a candidate can find it in one place and check it
  * against what is being asked of them.
  */
-export default function ConfiancePage() {
+export default function ConfiancePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  // Prerendered: without this, next-intl resolves the locale from the
+  // request headers and the page is re-rendered for every visitor.
+  setRequestLocale(use(params).locale);
+
   const tCommon = useTranslations("common");
   const t = useTranslations("confiance");
 

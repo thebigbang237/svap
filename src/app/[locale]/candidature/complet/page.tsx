@@ -1,3 +1,5 @@
+import { use } from "react";
+import { setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { CTAButton } from "@/components/marketing/CTAButton";
 import { Link } from "@/i18n/navigation";
@@ -17,7 +19,15 @@ import { Link } from "@/i18n/navigation";
  * conflating them would tell an eligible candidate something untrue about
  * themselves. This page says plainly that nothing was wrong with the dossier.
  */
-export default function PackCompletPage() {
+export default function PackCompletPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  // Prerendered: without this, next-intl resolves the locale from the
+  // request headers and the page is re-rendered for every visitor.
+  setRequestLocale(use(params).locale);
+
   const t = useTranslations("candidature.complet");
 
   return (

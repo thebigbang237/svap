@@ -1,3 +1,5 @@
+import { use } from "react";
+import { setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/marketing/PageHeader";
 import { AgendaDayCard } from "@/components/marketing/AgendaDayCard";
@@ -5,7 +7,15 @@ import { CTAButton } from "@/components/marketing/CTAButton";
 import { ArrowRightIcon } from "@/components/marketing/icons";
 import { PROGRAMME_DAYS } from "@/lib/constants/program";
 
-export default function AgendaPage() {
+export default function AgendaPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  // Prerendered: without this, next-intl resolves the locale from the
+  // request headers and the page is re-rendered for every visitor.
+  setRequestLocale(use(params).locale);
+
   const tCommon = useTranslations("common");
   const t = useTranslations("agenda");
 

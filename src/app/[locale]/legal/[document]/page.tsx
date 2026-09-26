@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PageHeader } from "@/components/marketing/PageHeader";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
@@ -50,7 +50,9 @@ export default async function LegalPage({
 }: {
   params: Promise<{ locale: string; document: string }>;
 }) {
-  const { document } = await params;
+  const { locale, document } = await params;
+  // Prerendered — see the note in the layout.
+  setRequestLocale(locale);
 
   if (!(DOCUMENTS as readonly string[]).includes(document)) notFound();
 

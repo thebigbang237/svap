@@ -1,3 +1,5 @@
+import { use } from "react";
+import { setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { PageHeader } from "@/components/marketing/PageHeader";
 import { CTAButton } from "@/components/marketing/CTAButton";
@@ -18,7 +20,15 @@ interface FaqItem {
  * and search engines can see them. On a page whose job is partly to answer
  * "is this a scam?", the answers being findable is the point.
  */
-export default function FaqPage() {
+export default function FaqPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  // Prerendered: without this, next-intl resolves the locale from the
+  // request headers and the page is re-rendered for every visitor.
+  setRequestLocale(use(params).locale);
+
   const tCommon = useTranslations("common");
   const t = useTranslations("faq");
   const items = t.raw("items") as FaqItem[];

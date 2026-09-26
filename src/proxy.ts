@@ -82,6 +82,24 @@ async function handleAdminAuth(request: NextRequest) {
   return response;
 }
 
+/**
+ * What still needs the proxy, and nothing else.
+ *
+ * The public pages are prerendered, and a request for `/fr/faq` already
+ * carries its locale in the path — running locale negotiation over it buys
+ * nothing and costs a function invocation on every page view, which on a
+ * marketing site is nearly all of them.
+ *
+ * So locale-prefixed paths are excluded, and what is left is exactly the two
+ * jobs that cannot be done anywhere else:
+ *
+ *   • an unprefixed path (`/`, `/faq`, a pasted old link) → redirected to a
+ *     locale by next-intl;
+ *   • `/admin/*` → gated on a session and an admin_profiles row.
+ *
+ * Also excluded: `api` (the routes authenticate themselves), `_next`, and
+ * anything with a file extension.
+ */
 export const config = {
-  matcher: ["/((?!api|_next|.*\\..*).*)"],
+  matcher: ["/((?!fr/|en/|ar/|api|_next|.*\\..*).*)"],
 };

@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getMessages, getTranslations } from "next-intl/server";
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
 import { routing, getDirection } from "@/i18n/routing";
 // Side-effect import: registers every @font-face. Self-hosted, so nothing is
 // fetched from a third party at build time or at runtime.
@@ -56,6 +60,13 @@ export default async function RootLayout({
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+
+  // Everything under here can be prerendered, and must be: without this call
+  // next-intl resolves the locale from the request headers, which makes every
+  // page dynamic — the whole marketing site re-rendered per visitor, at a cost
+  // that showed up as 75% of a Vercel CPU quota. Each page repeats the call,
+  // as the docs require, because layouts and pages render concurrently.
+  setRequestLocale(locale);
 
   const messages = await getMessages();
 
