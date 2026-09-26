@@ -279,6 +279,24 @@ export async function markCandidaturePaid(
 }
 
 /**
+ * What the payer actually saw leave their account.
+ *
+ * For Paiement Pro the CFA figure on the row is an instruction to their
+ * gateway, computed backwards from the fee so that their conversion lands on
+ * it (see `quoteFor`). The payer was billed in USD and never saw a franc, so a
+ * receipt quoting francs would be a receipt for a payment they don't
+ * recognise.
+ */
+function chargedOnReceipt(payment: PaymentRow): {
+  amountLocal: number;
+  currency: string;
+} {
+  return payment.provider === "paiementpro"
+    ? { amountLocal: payment.amount_usd, currency: "USD" }
+    : { amountLocal: payment.amount_local, currency: payment.currency };
+}
+
+/**
  * Everything that must happen exactly once when a fee settles: advance the
  * dossier, and send the receipt.
  *
@@ -324,8 +342,7 @@ export async function settlePayment(
       email: candidature.email,
       locale: candidature.locale,
       amountUsd: payment.amount_usd,
-      amountLocal: payment.amount_local,
-      currency: payment.currency,
+      ...chargedOnReceipt(payment),
       reference: payment.provider_ref,
       paidAt: new Date(),
     });

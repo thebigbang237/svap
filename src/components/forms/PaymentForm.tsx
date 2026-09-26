@@ -57,6 +57,21 @@ interface Operator {
  */
 const REVIVE_HINT_AFTER_MS = 12_000;
 
+/**
+ * The charged figure, as the gateway will show it. Falls back to the plain fee
+ * if the quote could not be computed — better a slightly rounder number than
+ * an empty box on the step where someone is about to pay.
+ */
+function formatCharged(
+  charged: { amount: number; currency: string } | null,
+  feeUsd: number,
+): string {
+  if (!charged) return `$${feeUsd}`;
+  return charged.currency === "USD"
+    ? `$${charged.amount.toFixed(2)}`
+    : `${charged.amount.toLocaleString("en-US")} ${charged.currency}`;
+}
+
 export function PaymentForm({
   methods,
   defaultPhone,
@@ -314,7 +329,7 @@ export function PaymentForm({
             <p className="text-ink-mid">
               {t("waiting.amount")}{" "}
               <Ltr className="font-semibold">
-                {`${charged.amount} ${charged.currency}`}
+                {formatCharged(charged, amountUsd)}
               </Ltr>
             </p>
           )}
@@ -548,42 +563,23 @@ export function PaymentForm({
         </div>
       )}
 
-      {method === "card" && (
+      {/* Card and PayPal are billed in USD, whatever the processor does behind
+          the scenes: the francs we send Paiement Pro are computed backwards
+          from the fee, so their page lands on this figure. What is shown here
+          is therefore what the gateway shows next — never a number the payer
+          has to reconcile. */}
+      {(method === "card" || method === "paypal") && (
         <div className="border border-ink-dim/20 bg-white p-6">
           <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-ink-dim">
             {t("amountToPay")}
           </span>
           <Ltr className="font-serif text-[32px] font-normal leading-none text-terracotta">
-            {cardAmount
-              ? `${cardAmount.amount.toLocaleString("en-US")} ${cardAmount.currency}`
-              : `$${amountUsd}`}
+            {formatCharged(method === "paypal" ? paypalAmount : cardAmount, amountUsd)}
           </Ltr>
-          {/* The figure the processor actually charges, so it matches its
-              hosted page. The issuer then converts to the card's own currency
-              at its own rate — a figure we cannot quote. */}
           <p className="mt-2 text-xs text-ink-dim">
-            {cardAmount
-              ? t("cardLocalNote", { usd: amountUsd })
+            {method === "paypal"
+              ? t("paypalNote")
               : t("cardConversionNote")}
-          </p>
-        </div>
-      )}
-
-      {method === "paypal" && (
-        <div className="border border-ink-dim/20 bg-white p-6">
-          <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.2em] text-ink-dim">
-            {t("amountToPay")}
-          </span>
-          <Ltr className="font-serif text-[32px] font-normal leading-none text-terracotta">
-            {paypalAmount
-              ? `${paypalAmount.amount.toLocaleString("en-US")} ${paypalAmount.currency}`
-              : `$${amountUsd}`}
-          </Ltr>
-          {/* PayPal cannot hold CFA francs, so what it debits is a conversion
-              made on the way — shown on its own page before the payer
-              confirms, and not a figure we can quote here. */}
-          <p className="mt-2 text-xs text-ink-dim">
-            {t("paypalNote", { usd: amountUsd })}
           </p>
         </div>
       )}

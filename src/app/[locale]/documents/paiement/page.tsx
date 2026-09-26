@@ -5,8 +5,7 @@ import { findResumablePayment } from "@/lib/payments/record";
 import { Phase2StepShell } from "@/components/forms/Phase2StepShell";
 import { PaymentForm } from "@/components/forms/PaymentForm";
 import { Ltr } from "@/components/layout/Ltr";
-import { availableMethods, hostedMoney } from "@/lib/payments/registry";
-import { convertUsd } from "@/lib/payments/fx";
+import { availableMethods, quoteFor } from "@/lib/payments/registry";
 import type { PaymentMethod } from "@/lib/payments/types";
 import { COUNTRIES, PACK_SPECS, type Country, type Pack } from "@/lib/constants/program";
 
@@ -51,36 +50,26 @@ export default async function Phase2PaiementPage({
     ? availableMethods(country)
     : ["card"];
 
-  // Local-currency equivalent, computed with the same function the checkout
-  // uses — so the figure shown here is the figure that gets charged. Null when
-  // the country is card-only, or when no rate is configured, which must not
-  // take the payment step down.
-  let localAmount: { amountLocal: number; currency: string } | null = null;
-  if (country && methods.includes("mobile_money")) {
+  // What each method will actually debit, from the same function the checkout
+  // quotes from — so the figure shown here is the figure charged. A rate
+  // lookup that fails must not take the payment step down, so each one falls
+  // back to null and the block is simply not rendered.
+  const country_ = country;
+  async function charged(method: PaymentMethod) {
+    if (!country_) return null;
     try {
-      const money = convertUsd(spec.verificationFeeUsd, country);
-      localAmount = { amountLocal: money.amountLocal, currency: money.currency };
+      return (await quoteFor(method, country_, spec.verificationFeeUsd)).charged;
     } catch (error) {
-      console.error("FX rate unavailable for the payment page:", error);
-    }
-  }
-
-  // What a card or PayPal payment is charged in, when that isn't the USD
-  // figure above — Paiement Pro charges XOF. Same function as the checkout,
-  // same reason.
-  function hostedAmount(method: "card" | "paypal") {
-    try {
-      const money = hostedMoney(method, spec.verificationFeeUsd);
-      return money.currency === "USD"
-        ? null
-        : { amount: money.amountLocal, currency: money.currency };
-    } catch (error) {
-      console.error(`FX rate unavailable for the ${method} amount:`, error);
+      console.error(`Cannot quote ${method} for the payment page:`, error);
       return null;
     }
   }
-  const cardAmount = hostedAmount("card");
-  const paypalAmount = methods.includes("paypal") ? hostedAmount("paypal") : null;
+
+  const [localAmount, cardAmount, paypalAmount] = await Promise.all([
+    methods.includes("mobile_money") ? charged("mobile_money") : null,
+    charged("card"),
+    methods.includes("paypal") ? charged("paypal") : null,
+  ]);
 
   return (
     <Phase2StepShell step="paiement" steps={progress.steps}>
@@ -138,7 +127,7 @@ export default async function Phase2PaiementPage({
             methods={methods}
             defaultPhone={progress.candidature.telephone ?? ""}
             amountUsd={spec.verificationFeeUsd}
-            amountLocal={localAmount?.amountLocal ?? null}
+            amountLocal={localAmount?.amount ?? null}
             currency={localAmount?.currency ?? null}
             cardAmount={cardAmount}
             paypalAmount={paypalAmount}

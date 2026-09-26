@@ -882,8 +882,7 @@
       "amountToPay": "Amount to pay",
       "amountEquivalent": "Equivalent of {usd} USD at today's rate.",
       "cardConversionNote": "Charged in USD. Your bank applies its own conversion.",
-      "cardLocalNote": "Equivalent of {usd} USD. Your bank applies its own conversion.",
-      "paypalNote": "Equivalent of {usd} USD. PayPal shows the exact amount in your currency before you confirm.",
+      "paypalNote": "PayPal shows this amount before you confirm. Your bank applies its own conversion.",
       "operatorLabel": "Your Mobile Money operator",
       "operatorLoading": "Loading operators...",
       "operatorUnavailable": "No Mobile Money operator is available right now. Please use a bank card."

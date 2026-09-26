@@ -3,7 +3,8 @@ import { COUNTRY_PAYMENT, type Country } from "@/lib/constants/program";
 import { pawapayProvider } from "./pawapay";
 import { stripeProvider } from "./stripe";
 import { paiementproProvider } from "./paiementpro";
-import { convertUsdTo, usdOnly } from "./fx";
+import { convertUsd, moneyIn, roundLocal, usdOnly } from "./fx";
+import { localForFee, feeForLocal, type Surcharge } from "./paiementpro-amount";
 import type {
   Money,
   PaymentMethod,
@@ -60,19 +61,86 @@ export function providerFor(
 }
 
 /**
- * What a card or PayPal payment is charged in, by the provider that takes it.
- *
- * Shared by the checkout and the payment page, so the figure the candidate is
- * shown is the figure that gets charged. Stripe takes USD; Paiement Pro reads
- * every amount as CFA francs, so the fee has to be converted first.
+ * Paiement Pro's own charges, which the programme absorbs rather than passing
+ * on. Overridable without a deploy, because they are *their* numbers and can
+ * change with no notice — `scripts/paiementpro-calibrate.mjs` measures them.
  */
-export function hostedMoney(
-  method: "card" | "paypal",
+function surcharge(): Surcharge {
+  return {
+    xofPerUsd: Number(process.env.PAIEMENTPRO_XOF_PER_USD ?? 540),
+    fixedUsd: Number(process.env.PAIEMENTPRO_SURCHARGE_FIXED_USD ?? 1),
+    bufferPct: Number(process.env.PAIEMENTPRO_RATE_BUFFER_PCT ?? 0),
+  };
+}
+
+/**
+ * What a payment will cost, on every rail: the amount we ask the rail for, and
+ * the amount the candidate's account is actually debited.
+ *
+ * The two differ only for Paiement Pro, and that difference is the whole
+ * reason this function exists. They take CFA francs, convert them back to USD
+ * at their own rate, and add a margin plus a flat dollar — so a fee converted
+ * straight across arrives at the payer as something larger. A candidate quoted
+ * $30 was asked for $34.92, which is how this was found.
+ *
+ * So the francs are computed *backwards from the fee*: enough that their
+ * arithmetic lands on $30, and the programme absorbs what they take. Every
+ * caller — the payment page, the checkout, the receipt — asks this one
+ * function, so the figure shown, charged and receipted cannot drift apart.
+ */
+export interface Quote {
+  /** What the rail is asked for. Goes on the payment row. */
+  money: Money;
+  /** What the candidate's account is debited, in the currency they'll see. */
+  charged: { amount: number; currency: string };
+}
+
+export async function quoteFor(
+  method: PaymentMethod,
+  country: Country,
   amountUsd: number,
-): Money {
+): Promise<Quote> {
+  if (method === "mobile_money") {
+    // pawaPay debits exactly what we ask for, in the candidate's own currency.
+    const money = await convertUsd(amountUsd, country);
+    return {
+      money,
+      charged: { amount: money.amountLocal, currency: money.currency },
+    };
+  }
+
   const provider = method === "paypal" ? paiementproProvider : cardProvider();
   const currency = provider.chargeCurrency;
-  return currency ? convertUsdTo(amountUsd, currency) : usdOnly(amountUsd);
+
+  // Stripe: billed in USD, nothing added.
+  if (!currency) {
+    return {
+      money: usdOnly(amountUsd),
+      charged: { amount: amountUsd, currency: "USD" },
+    };
+  }
+
+  const s = surcharge();
+  const amountLocal = roundLocal(localForFee(amountUsd, s), currency);
+
+  return {
+    // The rate recorded is THEIRS, not the market's: it is the rate this
+    // amount was actually computed with, and a receipt has to be able to
+    // explain the figure it shows.
+    money: moneyIn(
+      amountUsd,
+      amountLocal,
+      currency,
+      s.xofPerUsd,
+      "paiementpro:fixed-rate",
+    ),
+    // What their page will show — the advertised fee, by construction, and
+    // never above it.
+    charged: {
+      amount: Math.round(feeForLocal(amountLocal, s) * 100) / 100,
+      currency: "USD",
+    },
+  };
 }
 
 /** Every adapter, configured or not — see `cardProvider`. */

@@ -9,7 +9,11 @@
  * or mis-quoted transaction settles a dossier. Neither shows up in a log you
  * happen to be watching, so the bands are asserted here instead.
  */
-import { amountIsRight } from "../src/lib/payments/paiementpro-amount.ts";
+import {
+  amountIsRight,
+  feeForLocal,
+  localForFee,
+} from "../src/lib/payments/paiementpro-amount.ts";
 
 // The two live fees, with the XOF we send at the configured rate.
 const laureat = { amountUsd: 20, amountLocal: 11436 };
@@ -37,6 +41,35 @@ const cases = [
 
 let passed = 0;
 let failed = 0;
+
+/**
+ * The pricing round-trip: the francs we send must come back out of their
+ * formula as the advertised fee. This is what stops a candidate being quoted
+ * $30 and asked for $34.92, which is how the whole thing was found.
+ */
+const surcharge = { xofPerUsd: 540, fixedUsd: 1, bufferPct: 0 };
+
+for (const fee of [20, 30, 330]) {
+  const xof = localForFee(fee, surcharge);
+  const charged = feeForLocal(xof, surcharge);
+  const off = Math.abs(charged - fee);
+  if (off <= 0.01) {
+    passed += 1;
+    console.log(`  ok   $${fee} fee → ${xof} XOF → payer pays $${charged.toFixed(2)}`);
+  } else {
+    failed += 1;
+    console.error(`  FAIL $${fee} fee → ${xof} XOF → payer pays $${charged.toFixed(2)}`);
+  }
+}
+
+// Their 100 XOF floor: every fee must stay well clear of it.
+if (localForFee(20, surcharge) > 100) {
+  passed += 1;
+  console.log("  ok   the cheapest pack is above their 100 XOF minimum");
+} else {
+  failed += 1;
+  console.error("  FAIL the cheapest pack falls under their 100 XOF minimum");
+}
 
 for (const [name, expected, paid, want] of cases) {
   const got = amountIsRight(paid, expected);

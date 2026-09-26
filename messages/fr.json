@@ -882,8 +882,7 @@
       "amountToPay": "Montant à régler",
       "amountEquivalent": "Équivalent de {usd} USD au taux du jour.",
       "cardConversionNote": "Débité en USD. Votre banque applique sa propre conversion.",
-      "cardLocalNote": "Équivalent de {usd} USD. Votre banque applique sa propre conversion.",
-      "paypalNote": "Équivalent de {usd} USD. PayPal affiche le montant exact dans votre devise avant que vous confirmiez.",
+      "paypalNote": "PayPal affiche ce montant avant votre confirmation. Votre banque applique sa propre conversion.",
       "operatorLabel": "Votre opérateur Mobile Money",
       "operatorLoading": "Chargement des opérateurs...",
       "operatorUnavailable": "Aucun opérateur Mobile Money disponible actuellement. Utilisez la carte bancaire."

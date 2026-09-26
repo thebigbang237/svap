@@ -130,7 +130,9 @@ with `openssl rand -hex 32`.
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Cards (all 6 countries) | Card payment unavailable |
 | `CARD_PROVIDER`, `PAIEMENTPRO_MERCHANT_ID` | `paiementpro` routes cards through Paiement Pro instead of Stripe | Cards go to Stripe; with `paiementpro` but no merchant id, card checkout fails |
 | `PAIEMENTPRO_PAYPAL` | `true` offers PayPal through Paiement Pro. Needs the PAYPAL channel enabled on the account and migration `0018` | PayPal not offered |
-| `FX_RATES_USD` | USD → local conversion (incl. `XOF` for Paiement Pro card and PayPal) | Mobile-money and Paiement Pro checkout throw |
+| `PAIEMENTPRO_XOF_PER_USD`, `PAIEMENTPRO_SURCHARGE_FIXED_USD` | Their conversion rate and flat fee, so the francs sent land on the advertised fee. Measure with `scripts/paiementpro-calibrate.mjs` | Defaults 540 / $1.00 apply; if they have changed theirs, candidates are charged something other than the fee |
+| `FX_FEED_URL` | Live USD → local rates for mobile money. Cached 6h | Default feed (open.er-api.com) is used |
+| `FX_RATES_USD` | Fallback rates, used only when the feed is unreachable | Feed outage takes mobile-money checkout down |
 
 ⚠️ **`FIELD_ENCRYPTION_KEY` and `ACCESS_CODE_PEPPER` are effectively permanent.**
 Losing the first makes stored passport numbers unrecoverable; rotating the second
@@ -502,11 +504,41 @@ nowhere else.
 card, and Paiement Pro exposes no refund API — a refund is manual, from their
 back office. Test on the **`laureat`** pack, the cheapest at $20.
 
-**⚠️ What the payer is charged.** We send XOF; Paiement Pro converts to USD at
-its own rate and PayPal takes the payment. $20 → 11 436 XOF → **$22.18** on
-their page, about 11% over the fee. Both figures are correct and neither is a
-bug — decide whether to absorb it (lower the `XOF` rate in `FX_RATES_USD`) or
-leave it, but know which you chose before candidates ask.
+**What the payer is charged, and why it is the fee exactly.**
+
+Paiement Pro converts the francs we send into USD at a rate of their own — 540
+XOF/USD, which does *not* track the market — and adds a flat $1.00. Converting
+the fee straight across therefore overshoots: $30 became **$34.92**, which a
+candidate wrote in to query.
+
+So the francs are computed backwards from the fee (`quoteFor` in
+`lib/payments/registry.ts`): $30 → 15 660 XOF → their page shows **$30.00**.
+The programme absorbs their charge, and the payment page quotes the same USD
+figure the gateway will.
+
+✅ Assert the round-trip, and the amount bands, with:
+
+```bash
+node --experimental-strip-types scripts/check-paiementpro-amounts.mjs
+# → 16 passed, 0 failed
+```
+
+**⚠️ Those two constants are theirs and can change without notice.** The only
+symptom is a candidate charged something other than the fee. Re-measure
+whenever that is reported, and periodically regardless — it costs nothing, as
+initiating a payment is free and their page states the total:
+
+```bash
+node scripts/paiementpro-calibrate.mjs
+#   their rate   : 540.03 XOF/USD
+#   fixed fee    : $1.00
+# then set PAIEMENTPRO_XOF_PER_USD / PAIEMENTPRO_SURCHARGE_FIXED_USD if they moved
+```
+
+**Mobile money is quoted from a live rate feed** (`FX_FEED_URL`, cached six
+hours, falling back to `FX_RATES_USD`). The hand-maintained table it replaced
+is what quoted a Ghanaian candidate 31% over the fee — keep the fallback
+roughly current for the day the feed is down.
 
 **Card (any country).** Choose "Carte bancaire" → their page asks for the
 country, then the method → pick Visa/Mastercard → pay.

@@ -4,8 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { readSession } from "@/lib/access-code/session";
 import { loadPhase2Progress } from "@/lib/phase2/steps";
 import { PACK_SPECS, type Country, type Pack } from "@/lib/constants/program";
-import { hostedMoney, providerFor } from "@/lib/payments/registry";
-import { convertUsd } from "@/lib/payments/fx";
+import { quoteFor, providerFor } from "@/lib/payments/registry";
 import { createPaymentRecord, markPaymentFailed } from "@/lib/payments/record";
 import { PaymentConfigError } from "@/lib/payments/types";
 import {
@@ -94,14 +93,12 @@ export async function POST(request: Request) {
     }
   }
 
-  // Mobile money collects in local currency. Card and PayPal take whatever
-  // their processor charges in — USD for Stripe, XOF for Paiement Pro.
-  let money;
+  // One quote for every rail: what we ask the provider for, and what the
+  // candidate is actually debited. Same function the payment page quoted
+  // from, so the two cannot disagree.
+  let quote;
   try {
-    money =
-      parsed.data.method === "mobile_money"
-        ? convertUsd(spec.verificationFeeUsd, country)
-        : hostedMoney(parsed.data.method, spec.verificationFeeUsd);
+    quote = await quoteFor(parsed.data.method, country, spec.verificationFeeUsd);
   } catch (error) {
     if (error instanceof PaymentConfigError) {
       console.error("Payment configuration error:", error.message);
@@ -157,10 +154,10 @@ export async function POST(request: Request) {
 
     // Decimal support and wallet limits vary per operator, and both are known
     // up front.
-    const shaped = formatAmountForOperator(money.amountLocal, operator);
+    const shaped = formatAmountForOperator(quote.money.amountLocal, operator);
     if ("error" in shaped) {
       console.error(
-        `Fee ${money.amountLocal} ${money.currency} is ${shaped.error} for ${operator.provider} (limit ${shaped.limit}).`,
+        `Fee ${quote.money.amountLocal} ${quote.money.currency} is ${shaped.error} for ${operator.provider} (limit ${shaped.limit}).`,
       );
       return NextResponse.json(
         {
@@ -189,7 +186,7 @@ export async function POST(request: Request) {
         provider: provider.id,
         providerRef: reference,
         method: parsed.data.method,
-        money,
+        money: quote.money,
         // Recorded for reconciliation: "pawapay" alone doesn't say whether the
         // money moved over MTN or Orange, which is the first thing support asks.
         operator: parsed.data.operator,
@@ -211,7 +208,7 @@ export async function POST(request: Request) {
       candidatureId: session.cid,
       country,
       method: parsed.data.method,
-      money,
+      money: quote.money,
       reference,
       amountOverride,
       phone: msisdn,
@@ -239,7 +236,7 @@ export async function POST(request: Request) {
         provider: provider.id,
         providerRef: checkout.providerRef,
         method: parsed.data.method,
-        money,
+        money: quote.money,
         operator: parsed.data.operator,
       });
 
@@ -257,8 +254,8 @@ export async function POST(request: Request) {
       paymentId: payment.id,
       redirectUrl: checkout.redirectUrl,
       asynchronous: checkout.asynchronous,
-      amountLocal: money.amountLocal,
-      currency: money.currency,
+      amountLocal: quote.charged.amount,
+      currency: quote.charged.currency,
     });
   } catch (error) {
     // An outcome we cannot determine is NOT a failure. The deposit may be
@@ -271,8 +268,8 @@ export async function POST(request: Request) {
         paymentId: payment.id,
         asynchronous: true,
         indeterminate: true,
-        amountLocal: money.amountLocal,
-        currency: money.currency,
+        amountLocal: quote.charged.amount,
+        currency: quote.charged.currency,
       });
     }
 
