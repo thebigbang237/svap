@@ -5,7 +5,11 @@ import { findResumablePayment } from "@/lib/payments/record";
 import { Phase2StepShell } from "@/components/forms/Phase2StepShell";
 import { PaymentForm } from "@/components/forms/PaymentForm";
 import { Ltr } from "@/components/layout/Ltr";
-import { availableMethods, quoteFor } from "@/lib/payments/registry";
+import {
+  availableMethods,
+  cardProviderId,
+  quoteFor,
+} from "@/lib/payments/registry";
 import type { PaymentMethod } from "@/lib/payments/types";
 import { COUNTRIES, PACK_SPECS, type Country, type Pack } from "@/lib/constants/program";
 
@@ -130,6 +134,10 @@ export default async function Phase2PaiementPage({
             amountLocal={localAmount?.amount ?? null}
             currency={localAmount?.currency ?? null}
             cardAmount={cardAmount}
+            // Paiement Pro settles cards through PayPal, which refuses most
+            // prepaid and virtual cards — said before the redirect, not after
+            // a rejection on someone else's page.
+            strictCards={cardProviderId() === "paiementpro"}
             paypalAmount={paypalAmount}
             resume={inFlight}
           />

@@ -325,6 +325,22 @@ export async function listOperators(
     }
   }
 
+  // An empty list is a dead end for the candidate — in Ghana and Kenya it is
+  // the only rail they have — and it looks identical whether the account
+  // isn't enabled for the country, every operator is CLOSED, or the country
+  // was never activated after going live. Silence here is what turned that
+  // into an email from a candidate rather than a log line.
+  if (operators.length === 0) {
+    console.warn(
+      `pawaPay returned no usable DEPOSIT operator for ${country} (${COUNTRY_CODES[country]}). ` +
+        `Providers seen: ${
+          (data.countries ?? [])
+            .flatMap((c) => (c.providers ?? []).map((p) => p.provider))
+            .join(", ") || "none"
+        }. Check the country is enabled on the account, and that PAWAPAY_ENV matches the token.`,
+    );
+  }
+
   return { prefix, operators };
 }
 

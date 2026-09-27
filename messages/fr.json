@@ -833,11 +833,13 @@
         },
         "card": {
           "title": "Carte bancaire",
-          "description": "Visa ou Mastercard. Paiement sécurisé, aucune donnée de carte n'est stockée par le programme."
+          "description": "Visa ou Mastercard. Paiement sécurisé, aucune donnée de carte n'est stockée par le programme.",
+          "caution": "Utilisez une carte Visa ou Mastercard émise par une banque. Les cartes prépayées et virtuelles sont généralement refusées par le prestataire de paiement."
         },
         "paypal": {
           "title": "PayPal",
-          "description": "Payez avec votre solde PayPal ou une carte liée à votre compte PayPal."
+          "description": "Payez avec votre solde PayPal ou une carte liée à votre compte PayPal.",
+          "caution": "Nécessite un compte PayPal pouvant envoyer des paiements depuis votre pays."
         }
       },
       "phoneLabel": "Numéro Mobile Money",
@@ -892,7 +894,7 @@
       "paypalNote": "PayPal affiche ce montant avant votre confirmation. Votre banque applique sa propre conversion.",
       "operatorLabel": "Votre opérateur Mobile Money",
       "operatorLoading": "Chargement des opérateurs...",
-      "operatorUnavailable": "Aucun opérateur Mobile Money disponible actuellement. Utilisez la carte bancaire."
+      "operatorUnavailable": "Le Mobile Money n'est pas disponible dans votre pays pour le moment. Essayez la carte bancaire — et si elle est refusée elle aussi, répondez à l'e-mail que nous vous avons envoyé : nous organiserons votre paiement."
     },
     "options": {
       "profession": {

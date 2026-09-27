@@ -80,6 +80,7 @@ export function PaymentForm({
   currency,
   cardAmount = null,
   paypalAmount = null,
+  strictCards = false,
   resume = null,
 }: {
   methods: PaymentMethod[];
@@ -92,6 +93,13 @@ export function PaymentForm({
   cardAmount?: { amount: number; currency: string } | null;
   /** The same for PayPal, which only ever goes through Paiement Pro. */
   paypalAmount?: { amount: number; currency: string } | null;
+  /**
+   * True when cards are processed by Paiement Pro, i.e. by PayPal, which
+   * refuses most prepaid and virtual cards. The candidate is told which card
+   * to reach for *before* they leave the site, rather than being bounced back
+   * by a page they have no way to interpret.
+   */
+  strictCards?: boolean;
   /**
    * A payment already in flight for this dossier, if any. Set when the
    * candidate arrives back from a hosted card page, or reloads while a mobile
@@ -544,6 +552,13 @@ export function PaymentForm({
                 <span className="mt-1 block text-sm text-ink-mid">
                   {t(`methods.${m}.description`)}
                 </span>
+                {/* What will get them refused, stated at the moment of
+                    choosing rather than after a redirect. */}
+                {strictCards && (m === "card" || m === "paypal") && (
+                  <span className="mt-2 block text-xs text-terracotta">
+                    {t(`methods.${m}.caution`)}
+                  </span>
+                )}
               </span>
             </label>
           ))}

@@ -33,6 +33,18 @@ function cardProvider(): PaymentProvider {
 }
 
 /**
+ * Which processor a card payment would go to right now.
+ *
+ * The payment page asks because the two behave differently in ways a
+ * candidate has to know *before* being redirected: Paiement Pro settles cards
+ * through PayPal, which refuses most prepaid and virtual cards and many
+ * African-issued ones. Stripe takes them without complaint.
+ */
+export function cardProviderId(): PaymentProviderId {
+  return cardProvider().id;
+}
+
+/**
  * PayPal, through Paiement Pro's hosted page.
  *
  * Off unless `PAIEMENTPRO_PAYPAL=true`, independently of CARD_PROVIDER: the
