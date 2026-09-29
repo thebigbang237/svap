@@ -107,18 +107,27 @@ export function FinancialDossierForm({
       } | null = await res.json().catch(() => null);
 
       if (!res.ok) {
-        const fieldErrors = Object.entries(body?.errors ?? {});
-        if (fieldErrors.length > 0) {
-          for (const [field, messages] of fieldErrors) {
-            if (messages?.[0]) {
-              setError(field as FieldPath<FinancialDossierValues>, {
-                message: messages[0],
-              });
-            }
-          }
-        } else {
-          setBlocked(body?.error ?? "errors.server");
+        // Which fields this pack actually renders. A message attached to one
+        // it doesn't is a message nobody sees: the button spins, the page
+        // stays put, and the candidate writes to support saying "nothing
+        // happens" — which is precisely what a Lauréat experienced.
+        const visible = new Set<string>([
+          ...(requirement.requiresBankName
+            ? ["banqueEmettrice", "montantAtteste"]
+            : []),
+          ...(requirement.requiresFundsOrigin ? ["origineFonds"] : []),
+        ]);
+
+        let shown = false;
+        for (const [field, messages] of Object.entries(body?.errors ?? {})) {
+          if (!messages?.[0]) continue;
+          setError(field as FieldPath<FinancialDossierValues>, {
+            message: messages[0],
+          });
+          if (visible.has(field)) shown = true;
         }
+
+        if (!shown) setBlocked(body?.error ?? "errors.server");
         return;
       }
 

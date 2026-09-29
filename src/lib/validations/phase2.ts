@@ -163,7 +163,15 @@ export type CasierMetadataInput = z.infer<typeof casierMetadataSchema>;
  * comparison, which is where the judgement belongs.
  */
 const optionalText = (max: number) =>
-  z.string().trim().max(max, { error: "validation.tooLong" }).optional();
+  z
+    .string()
+    .trim()
+    .max(max, { error: "validation.tooLong" })
+    // `nullish`, not `optional`: this schema parses its own output. The browser
+    // validates with it, posts what came out, and the route validates that
+    // again — so anything the transform can produce has to be accepted on the
+    // way back in. See `attestedAmount`.
+    .nullish();
 
 /**
  * Accepts the string a number input produces *and* the number that survives a
@@ -173,9 +181,16 @@ const optionalText = (max: number) =>
 const attestedAmount = (required: boolean) =>
   z
     .union([z.string(), z.number()])
-    .optional()
+    // ⚠️ `nullish`, not `optional`. The transform below turns "nothing given"
+    // into `null`, the browser posts that, and the route parses the same
+    // schema again — so `null` must be valid INPUT as well as output. With
+    // `optional()` it was not, and a Lauréat, whose pack renders none of these
+    // fields, posted `montantAtteste: null` and got a 400 for a field that
+    // wasn't on their screen. The form appeared to do nothing when they
+    // pressed Continue, and no Lauréat could finish Étape 5.
+    .nullish()
     .transform((value) => {
-      if (value === undefined) return null;
+      if (value === undefined || value === null) return null;
       const trimmed = typeof value === "string" ? value.trim() : value;
       return trimmed === "" ? null : Number(trimmed);
     })
