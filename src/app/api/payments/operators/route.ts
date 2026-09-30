@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { readSession } from "@/lib/access-code/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { loadPhase2Progress } from "@/lib/phase2/steps";
-import { listOperators, predictProvider } from "@/lib/payments/pawapay";
+import { predictProvider } from "@/lib/payments/pawapay";
+import { providerFor } from "@/lib/payments/registry";
 import { COUNTRIES, type Country } from "@/lib/constants/program";
 
 /**
@@ -34,11 +35,16 @@ export async function GET() {
     return NextResponse.json({ operators: [] });
   }
 
+  // Asked of whichever rail serves this country — pawaPay for Cameroun and
+  // Kenya, SasPay for Ghana — rather than of pawaPay always.
+  const provider = providerFor(stored as Country, "mobile_money");
+  if (!provider?.listOperators) return NextResponse.json({ operators: [] });
+
   try {
-    const listing = await listOperators(stored as Country);
+    const listing = await provider.listOperators(stored as Country);
     return NextResponse.json(listing);
   } catch (error) {
-    // A pawaPay outage shouldn't blank the payment step — the card path is
+    // A provider outage shouldn't blank the payment step — the card path is
     // still available, and the UI falls back to showing only that.
     console.error(
       "Failed to list mobile money operators:",
@@ -78,6 +84,11 @@ export async function POST(request: Request) {
   if (!(COUNTRIES as readonly string[]).includes(stored)) {
     return NextResponse.json({ valid: false });
   }
+
+  // Prediction is pawaPay's; SasPay has no equivalent and normalises the
+  // number its own side, so there the field is simply accepted as typed.
+  const provider = providerFor(stored as Country, "mobile_money");
+  if (provider?.id !== "pawapay") return NextResponse.json({ valid: true });
 
   try {
     const predicted = await predictProvider(body.phone, stored as Country);

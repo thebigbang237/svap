@@ -7,6 +7,7 @@ import { routing } from "@/i18n/routing";
 
 const KNOWN: PaymentProviderId[] = [
   "pawapay",
+  "saspay",
   "stripe",
   "paiementpro",
   "flutterwave",

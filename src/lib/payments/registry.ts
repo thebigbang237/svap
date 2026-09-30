@@ -1,6 +1,7 @@
 import "server-only";
 import { COUNTRY_PAYMENT, type Country } from "@/lib/constants/program";
 import { pawapayProvider } from "./pawapay";
+import { saspayProvider } from "./saspay";
 import { stripeProvider } from "./stripe";
 import { paiementproProvider } from "./paiementpro";
 import { convertUsd, moneyIn, roundLocal, usdOnly } from "./fx";
@@ -68,7 +69,16 @@ export function providerFor(
   method: PaymentMethod,
 ): PaymentProvider | null {
   if (method === "paypal") return paypalProvider();
-  const providers: PaymentProvider[] = [pawapayProvider, cardProvider()];
+
+  // SasPay first, and only for the countries it is configured for: pawaPay
+  // still claims Ghana as a network, but the wallet is not provisioned on that
+  // account, so it would route Ghanaian candidates into an empty operator list
+  // — the dead end a candidate wrote in about.
+  const providers: PaymentProvider[] = [
+    saspayProvider,
+    pawapayProvider,
+    cardProvider(),
+  ];
   return providers.find((p) => p.supports(country, method)) ?? null;
 }
 
@@ -158,6 +168,7 @@ export async function quoteFor(
 /** Every adapter, configured or not — see `cardProvider`. */
 const ALL_PROVIDERS: PaymentProvider[] = [
   pawapayProvider,
+  saspayProvider,
   stripeProvider,
   paiementproProvider,
 ];

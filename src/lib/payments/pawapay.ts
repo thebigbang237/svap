@@ -4,6 +4,9 @@ import { COUNTRY_PAYMENT, type Country } from "@/lib/constants/program";
 import { verifyPawapaySignature } from "./pawapay-signature";
 import {
   PaymentConfigError,
+  type MobileMoneyOperator,
+  type OperatorListing,
+  type PinPromptInstructions,
   type CheckoutInput,
   type CheckoutResult,
   type PaymentMethod,
@@ -26,6 +29,14 @@ import {
  * minutes later via callback. Nothing here can be resolved from the browser,
  * which is why `asynchronous` is true and the UI polls `getStatus`.
  */
+
+// Re-exported: these moved to ./types so every rail can describe its
+// operators, not just this one.
+export type {
+  MobileMoneyOperator,
+  OperatorListing,
+  PinPromptInstructions,
+} from "./types";
 
 const SANDBOX_BASE = "https://api.sandbox.pawapay.io";
 const LIVE_BASE = "https://api.pawapay.io";
@@ -141,53 +152,6 @@ async function pawapayFetch(
 // ---------------------------------------------------------------------------
 // Operator discovery
 // ---------------------------------------------------------------------------
-
-export interface MobileMoneyOperator {
-  /** e.g. "MTN_MOMO_CMR" — goes into the deposit payload verbatim. */
-  provider: string;
-  /** e.g. "MTN" — the operator, as the payer knows it. */
-  displayName: string;
-  /**
-   * The merchant name that appears on the PIN prompt, e.g. "PAWAPAY".
-   *
-   * NOT a label for the operator picker — an earlier version used it as one,
-   * which showed every operator as "PAWAPAY" instead of MTN/Orange. Its actual
-   * job is the waiting screen: telling the payer which name to expect on the
-   * prompt is what stops a genuine request looking like a scam.
-   */
-  nameDisplayedToCustomer?: string;
-  /** Operator logo served by pawaPay, so a newly-enabled operator needs no asset work. */
-  logo?: string;
-  currency: string;
-  minAmount?: string;
-  maxAmount?: string;
-  /** NONE | TWO_PLACES — some rails reject fractional amounts outright. */
-  decimalsInAmount?: string;
-  /** OPERATIONAL | DELAYED | CLOSED */
-  status?: string;
-  /** PROVIDER_AUTH (PIN prompt) | PREAUTH | REDIRECT_AUTH */
-  authType?: string;
-  /** AUTOMATIC — prompt arrives by itself; MANUAL — the payer must dial in. */
-  pinPrompt?: string;
-  pinPromptRevivable?: boolean;
-  /** Localised, step-by-step instructions for raising the PIN prompt. */
-  pinPromptInstructions?: PinPromptInstructions;
-}
-
-export interface PinPromptInstructions {
-  channels?: {
-    type?: string;
-    displayName?: Record<string, string>;
-    quickLink?: string;
-    instructions?: Record<string, { text?: string }[]>;
-  }[];
-}
-
-export interface OperatorListing {
-  /** Country calling code, shown in front of the phone input. */
-  prefix?: string;
-  operators: MobileMoneyOperator[];
-}
 
 /**
  * Which operators can actually take a deposit in this country, right now.
@@ -440,8 +404,14 @@ export const pawapayProvider: PaymentProvider = {
   id: "pawapay",
 
   supports(country: Country, method: PaymentMethod) {
+    // Still claims Ghana: pawaPay covers it as a network, the wallet simply
+    // isn't provisioned on this account. `providerFor` asks SasPay first, so
+    // this only applies if SasPay is unconfigured — in which case a Ghanaian
+    // sees the same empty operator list as before rather than nothing at all.
     return method === "mobile_money" && COUNTRY_PAYMENT[country].mobileMoney;
   },
+
+  listOperators,
 
   // The depositId. Generated here and persisted by the caller BEFORE the
   // deposit is initiated — see PaymentProvider.newReference.

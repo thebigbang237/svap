@@ -8,7 +8,6 @@ import { quoteFor, providerFor } from "@/lib/payments/registry";
 import { createPaymentRecord, markPaymentFailed } from "@/lib/payments/record";
 import { PaymentConfigError } from "@/lib/payments/types";
 import {
-  listOperators,
   predictProvider,
   formatAmountForOperator,
   PawapayIndeterminate,
@@ -113,7 +112,7 @@ export async function POST(request: Request) {
   // -------------------------------------------------------------------------
   // Mobile money: everything that can be validated before the money moves
   // -------------------------------------------------------------------------
-  // pawaPay documents each of these as an avoidable rejection. Catching them
+  // Each of these is an avoidable rejection the rail documents. Catching them
   // here costs one or two API calls; catching them after initiation costs the
   // candidate a failed payment on a page they had already committed to.
   let msisdn = parsed.data.phone;
@@ -122,7 +121,7 @@ export async function POST(request: Request) {
   if (parsed.data.method === "mobile_money") {
     let operators;
     try {
-      operators = (await listOperators(country)).operators;
+      operators = (await provider.listOperators?.(country))?.operators ?? [];
     } catch (error) {
       console.error("Operator lookup failed at checkout:", (error as Error).message);
       return NextResponse.json({ error: "errors.checkoutFailed" }, { status: 502 });
@@ -138,38 +137,40 @@ export async function POST(request: Request) {
       );
     }
 
-    // Sanitise the number into the MSISDN pawaPay expects, and reject a
-    // malformed one before it becomes an INVALID_PHONE_NUMBER rejection.
-    try {
-      const predicted = await predictProvider(parsed.data.phone!, country);
-      if (!predicted) {
-        return NextResponse.json({ error: "errors.phoneInvalid" }, { status: 400 });
+    // The rest is pawaPay's: it wants a sanitised MSISDN, refuses fractional
+    // amounts on some operators and enforces per-wallet limits. SasPay
+    // normalises the number itself and takes a plain decimal string, so
+    // imposing pawaPay's shaping on it would reject numbers it accepts.
+    if (provider.id === "pawapay") {
+      try {
+        const predicted = await predictProvider(parsed.data.phone!, country);
+        if (!predicted) {
+          return NextResponse.json({ error: "errors.phoneInvalid" }, { status: 400 });
+        }
+        msisdn = predicted.phoneNumber;
+      } catch (error) {
+        // Validation being unavailable must not block the payment — send the
+        // digits as typed and let pawaPay have the final say.
+        console.error("predict-provider unavailable:", (error as Error).message);
       }
-      msisdn = predicted.phoneNumber;
-    } catch (error) {
-      // Validation being unavailable must not block the payment — send the
-      // digits as typed and let pawaPay have the final say.
-      console.error("predict-provider unavailable:", (error as Error).message);
-    }
 
-    // Decimal support and wallet limits vary per operator, and both are known
-    // up front.
-    const shaped = formatAmountForOperator(quote.money.amountLocal, operator);
-    if ("error" in shaped) {
-      console.error(
-        `Fee ${quote.money.amountLocal} ${quote.money.currency} is ${shaped.error} for ${operator.provider} (limit ${shaped.limit}).`,
-      );
-      return NextResponse.json(
-        {
-          error:
-            shaped.error === "too_small"
-              ? "errors.amountTooSmall"
-              : "errors.amountTooLarge",
-        },
-        { status: 409 },
-      );
+      const shaped = formatAmountForOperator(quote.money.amountLocal, operator);
+      if ("error" in shaped) {
+        console.error(
+          `Fee ${quote.money.amountLocal} ${quote.money.currency} is ${shaped.error} for ${operator.provider} (limit ${shaped.limit}).`,
+        );
+        return NextResponse.json(
+          {
+            error:
+              shaped.error === "too_small"
+                ? "errors.amountTooSmall"
+                : "errors.amountTooLarge",
+          },
+          { status: 409 },
+        );
+      }
+      amountOverride = shaped.amount;
     }
-    amountOverride = shaped.amount;
   }
 
   // -------------------------------------------------------------------------

@@ -12,6 +12,8 @@ import type { Country } from "@/lib/constants/program";
 
 export type PaymentProviderId =
   | "pawapay"
+  // Mobile money in Ghana, where pawaPay could not provision a wallet.
+  | "saspay"
   | "stripe"
   | "paiementpro"
   | "flutterwave";
@@ -119,11 +121,68 @@ export interface RefundResult {
   reason?: string;
 }
 
+export interface MobileMoneyOperator {
+  /** e.g. "MTN_MOMO_CMR" — goes into the deposit payload verbatim. */
+  provider: string;
+  /** e.g. "MTN" — the operator, as the payer knows it. */
+  displayName: string;
+  /**
+   * The merchant name that appears on the PIN prompt, e.g. "PAWAPAY".
+   *
+   * NOT a label for the operator picker — an earlier version used it as one,
+   * which showed every operator as "PAWAPAY" instead of MTN/Orange. Its actual
+   * job is the waiting screen: telling the payer which name to expect on the
+   * prompt is what stops a genuine request looking like a scam.
+   */
+  nameDisplayedToCustomer?: string;
+  /** Operator logo served by pawaPay, so a newly-enabled operator needs no asset work. */
+  logo?: string;
+  currency: string;
+  minAmount?: string;
+  maxAmount?: string;
+  /** NONE | TWO_PLACES — some rails reject fractional amounts outright. */
+  decimalsInAmount?: string;
+  /** OPERATIONAL | DELAYED | CLOSED */
+  status?: string;
+  /** PROVIDER_AUTH (PIN prompt) | PREAUTH | REDIRECT_AUTH */
+  authType?: string;
+  /** AUTOMATIC — prompt arrives by itself; MANUAL — the payer must dial in. */
+  pinPrompt?: string;
+  pinPromptRevivable?: boolean;
+  /** Localised, step-by-step instructions for raising the PIN prompt. */
+  pinPromptInstructions?: PinPromptInstructions;
+}
+
+export interface PinPromptInstructions {
+  channels?: {
+    type?: string;
+    displayName?: Record<string, string>;
+    quickLink?: string;
+    instructions?: Record<string, { text?: string }[]>;
+  }[];
+}
+
+export interface OperatorListing {
+  /** Country calling code, shown in front of the phone input. */
+  prefix?: string;
+  operators: MobileMoneyOperator[];
+}
+
 export interface PaymentProvider {
   readonly id: PaymentProviderId;
 
   /** Can this provider take this method in this country? */
   supports(country: Country, method: PaymentMethod): boolean;
+
+  /**
+   * Mobile-money operators this provider can collect through, right now.
+   *
+   * Asked of the provider rather than hard-coded, because the answer is
+   * account configuration: an operator down for maintenance, or a market not
+   * yet enabled, must not be offered. Absent on card rails, which have no
+   * operator to choose.
+   */
+  listOperators?(country: Country): Promise<OperatorListing>;
 
   /**
    * The only currency this provider's hosted page (card, PayPal) can charge
