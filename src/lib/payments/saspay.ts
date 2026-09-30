@@ -95,16 +95,47 @@ function unwrap<T>(body: unknown): T {
   return body as T;
 }
 
-/** Their error text, from wherever this particular endpoint put it. */
+/**
+ * Their error text, from wherever this particular endpoint put it.
+ *
+ * Three shapes seen in the wild, and the reason each is handled: a routing
+ * refusal is `{ message, code }` with codes like `invalid_method` or
+ * `no_route_available`; a field rejection is
+ * `{ success: false, error: { amount: ["Le montant minimum est de 5 GHS."] } }`;
+ * and some endpoints wrap either in `data`. Reading only `message` turned a
+ * perfectly clear "minimum 5 GHS" into "no detail" — which is how a support
+ * ticket gets written about a limit the response already named.
+ */
 function errorText(body: unknown): string {
-  const outer = (body ?? {}) as { message?: string; code?: string };
+  const outer = (body ?? {}) as {
+    message?: string;
+    code?: string | number;
+    error?: unknown;
+  };
   const inner = (unwrap<{ message?: string; code?: string }>(body) ?? {}) as {
     message?: string;
     code?: string;
   };
-  const code = outer.code ?? inner.code;
-  const message = outer.message ?? inner.message;
-  return [code, message].filter(Boolean).join(": ") || "no detail";
+
+  const fields =
+    outer.error && typeof outer.error === "object"
+      ? Object.entries(outer.error as Record<string, unknown>)
+          .map(([field, messages]) => {
+            const text = Array.isArray(messages)
+              ? messages.join(" ")
+              : String(messages);
+            return `${field}: ${text}`;
+          })
+          .join("; ")
+      : typeof outer.error === "string"
+        ? outer.error
+        : "";
+
+  return (
+    [outer.code ?? inner.code, outer.message ?? inner.message, fields]
+      .filter(Boolean)
+      .join(" — ") || "no detail"
+  );
 }
 
 async function saspayFetch(
