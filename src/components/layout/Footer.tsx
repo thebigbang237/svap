@@ -122,7 +122,29 @@ export function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 md:col-span-12 md:flex-row">
-          <p className="text-xs text-sky-deep/50">{t("copyright")}</p>
+          <div className="flex flex-col items-center gap-1 md:items-start">
+            <p className="text-xs text-sky-deep/50">{t("copyright")}</p>
+            {/* Agency credit. A plain followed link on purpose: `nofollow` or
+                `sponsored` would tell search engines to pass no weight, which
+                is most of the point. `noreferrer` is left off too — it strips
+                the Referer header, and without it the agency cannot see this
+                site in its own referral analytics. `noopener` stays, since
+                that is the security half. */}
+            <p className="text-xs text-sky-deep/40">
+              {t.rich("credit", {
+                agency: (chunks) => (
+                  <a
+                    href="https://www.arbc-agency.com"
+                    target="_blank"
+                    rel="noopener"
+                    className="font-medium text-sky-deep/60 underline-offset-2 transition-colors hover:text-white hover:underline"
+                  >
+                    {chunks}
+                  </a>
+                ),
+              })}
+            </p>
+          </div>
           <div className="flex flex-wrap justify-center gap-6 text-xs text-sky-deep/50">
             {legal.map((link) => (
               <Link
