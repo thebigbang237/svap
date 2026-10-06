@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/supabase/require-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { recordAudit } from "@/lib/admin/audit";
@@ -79,6 +80,16 @@ export async function POST(request: Request) {
     request,
     metadata: { mediaName: data.media_name, url: data.url },
   });
+
+/**
+ * The news page is cached for an hour (`revalidate` in
+ * app/[locale]/actualites/page.tsx). Without this, an article published here
+ * would not appear for up to that long, and the obvious fix — shortening the
+ * window — costs ISR writes around the clock to serve a change made a few
+ * times a season. The route pattern plus `type: "page"` refreshes all three
+ * locales at once.
+ */
+  revalidatePath("/[locale]/actualites", "page");
 
   return NextResponse.json({ success: true, article: data });
 }

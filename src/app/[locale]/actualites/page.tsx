@@ -14,11 +14,18 @@ import type { ArticleRow } from "@/lib/supabase/types";
  *
  * Revalidated rather than rendered per request: press coverage changes a few
  * times a season, and this is the only public page that reads the database.
- * Publishing an article shows up within the window below.
  */
 
-/** Fifteen minutes: news is not time-critical, and this keeps the page free. */
-export const revalidate = 900;
+/**
+ * An hour — but publishing does not wait for it.
+ *
+ * The admin write routes call `revalidatePath("/[locale]/actualites", "page")`
+ * on create, update and delete, so a new article is live immediately and this
+ * window only covers changes made outside the admin (straight in the
+ * database). Fifteen minutes cost four times the ISR writes for no benefit
+ * nobody could perceive.
+ */
+export const revalidate = 3600;
 
 export default async function ActualitesPage({
   params,
