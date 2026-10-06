@@ -19,8 +19,31 @@ import { TextField, errorClasses, labelClasses } from "./fields";
  * hammering the provider, and the timeout leaves them with a "check your
  * phone" message rather than a spinner that never stops.
  */
-const POLL_INTERVAL_MS = 4000;
+/**
+ * Polling cadence, as a schedule rather than one interval.
+ *
+ * Almost every payment resolves in the first half-minute: a PIN approved on
+ * the handset, or a card page finished. Polling every four seconds for five
+ * minutes served that minority at the cost of up to 75 server calls per
+ * attempt — each one a session check, a database read and a call to the
+ * provider. At the volume of a campaign chasing hundreds of candidates, that
+ * was a meaningful slice of the serverless CPU budget, spent re-asking a
+ * question whose answer rarely changes after the first minute.
+ *
+ * So: quick while it matters, slow afterwards.
+ */
+const POLL_SCHEDULE_MS = [
+  { until: 30_000, every: 3_000 },
+  { until: 90_000, every: 6_000 },
+  { until: Infinity, every: 12_000 },
+];
 const POLL_TIMEOUT_MS = 5 * 60 * 1000;
+
+function pollDelay(elapsedMs: number): number {
+  return (
+    POLL_SCHEDULE_MS.find((step) => elapsedMs < step.until)?.every ?? 12_000
+  );
+}
 
 type Phase = "choose" | "waiting" | "failed" | "timeout";
 
@@ -199,11 +222,16 @@ export function PaymentForm({
 
   const timers = useRef<{ poll?: number; timeout?: number }>({});
   const resumed = useRef(false);
+  /** The poll body, so the visibility listener can run it off-schedule. */
+  const pollNow = useRef<(() => Promise<void>) | null>(null);
+  /** Set while a wait is live, so the visibility listener knows to resume. */
+  const polling = useRef<{ paymentId: string; startedAt: number } | null>(null);
 
   const clearTimers = useCallback(() => {
-    if (timers.current.poll) window.clearInterval(timers.current.poll);
+    if (timers.current.poll) window.clearTimeout(timers.current.poll);
     if (timers.current.timeout) window.clearTimeout(timers.current.timeout);
     timers.current = {};
+    polling.current = null;
   }, []);
 
   useEffect(() => clearTimers, [clearTimers]);
@@ -212,9 +240,19 @@ export function PaymentForm({
     (paymentId: string) => {
       setPendingId(paymentId);
       setPhase("waiting");
+      polling.current = { paymentId, startedAt: Date.now() };
       window.setTimeout(() => setShowReviveHint(true), REVIVE_HINT_AFTER_MS);
 
-      timers.current.poll = window.setInterval(async () => {
+      const tick = async () => {
+        // Nothing to learn while the page is hidden, and this is exactly where
+        // a mobile-money payer goes: out of the browser, into the SIM menu, to
+        // approve the prompt. The visibility listener polls the moment they
+        // come back, so nothing is missed by staying quiet meanwhile.
+        if (typeof document !== "undefined" && document.hidden) {
+          schedule();
+          return;
+        }
+
         try {
           const res = await fetch(
             `/api/payments/status?paymentId=${encodeURIComponent(paymentId)}`,
@@ -225,15 +263,31 @@ export function PaymentForm({
           if (body?.status === "paye") {
             clearTimers();
             router.push("/documents/pieces");
-          } else if (body?.status === "echoue" || body?.status === "annule") {
+            return;
+          }
+          if (body?.status === "echoue" || body?.status === "annule") {
             clearTimers();
             setError(body.failureReason ?? "errors.paymentFailed");
             setPhase("failed");
+            return;
           }
         } catch {
           // A dropped poll is not a failed payment — the next tick retries.
         }
-      }, POLL_INTERVAL_MS);
+
+        schedule();
+      };
+
+      const schedule = () => {
+        if (!polling.current) return;
+        timers.current.poll = window.setTimeout(
+          tick,
+          pollDelay(Date.now() - polling.current.startedAt),
+        );
+      };
+
+      pollNow.current = tick;
+      schedule();
 
       timers.current.timeout = window.setTimeout(() => {
         clearTimers();
@@ -242,6 +296,23 @@ export function PaymentForm({
     },
     [clearTimers, router],
   );
+
+  /**
+   * Check immediately when the tab comes back to the front. Someone who just
+   * approved a PIN prompt returns to the browser expecting to have moved on,
+   * and waiting out the next tick to tell them is the wrong impression to give
+   * at the one moment they are watching.
+   */
+  useEffect(() => {
+    const onVisible = () => {
+      if (!document.hidden && polling.current && pollNow.current) {
+        window.clearTimeout(timers.current.poll);
+        void pollNow.current();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, []);
 
   // Pick up an in-flight payment on mount — declared after startPolling so it
   // can call it. Guarded with a ref rather than an empty dependency list so
