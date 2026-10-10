@@ -283,6 +283,40 @@ export async function markCandidaturePaid(
 }
 
 /**
+ * Closes the attempts a candidate abandoned on the way to paying.
+ *
+ * Someone who opens the card page, comes back, tries PayPal, comes back, then
+ * pays leaves three rows: one settled and two sitting at `en_cours` forever.
+ * Nothing re-reads them — the gateway has no record of a payment that never
+ * happened, and the reconciliation cron stops looking after 48 hours — so the
+ * admin shows a paid dossier alongside two payments that appear to be still
+ * running. That is not what happened, and it is the first thing someone asks
+ * about.
+ *
+ * Only ever touches rows that are still pending, and never the one that just
+ * settled.
+ */
+async function closeSupersededPayments(
+  supabase: AdminClient,
+  settled: PaymentRow,
+): Promise<void> {
+  const { error } = await supabase
+    .from("payments")
+    .update({
+      status: "annule",
+      failure_reason: `superseded: paid via ${settled.provider}/${settled.provider_ref}`,
+    })
+    .eq("candidature_id", settled.candidature_id)
+    .neq("id", settled.id)
+    .in("status", ["en_attente", "en_cours"]);
+
+  if (error) {
+    // Cosmetic next to the settlement itself, which has already happened.
+    console.error("Failed to close superseded payments:", error.message);
+  }
+}
+
+/**
  * What the payer actually saw leave their account.
  *
  * For Paiement Pro the CFA figure on the row is an instruction to their
@@ -318,6 +352,7 @@ export async function settlePayment(
   payment: PaymentRow,
 ): Promise<void> {
   await markCandidaturePaid(supabase, payment.candidature_id);
+  await closeSupersededPayments(supabase, payment);
 
   if (payment.receipt_sent_at) return;
 

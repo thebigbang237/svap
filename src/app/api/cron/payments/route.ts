@@ -138,12 +138,47 @@ async function reconcile() {
     }
   }
 
+  const expired = await expireAbandoned(supabase, giveUpBefore);
+
   const checked = pending?.length ?? 0;
   console.log(
-    `Cron payments run: checked=${checked} settled=${settled} failed=${failed} unresolved=${unresolved}`,
+    `Cron payments run: checked=${checked} settled=${settled} failed=${failed} unresolved=${unresolved} expired=${expired}`,
   );
 
-  return { checked, settled, failed, unresolved };
+  return { checked, settled, failed, unresolved, expired };
+}
+
+/**
+ * Closes out attempts nobody ever completed.
+ *
+ * Past the give-up window the loop above stops looking at a row, which left it
+ * sitting at `en_cours` for good: a candidate who opened a payment page and
+ * walked away is indistinguishable, in the admin, from one whose payment is
+ * still running. Two days is long enough to be sure — mobile-money prompts
+ * expire in minutes and hosted card sessions in an hour.
+ *
+ * Deliberately NOT marked `echoue`: nothing failed, nobody was refused. The
+ * candidate simply never paid, and the payment step is open to them again.
+ */
+async function expireAbandoned(
+  supabase: ReturnType<typeof createAdminClient>,
+  giveUpBefore: string,
+): Promise<number> {
+  const { data, error } = await supabase
+    .from("payments")
+    .update({
+      status: "annule",
+      failure_reason: `expired: no confirmation within ${GIVE_UP_AFTER_HOURS}h`,
+    })
+    .in("status", ["en_attente", "en_cours"])
+    .lt("created_at", giveUpBefore)
+    .select("id");
+
+  if (error) {
+    console.error("Failed to expire abandoned payments:", error.message);
+    return 0;
+  }
+  return data?.length ?? 0;
 }
 
 /**
