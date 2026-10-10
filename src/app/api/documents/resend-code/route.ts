@@ -32,6 +32,18 @@ const resendSchema = z.object({
  */
 const ACCEPTED = { success: true } as const;
 
+/** Escapes the LIKE wildcards so an address is matched literally. */
+function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, (char) => `\\${char}`);
+}
+
+/** "di…@gmail.com" — enough to recognise an address, not to harvest one. */
+function mask(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!domain) return "…";
+  return `${local.slice(0, 2)}…@${domain}`;
+}
+
 export async function POST(request: Request) {
   const json = await request.json().catch(() => null);
   const parsed = resendSchema.safeParse(json);
@@ -60,7 +72,14 @@ export async function POST(request: Request) {
   const { data: candidature } = await supabase
     .from("candidatures")
     .select("id, prenom, nom, email, locale, status")
-    .eq("email", parsed.data.email.toLowerCase())
+    // ⚠️ Case-insensitive, and it has to be: Phase 1 stores the address
+    // exactly as typed — which is why the uniqueness index is on
+    // `lower(email)` — so an exact match missed every candidate who
+    // capitalised anything. They got the same "a code has been sent"
+    // confirmation as everyone else, and no email, with nothing in the logs.
+    // `_` and `%` are legal in a local part, so they are escaped rather than
+    // left to act as wildcards.
+    .ilike("email", escapeLikePattern(parsed.data.email))
     .maybeSingle<
       Pick<
         CandidatureRow,
@@ -71,20 +90,45 @@ export async function POST(request: Request) {
   // Every early return below is deliberately indistinguishable from success
   // to the caller; the attempt log is where the difference is recorded.
   if (!candidature) {
+    // The response stays identical either way; the reason belongs in the log,
+    // or a resend that quietly does nothing is undiagnosable. The address is
+    // masked — this line is about which branch was taken, not who asked.
+    console.warn(`Resend refused: no candidature for ${mask(parsed.data.email)}`);
     await logAttempt(supabase, ctx, false);
     return NextResponse.json(ACCEPTED);
   }
 
   if (!fullNameMatches(parsed.data.fullName, candidature)) {
+    console.warn(`Resend refused: name mismatch on candidature ${candidature.id}`);
     await logAttempt(supabase, ctx, false);
     return NextResponse.json(ACCEPTED);
   }
 
-  // Only dossiers that legitimately hold a code. A candidate who was never
-  // pre-selected must not be able to conjure one, and one already past the
-  // gate doesn't need another.
-  const RESENDABLE = ["code_envoye", "expire"];
+  // Only dossiers that legitimately hold a code: someone never pre-selected
+  // must not be able to conjure one.
+  //
+  // Phase-2 statuses are in here deliberately. They were not, and the result
+  // was the worst kind of dead end: a candidate halfway through their dossier
+  // who had lost the email got the same cheerful "a code has been sent"
+  // confirmation and no email, because this list stopped at the gate they had
+  // already walked through. They are the people most likely to be asking.
+  // Verifying name and email again reveals nothing a resend to the address on
+  // file could expose.
+  //
+  // `rejete` is left out: a decided dossier is read-only and the decision
+  // reaches them by email, so a fresh code offers nothing to do.
+  const RESENDABLE = [
+    "code_envoye",
+    "expire",
+    "phase2_en_cours",
+    "phase2_paye",
+    "verification",
+    "valide",
+  ];
   if (!RESENDABLE.includes(candidature.status)) {
+    console.warn(
+      `Resend refused: candidature ${candidature.id} is ${candidature.status}`,
+    );
     await logAttempt(supabase, ctx, false);
     return NextResponse.json(ACCEPTED);
   }

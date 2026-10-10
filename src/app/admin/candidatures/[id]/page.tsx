@@ -6,6 +6,7 @@ import { CandidatureReviewForm } from "@/components/admin/CandidatureReviewForm"
 import { RiskScorePanel } from "@/components/admin/RiskScorePanel";
 import { DocumentViewer } from "@/components/admin/DocumentViewer";
 import { PassportReveal } from "@/components/admin/PassportReveal";
+import { AccessCodeResend } from "@/components/admin/AccessCodeResend";
 import { PaymentsPanel } from "@/components/admin/PaymentsPanel";
 import { loadDossier, type FinancialView } from "@/lib/admin/dossier";
 import {
@@ -385,6 +386,12 @@ export default async function CandidatureDetailPage({
                 Le code est stocké haché et n&apos;est affichable nulle part.
                 Un renvoi génère un nouveau code et annule le précédent.
               </p>
+              {/* The only way to help a candidate whose name or email no
+                  longer matches what the public form checks against. */}
+              <AccessCodeResend
+                candidatureId={candidature.id}
+                email={candidature.email}
+              />
             </div>
           )}
         </div>
