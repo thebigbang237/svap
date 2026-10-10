@@ -19,12 +19,17 @@ const checkoutSchema = z.object({
   /** Required for mobile money; the prompt goes to this handset. */
   phone: z.string().trim().regex(/^[0-9+\s().-]{6,20}$/).optional(),
   /**
-   * Mobile money operator id from /api/payments/operators, e.g.
-   * "MTN_MOMO_CMR". pawaPay v2 carries the provider in the deposit payload,
-   * so the candidate has to pick it. Pattern-bounded rather than free text
-   * because it is forwarded to the provider verbatim.
+   * Mobile money operator id from /api/payments/operators, forwarded to the
+   * provider verbatim — hence a pattern rather than free text.
+   *
+   * ⚠️ Case matters, in both directions: pawaPay's codes are upper case
+   * ("MTN_MOMO_CMR"), SasPay's are lower ("mtn_gh"). This pattern allowed only
+   * the first, so every Ghanaian mobile-money payment was rejected here with
+   * "invalid request" — before any payment row existed, which is why the
+   * failure left no trace in the payments table and looked like SasPay being
+   * unconfigured. Keep both cases.
    */
-  operator: z.string().trim().regex(/^[A-Z0-9_]{3,40}$/).optional(),
+  operator: z.string().trim().regex(/^[A-Za-z0-9_]{3,40}$/).optional(),
 });
 
 export async function POST(request: Request) {
