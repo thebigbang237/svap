@@ -835,7 +835,7 @@
         "card": {
           "title": "Bank card",
           "description": "Visa or Mastercard. Secure payment — no card data is stored by the program.",
-          "caution": "Use a Visa or Mastercard issued by a bank. Prepaid and virtual cards are usually refused by the payment provider."
+          "caution": "Use a Visa or Mastercard issued by a bank — prepaid and virtual cards are usually refused. The payment page is operated by PayPal; no PayPal account is needed, but your bank may show a temporary verification hold of about $1, which is released automatically."
         },
         "paypal": {
           "title": "PayPal",

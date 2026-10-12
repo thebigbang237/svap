@@ -835,7 +835,7 @@
         "card": {
           "title": "Carte bancaire",
           "description": "Visa ou Mastercard. Paiement sécurisé, aucune donnée de carte n'est stockée par le programme.",
-          "caution": "Utilisez une carte Visa ou Mastercard émise par une banque. Les cartes prépayées et virtuelles sont généralement refusées par le prestataire de paiement."
+          "caution": "Utilisez une carte Visa ou Mastercard émise par une banque — les cartes prépayées et virtuelles sont généralement refusées. La page de paiement est opérée par PayPal ; aucun compte PayPal n'est nécessaire, mais votre banque peut afficher une autorisation temporaire d'environ 1 $, annulée automatiquement."
         },
         "paypal": {
           "title": "PayPal",
