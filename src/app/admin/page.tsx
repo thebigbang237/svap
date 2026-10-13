@@ -70,6 +70,7 @@ export default async function AdminDashboardPage() {
           </h2>
           <Link
             href="/admin/candidatures"
+            prefetch={false}
             className="text-xs font-semibold uppercase tracking-wide text-blue hover:underline"
           >
             Voir tout →
@@ -95,6 +96,7 @@ export default async function AdminDashboardPage() {
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/candidatures/${row.id}`}
+                      prefetch={false}
                       className="font-medium text-blue hover:underline"
                     >
                       {row.prenom} {row.nom}

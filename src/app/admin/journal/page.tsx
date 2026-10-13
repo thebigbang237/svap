@@ -94,6 +94,7 @@ export default async function AuditLogPage() {
                   {entry.entity_type === "candidature" && entry.entity_id ? (
                     <Link
                       href={`/admin/candidatures/${entry.entity_id}`}
+                      prefetch={false}
                       className="text-blue hover:underline"
                     >
                       {entry.entity_id.slice(0, 8)}

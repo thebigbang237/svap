@@ -73,6 +73,7 @@ export default async function CandidaturesListPage({
               <th className="px-4 py-3">
                 <Link
                   href={`/admin/candidatures?${sortParams.toString()}`}
+                  prefetch={false}
                   className="inline-flex items-center gap-1 hover:text-blue"
                 >
                   Date {filters.sort === "asc" ? "↑" : "↓"}
@@ -89,6 +90,7 @@ export default async function CandidaturesListPage({
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/candidatures/${row.id}`}
+                    prefetch={false}
                     className="font-medium text-blue hover:underline"
                   >
                     {row.prenom} {row.nom}

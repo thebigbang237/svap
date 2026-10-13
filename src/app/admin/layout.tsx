@@ -75,10 +75,15 @@ export default async function AdminLayout({
                 </span>
               </div>
               <nav className="flex flex-col gap-1 p-4">
+                {/* No admin link prefetches, here or in any table. Every
+                    admin route is dynamic, so each prefetch is a function
+                    invocation that re-runs the proxy's session check and
+                    this layout's — once per link in view, per page. */}
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
+                    prefetch={false}
                     className="px-3 py-2 text-sm font-medium text-ink-mid transition-colors hover:bg-sky-mid hover:text-blue"
                   >
                     {link.label}
