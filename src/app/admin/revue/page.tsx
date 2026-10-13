@@ -97,6 +97,7 @@ export default async function ReviewQueuePage() {
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/candidatures/${row.candidature_id}`}
+                    prefetch={false}
                     className="font-medium text-blue hover:underline"
                   >
                     {row.candidature!.prenom} {row.candidature!.nom}

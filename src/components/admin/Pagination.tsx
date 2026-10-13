@@ -30,6 +30,7 @@ export function Pagination({
         {page > 1 ? (
           <Link
             href={hrefForPage(page - 1)}
+            prefetch={false}
             className="border border-ink-dim/30 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-ink-mid hover:border-blue hover:text-blue"
           >
             Précédent
@@ -42,6 +43,7 @@ export function Pagination({
         {page < totalPages ? (
           <Link
             href={hrefForPage(page + 1)}
+            prefetch={false}
             className="border border-ink-dim/30 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-ink-mid hover:border-blue hover:text-blue"
           >
             Suivant

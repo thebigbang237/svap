@@ -110,6 +110,7 @@ export function ReconciliationTable({ rows }: { rows: PendingSettlement[] }) {
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/candidatures/${row.candidature_id}`}
+                    prefetch={false}
                     className="font-medium text-blue hover:underline"
                   >
                     {row.candidate

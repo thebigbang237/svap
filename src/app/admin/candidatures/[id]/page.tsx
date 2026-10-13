@@ -109,6 +109,7 @@ export default async function CandidatureDetailPage({
       <div>
         <Link
           href="/admin/candidatures"
+          prefetch={false}
           className="text-xs font-semibold uppercase tracking-wide text-blue hover:underline"
         >
           ← Retour aux candidatures
