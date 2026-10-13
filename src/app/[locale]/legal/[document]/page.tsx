@@ -37,6 +37,9 @@ export function generateStaticParams() {
   );
 }
 
+// An unknown document is a 404 without a render — see the locale layout.
+export const dynamicParams = false;
+
 interface Section {
   title: string;
   body?: string;

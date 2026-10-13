@@ -20,6 +20,12 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// Anything that isn't one of the locales above is a 404 without a render.
+// Left to the default, `/robots.txt`, `/wp-login.php`, `/.env` and every
+// other single-segment probe matched `[locale]`, skipped the proxy for having
+// a dot in it, and was server-rendered on demand just to reach notFound().
+export const dynamicParams = false;
+
 export async function generateMetadata({
   params,
 }: {
