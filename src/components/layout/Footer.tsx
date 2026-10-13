@@ -19,7 +19,10 @@ export function Footer() {
   const resources = [
     { href: "/faq", label: t("faq") },
     { href: "/confiance", label: t("confiance") },
-    { href: "/documents", label: t("documents") },
+    // Not prefetched: /documents reads the session cookie, which makes it the
+    // one dynamic route linked from the shared chrome. Every page whose footer
+    // scrolled into view would otherwise spend a function invocation on it.
+    { href: "/documents", label: t("documents"), prefetch: false },
   ];
 
   // §8 requires the privacy policy to be reachable from every page — the
@@ -85,6 +88,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
+                    prefetch={link.prefetch}
                     className="text-sky-deep/70 transition-colors hover:text-terracotta-light"
                   >
                     {link.label}
