@@ -90,8 +90,9 @@ async function handleAdminAuth(request: NextRequest) {
  * nothing and costs a function invocation on every page view, which on a
  * marketing site is nearly all of them.
  *
- * So locale-prefixed paths are excluded, and what is left is exactly the two
- * jobs that cannot be done anywhere else:
+ * So locale-prefixed paths are excluded — the bare `/fr`, `/en` and `/ar` home
+ * pages included, the most-visited URLs of all — and what is left is exactly
+ * the two jobs that cannot be done anywhere else:
  *
  *   • an unprefixed path (`/`, `/faq`, a pasted old link) → redirected to a
  *     locale by next-intl;
@@ -101,5 +102,5 @@ async function handleAdminAuth(request: NextRequest) {
  * anything with a file extension.
  */
 export const config = {
-  matcher: ["/((?!fr/|en/|ar/|api|_next|.*\\..*).*)"],
+  matcher: ["/((?!(?:fr|en|ar)(?:/|$)|api|_next|.*\\..*).*)"],
 };
